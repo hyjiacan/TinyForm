@@ -80,7 +80,7 @@ var form = $('#f1').mf({
 });
 ```
 
-### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/jquery.miniform/)** 吧
+### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/tinyform/)** 吧
 
 ## 选项/option
 **fieldSelector** String

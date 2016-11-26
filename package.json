@@ -4,7 +4,7 @@
     "description": "基于jQuery的WEB表单处理工具库",
     "keywords": "form",
     "homepage": "http://git.oschina.net/hyjiacan/TinyForm",
-    "example": "http://hyjiacan.oschina.io/TinyForm",
+    "example": "http://hyjiacan.oschina.io/tinyform",
     "bugs": "http://git.oschina.net/hyjiacan/TinyForm/issues",
     "repository": {
         "type": "git",
