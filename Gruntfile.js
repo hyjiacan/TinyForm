@@ -6,7 +6,7 @@ module.exports = function(grunt) {
         '\n * @示例: <%= pkg.example %>' +
         '\n * @许可协议: this lib under <%= pkg.license %> license' +
         '\n * @依赖: jQuery <%= pkg.dependencies.jQuery %>' +
-        '\n * @浏览器支持: 不支持IE8及更低版本' +
+        '\n * @浏览器支持: 不支持IE7及更低版本' +
         '\n * @QQ群: 187786345 (Javascript爱好者)' +
         '\n */\n';
         

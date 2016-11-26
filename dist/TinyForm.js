@@ -1,14 +1,15 @@
 /**
  * TinyForm 0.3.0 2016-11-26
- * @作者: hyjican
+ * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/TinyForm
  * @许可协议: this lib under MIT license
  * @依赖: jQuery >=1.8.0
- * @浏览器支持: 不支持IE8及更低版本
+ * @浏览器支持: 不支持IE7及更低版本
  * @QQ群: 187786345 (Javascript爱好者)
  */
 (function($, win) {
+    'use strict';
     /**
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
@@ -24,8 +25,18 @@
      */
     var STR_REQUIRED = '需要字符串';
 
+    /**
+     * 扩展的初始化方法数组，每个插件的初始化方法都会注册到这个数组中
+     */
     var extsetupfn = [];
+    /**
+     * 扩展的刷新方法数组，每个插件的刷新方法都会注册到这个数组中
+     */
     var extrefreshfn = [];
+    /**
+     * 存放所有表单的实例
+     */
+    var tinyformInstance = {};
 
     /**
      * 表单构造函数
@@ -35,12 +46,13 @@
      */
     function TinyForm(selector, option) {
         var $me = $(selector).first();
-        var instance = $me.data('_tinyform_instance_');
-        if(!instance || !(instance instanceof TinyForm)) {
-            instance = new TinyForm.prototype.setup($me, option);
-            $me.data('_tinyform_instance_', instance);
+        var id = $me.attr('data-tiny-id');
+        if(!id || !tinyformInstance.hasOwnProperty(id)) {
+            id = 'tiny' + Math.random().toString().substring(2);
+            $me.attr('data-tiny-id', id);
+            tinyformInstance[id] = new TinyForm.prototype.setup($me, option);
         }
-        return instance;
+        return tinyformInstance[id];
     }
 
     /**
@@ -60,7 +72,9 @@
                 // 失去焦点时自动验证
                 autoValidate: false,
                 // 是否在第一个验证失败时停止验证
-                stopOnFail: true
+                stopOnFail: true,
+                // 表单控件的选择器
+                fieldSelector: CONTROL_SELECTOR
             }, option);
             // 表单的DOM上下文
             me.context = formContainer;
@@ -151,7 +165,7 @@
             field.length = 0;
         });
 
-        fm.context.find(CONTROL_SELECTOR).each(function() {
+        fm.context.find(fm.option.fieldSelector).each(function() {
             var name = $.trim($(this).attr('name'));
             // 如果name为空，则跳过
             if(name === '') {
@@ -180,7 +194,12 @@
         });
     }
 })(jQuery, window);(function($, TF) {
+    'use strict';
     TF.extend({
+        setup: function() {
+            // 保存初始数据，用于重置
+            this.originData = this.getData();
+        },
         /**
          * 获取所有控件的值，返回对象
          * @param {String} fieldName 控件的name名称，如果指定了此参数，则只获取name=此值的控件的值
@@ -233,6 +252,44 @@
                 setFieldData(me, val, field);
             });
             return me;
+        },
+        /**
+         * 使用jQuery异步提交表单
+         * @param {Object} option Ajax参数项
+         * @returns {Object}  表单实例
+         */
+        submit: function(option) {
+            var me = this;
+            option = $.extend({
+                url: me.context.attr('action'),
+                type: me.context.attr('method') || 'post',
+                async: true,
+                data: {},
+                success: false,
+                error: false,
+                cache: false
+            }, option);
+
+            option.data = $.extend({}, option.data, me.getData());
+            if($.isFunction(me.option.beforeSubmit)) {
+                me.option.beforeSubmit.call(me, option);
+            }
+            $.ajax(option);
+
+            return me;
+        },
+
+        /**
+         * 重置表单所有项
+         * @returns {Object} 表单实例 
+         */
+        reset: function() {
+            if($.isFunction(this.context.get(0).reset)) {
+                this.context.get(0).reset();
+            } else {
+                this.setData(this.originData);
+            }
+            return this;
         }
     });
 
@@ -332,52 +389,7 @@
         return item.val();
     }
 })(jQuery, TinyForm);(function($, TF) {
-
-    TF.extend({
-        setup: function() {
-            // 保存初始数据，用于重置
-            this.originData = this.getData();
-        },
-        /**
-         * 使用jQuery异步提交表单
-         * @param {Object} option Ajax参数项
-         * @returns {Object}  表单实例
-         */
-        submit: function(option) {
-            var me = this;
-            option = $.extend({
-                url: me.context.attr('action'),
-                type: me.context.attr('method') || 'post',
-                async: true,
-                data: {},
-                success: false,
-                error: false,
-                cache: false
-            }, option);
-
-            option.data = $.extend({}, option.data, me.getData());
-            if($.isFunction(me.option.beforeSubmit)) {
-                me.option.beforeSubmit.call(me, option);
-            }
-            $.ajax(option);
-
-            return me;
-        },
-
-        /**
-         * 重置表单所有项
-         * @returns {Object} 表单实例 
-         */
-        reset: function() {
-            if($.isFunction(this.context.get(0).reset)) {
-                this.context.get(0).reset();
-            } else {
-                this.setData(this.originData);
-            }
-            return this;
-        }
-    });
-})(jQuery, TinyForm);(function($, TF) {
+    'use strict';
     /**
      * 验证规则定义，
      * 如果需要更多的规则，请直接添加到这里

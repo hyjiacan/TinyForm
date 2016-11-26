@@ -1,0 +1,453 @@
+<html>
+
+    <head>
+        <title>TinyForm-示例</title>
+        <meta charset="utf-8" />
+        <script src="http://cdn.bootcss.com/jquery/1.10.0/jquery.min.js"></script>
+        <script src="src/tinyform.core.js"></script>
+        <script src="src/tinyform.data.js"></script>
+        <script src="src/tinyform.validate.js"></script>
+        <script src="src/tinyform.submit.js"></script>
+        <style type="text/css">
+            html,
+            body {
+                background-color: #282828;
+                color: #fff;
+                font-size: 18px;
+                width: 1020px;
+                margin: 0 auto;
+            }
+            
+            h1 {
+                color: rgb(197, 72, 0);
+                padding-bottom: 6px;
+                border-bottom: 10px solid rgb(131, 35, 0);
+            }
+            
+            h3 {
+                color: rgb(197, 72, 0);
+                padding: 10px 0 3px 0;
+                border-bottom: 4px solid rgb(131, 35, 0);
+            }
+            
+            .left {
+                width: 600px;
+                float: left;
+                padding-bottom: 60px;
+            }
+            
+            .right {
+                width: 400px;
+                float: right;
+            }
+            
+            label {
+                display: inline-block;
+                width: 80px;
+                text-align: right;
+                float: left;
+                padding-right: 5px;
+                line-height: 24px;
+            }
+            
+            form>div {
+                min-height: 40px;
+                clear: both;
+                margin: 20px 0 10px 0;
+            }
+            
+            .quote,
+            textarea.code {
+                clear: both;
+                background-color: #424141;
+                color: #aaa;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: small;
+                display: block;
+            }
+            
+            .quote {
+                margin-top: 10px;
+            }
+            
+            textarea.code {
+                font-size: 0.8em;
+                color: #ccc;
+                resize: initial;
+                width: 100%;
+                border: none;
+                overflow: hidden;
+            }
+            
+            .buttons {
+                clear: both;
+            }
+            
+            .buttons>.code {
+                margin: 5px 0 20px 0;
+            }
+            
+            button {
+                background: #317629;
+                color: #fff;
+                border: none;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+            
+            button:hover {
+                background: #146D09;
+            }
+            
+            a,
+            a:visited,
+            a:link,
+            a:hover,
+            a:focus {
+                color: #B0B0B0;
+            }
+            
+            .notsupport {
+                background-color: #f00;
+                color: #fff;
+                text-align: center;
+                padding: 5px 10px;
+                margin: 10px 0;
+            }
+            
+            .outstand {
+                color: #FF0C00;
+                font-weight: bold;
+                font-size: 1.2em;
+                line-height: 40px;
+            }
+            
+            #f1 select,
+            #f1 input[type=text] {
+                width: 180px;
+            }
+            
+            .f2 {
+                margin: 20px 0;
+                border: 4px solid green;
+                padding: 10px;
+            }
+            
+            h1 small {
+                font-size: 14px;
+                color: #666;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="left">
+            <h1>
+			    TinyForm 示例
+			    <small>基于jQuery的WEB表单工具库</small>
+			</h1>
+            <div class="notsupport">
+                <del>IE7及更低版本IE浏览器</del>
+            </div>
+
+            <div class="quote outstand">
+                所有输出数据请按F12打开开发者控制台查看
+            </div>
+
+            <h3>无参数初始化</h3>
+
+            <textarea class="code">var form = $('#f1').mf();</textarea>
+
+            <h3>带参数初始化</h3>
+
+            <textarea class="code" data-target="1"></textarea>
+
+            <h3>表单	</h3>
+            <div id="f1" action="#">
+                <div>
+                    <label for="">用户名</label>
+                    <input type="text" name="username" data-rule="required" data-msg="有本事你写下你的名字" placeholder="不能为空" />
+                </div>
+                <div>
+                    <label for="">性别</label>
+                    <input type="radio" data-rule="required" name="gender" value="0" data-rule="required" data-msg="咋，你是人妖？" />男的
+                    <input type="radio" data-rule="required" name="gender" value="1" />女的
+                </div>
+                <div>
+                    <label for="">做啥的</label>
+                    <select name="job" id="">
+                        <option value="freedom">自由职业</option>
+                        <option value="it">IT玩家</option>
+                        <option value="code">码农</option>
+                        <option value="programmer">程序猿</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="">爱好</label>
+                    <select name="hobby" id="" multiple="multiple" data-rule="required">
+                        <option value="reading">看书</option>
+                        <option value="coding">写代码</option>
+                        <option value="traval">旅行</option>
+                        <option value="girl">妹子</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="">电话号码</label>
+                    <input type="text" name="phone" value="" data-rule="number" placeholder="只能是数字" />
+                </div>
+                <div>
+                    <label for="">英文名字</label>
+                    <input type="text" name="name-en" value="" data-rule="alpha" placeholder="只能是字母" />
+                </div>
+                <div>
+                    <label for="">邮箱</label>
+                    <input type="text" name="email" value="" data-rule="email" placeholder="只能输入邮箱" />
+                </div>
+                <div>
+                    <label for="">邮编</label>
+                    <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="请输入正确的6位数字" placeholder="只能输入6位数字" />
+                </div>
+                <div>
+                    <label for="">网址</label>
+                    <input type="text" name="website" value="" data-rule="site" placeholder="只能输入网址" />
+                </div>
+                <div>
+                    <label for="">签名</label>
+                    <input type="text" name="signature" value="" data-rule="length: 12" placeholder="至少要12个字符" />
+                </div>
+                <div>
+                    <label for="">备注</label>
+                    <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
+                </div>
+            </div>
+            <form action="" class="f2">
+                <p>这是另一个表单，用来测试实例共存</p>
+                <label for="">学校</label>
+                <select name="school">
+                    <option value="1">小学</option>
+                    <option value="2">中学</option>
+                    <option value="3">大学</option>
+                </select>
+            </form>
+            <h3>相关信息</h3>
+            <div>QQ群: 187786345</div>
+
+            <div>
+                <span>项目主页:</span>
+                <a href="http://www.hyjiacan.com/TinyForm/">http://www.hyjiacan.com/TinyForm/</a>
+            </div>
+            <div>
+                <span>源码:</span>
+                <a href="http://git.oschina.net/hyjiacan/TinyForm">http://git.oschina.net/hyjiacan/TinyForm</a>
+            </div>
+        </div>
+        <div class="right">
+            <h3>功能</h3>
+            <ul>
+                <li>支持实例化任何标签</li>
+                <li>获取表单控件对象</li>
+                <li>获取/设置表单控件的数据</li>
+                <li>验证表单控件的数据有有效性</li>
+                <li>异步提交表单</li>
+            </ul>
+
+            <h3>操作</h3>
+
+            <div class="buttons">
+                <select name="" id="fields"></select>
+                <button id="b1">获取某个控件的值</button>
+
+                <textarea class="code">var name = form.getData('username');</textarea>
+
+                <button id="b2">获取所有控件的值</button>
+                <textarea class="code">var formdata = form.getData();</textarea>
+
+                <button id="b3">获取"用户名"控件对象</button>
+                <textarea class="code">var field = form.getField('username');</textarea>
+
+                <button id="b4">获取"性别"控件对象</button>
+                <textarea class="code">var field = form.getField('gender');</textarea>
+
+                <button id="b5">获取所有控件对象</button>
+                <textarea class="code">var fields = form.getField();</textarea>
+
+                <button id="b6">设置"用户名"控件的值</button>
+                <textarea class="code">form.setData('hyjiacan', 'username');</textarea>
+
+                <button id="b7">设置"性别"控件的值</button>
+                <textarea class="code">form.setData(0, 'gender');</textarea>
+
+                <button id="b14">设置"爱好"的值</button>
+                <textarea class="code">var hobby = form.setData(['girl', 'coding'], 'hobby');</textarea>
+
+                <button id="b8">设置所有控件的值</button>
+                <textarea class="code">form.setData({
+	username: 'hyjiacan-data',
+	email: 'me@hyjiacan.com'
+});</textarea>
+                <button id="b9">重置表单</button>
+                <textarea class="code">form.reset();</textarea>
+
+                <button id="b10">验证"用户名"不为空</button>
+                <textarea class="code">form.validate('username');</textarea>
+
+                <button id="b13">验证备注长度</button>
+                <textarea class="code">form.validate('remark');</textarea>
+
+                <button id="b11">验证所有验证的控件</button>
+                <textarea class="code">form.validate();</textarea>
+
+                <button id="b12">提交表单，通过事件*beforeSubmit*修改请求参数</button>
+                <textarea class="code">// submit可以有参数，结构与jQuery的$.ajax参数一致
+form.submit();</textarea>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript" data-target="1">
+        var form = new TinyForm('#f1', {
+            autoValidate: true, // 是否在输入控件失去焦点时自动验证
+            stopOnFail: false, // 是否在第一次验证失败时停止验证
+            afterValidate: function(e) {
+                console.log('字段:' + e.field[0].attr('name'));
+                console.log('值:' + e.value);
+                console.log('结果:' + e.pass);
+                console.log('消息:' + e.msg);
+            },
+            beforeSubmit: function(ajaxOption) {
+                var data = ajaxOption.data || {};
+                data.addition = 'xxxxxxxxxxxxxx-fuck';
+                if(data.gender) {
+                    if(data.gender == '0') {
+                        data.gender = '男的';
+                    } else {
+                        data.gender = '女的';
+                    }
+                }
+            }
+        });
+
+        var f2 = new TinyForm('.f2');
+    </script>
+
+    <script type="text/javascript">
+        $(function() {
+            var scripts = $('script[data-target]');
+
+            function formatIndent(html) {
+                var lines = html.split('\n');
+                var data = [];
+                var offset = -1;
+                $.each(lines, function(index, line) {
+                    if('' == $.trim(line)) {
+                        return;
+                    }
+                    if(offset == -1) {
+                        offset = line.length - line.replace(/^\s*/, '').length;
+                    }
+
+                    if(line.length > offset) {
+                        line = line.substring(offset);
+                    }
+
+                    data.push(line);
+                });
+
+                return data.join('\n');
+            }
+
+            function getScript(item) {
+                var html = scripts.filter('[data-target=' + item + ']').html();
+                if(!html) {
+                    return;
+                }
+                return formatIndent(html);
+            }
+
+            $('#f1>div').each(function() {
+                var code = $('<textarea class="code">');
+                code.val(formatIndent($(this).html()));
+                $(this).append(code);
+            });
+
+            $('textarea.code').each(function() {
+                var me = $(this);
+                me.attr('readonly', 'readonly');
+                var target = me.attr('data-target');
+                if(target) {
+                    me.val(getScript(target));
+                }
+                me.height(me.get(0).scrollHeight);
+            });
+
+            var fields = form.getField();
+            for(var name in fields) {
+                var option = $('<option>');
+                option.val(name);
+                option.text($.trim(fields[name][0].prev().text()));
+                $('#fields').append(option);
+            }
+
+            $('#b1').click(function() {
+                var selected = $('#fields>option:selected');
+                console.log(selected.text() + ':' + form.getData(selected.val()));
+            });
+
+            $('#b2').click(function() {
+                console.log(form.getData());
+            });
+
+            $('#b3').click(function() {
+                console.log(form.getField('username'));
+            });
+
+            $('#b4').click(function() {
+                console.log(form.getField('gender'));
+            });
+
+            $('#b5').click(function() {
+                console.log(form.getField());
+            });
+
+            $('#b6').click(function() {
+                console.log(form.setData('hyjiacan', 'username'));
+            });
+
+            $('#b7').click(function() {
+                console.log(form.setData(0, 'gender'));
+            });
+
+            $('#b8').click(function() {
+                console.log(form.setData({
+                    username: 'hyjiacan-data',
+                    email: 'me@hyjiacan.com'
+                }));
+            });
+
+            $('#b9').click(function() {
+                console.log(form.reset());
+            });
+
+            $('#b10').click(function() {
+                console.log(form.validate('username'));
+            });
+
+            $('#b11').click(function() {
+                console.log(form.validate());
+            });
+
+            $('#b12').click(function() {
+                console.log(form.submit());
+            });
+
+            $('#b13').click(function() {
+                console.log(form.validate('remark'));
+            });
+
+            $('#b14').click(function() {
+                console.log(form.setData(['girl', 'coding'], 'hobby'));
+            });
+        });
+    </script>
+
+</html>

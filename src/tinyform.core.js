@@ -1,4 +1,5 @@
 (function($, win) {
+    'use strict';
     /**
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
