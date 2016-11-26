@@ -14,8 +14,18 @@
      */
     var STR_REQUIRED = '需要字符串';
 
+    /**
+     * 扩展的初始化方法数组，每个插件的初始化方法都会注册到这个数组中
+     */
     var extsetupfn = [];
+    /**
+     * 扩展的刷新方法数组，每个插件的刷新方法都会注册到这个数组中
+     */
     var extrefreshfn = [];
+    /**
+     * 存放所有表单的实例
+     */
+    var tinyformInstance = {};
 
     /**
      * 表单构造函数
@@ -25,12 +35,13 @@
      */
     function TinyForm(selector, option) {
         var $me = $(selector).first();
-        var instance = $me.data('_tinyform_instance_');
-        if(!instance || !(instance instanceof TinyForm)) {
-            instance = new TinyForm.prototype.setup($me, option);
-            $me.data('_tinyform_instance_', instance);
+        var id = $me.attr('data-tiny-id');
+        if(!id || !tinyformInstance.hasOwnProperty(id)) {
+            id = 'tiny' + Math.random().toString().substring(2);
+            $me.attr('data-tiny-id', id);
+            tinyformInstance[id] = new TinyForm.prototype.setup($me, option);
         }
-        return instance;
+        return tinyformInstance[id];
     }
 
     /**
@@ -50,7 +61,9 @@
                 // 失去焦点时自动验证
                 autoValidate: false,
                 // 是否在第一个验证失败时停止验证
-                stopOnFail: true
+                stopOnFail: true,
+                // 表单控件的选择器
+                fieldSelector: CONTROL_SELECTOR
             }, option);
             // 表单的DOM上下文
             me.context = formContainer;
@@ -141,7 +154,7 @@
             field.length = 0;
         });
 
-        fm.context.find(CONTROL_SELECTOR).each(function() {
+        fm.context.find(fm.option.fieldSelector).each(function() {
             var name = $.trim($(this).attr('name'));
             // 如果name为空，则跳过
             if(name === '') {
