@@ -1,9 +1,9 @@
 /**
- * tinyform 0.3.0 2016-11-28
- * @作者: 
+ * TinyForm 0.3.0 2016-11-28
+ * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
- * @许可协议: this lib under MIT license
+ * @许可协议: MIT
  * @依赖: jQuery 1.8.0及更高版本
  * @浏览器支持: 不支持IE7及更低版本
  * @QQ群: 187786345 (Javascript爱好者)

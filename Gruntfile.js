@@ -1,10 +1,10 @@
 module.exports = function(grunt) {
     var headerinfo = '/**' +
-        '\n * <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %>' +
-        '\n * @作者: <%= pkg.author.name %>' +
+        '\n * TinyForm <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %>' +
+        '\n * @作者: hyjiacan' +
         '\n * @源码: <%= pkg.repository.url %>' +
         '\n * @示例: <%= pkg.example %>' +
-        '\n * @许可协议: this lib under <%= pkg.license %> license' +
+        '\n * @许可协议: <%= pkg.license %>' +
         '\n * @依赖: jQuery 1.8.0及更高版本' +
         '\n * @浏览器支持: 不支持IE7及更低版本' +
         '\n * @QQ群: 187786345 (Javascript爱好者)' +
@@ -13,7 +13,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         jshint: {
-            files: ['src/*.js'],
+            files: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js'],
             options: {
                 globals: {
                     jQuery: true,
