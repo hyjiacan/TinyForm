@@ -217,3 +217,30 @@ var form = $('#f1').mf({
 	    data: 使用*getData()*取到的表单数据，在此指定时，参数会附加到参数里面
 	}
 	```
+
+## 扩展/Extend
+> TinyForm支持添加自定义功能扩展。
+
+```
+(function($, TinyForm){
+	TinyForm.extend({
+		setup: function(){
+			// 这里写初始化的代码
+		},
+		refresh:function(){
+			// 这里写刷新表单时的代码，对需要缓存的数据进行刷新操作
+		},
+		method2:function(){
+			// 扩展方法 method2
+		},
+		methodn:function(){
+			// 扩展方法 methodn
+		}
+	});
+})(jQuery, TinyForm);
+```
+这时候，就可以直接调用
+```
+form.method2();
+form.methodn();
+```
