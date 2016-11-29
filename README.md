@@ -57,9 +57,12 @@ TinyForm 是一个基于jQuery的WEB表单处理工具。他根据传入的*选�
 
 **js**
 ```
-var form = $('#f1').mf({
-	autoValidate: true, // 是否在输入控件失去焦点时自动验证
-	stopOnFail: false, // 是否在第一次验证失败时停止验证
+var form = new TinyForm('#f1', {
+	autoValidate: true, // 是否在输入控件失去焦点时自动验证，默认为false
+	stopOnFail: false, // 是否在第一次验证失败时停止验证，默认为true
+	storage: localStorage, // 使用的存储，可以设置  localStorage(默认)或sessionStorage
+	autoload: true, // 是否在初始化时加载存储的数据，默认为false
+	interval: 3000, // 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
 	afterValidate: function(e) {
 		console.log('字段:' + e.field[0].attr('name'));
 		console.log('值:' + e.value);
@@ -89,6 +92,9 @@ var form = $('#f1').mf({
 **autoValidate** Boolean
 > 是否在输入控件失去焦点时自动验证输入，默认为*false*
 
+**stopOnFail** Boolean
+> 是否在第一个验证失败的时停止验证，默认为 *true*
+
 **afterValidate** Function( e: Object): Boolean
 > 验证后的回调函数，上下文this指向 *minifom* 对象。此回调在验证每个输入控件时都会调用
 > **e** 回调事件参数，结构如下：
@@ -106,8 +112,14 @@ var form = $('#f1').mf({
 > 异步提交表单前的回调函数，上下文this指向 *minifom* 对象。可以通过此函数改变提交的数据
 > **ajaxOption** 异步请求的数据对象
 
-**stopOnFail** Boolean
-> 是否在第一个验证失败的时停止验证，默认为 *true*
+**storage** Storage
+> 使用的存储，可以设置  *localStorage*(默认)或*sessionStorage*
+
+**autoload** Boolean
+> 是否在初始化时加载存储的数据，默认为*false*
+
+**interval** Number
+> 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
 
 ## 标签属性/Tag Attribute
 **data-rule**
@@ -217,6 +229,21 @@ var form = $('#f1').mf({
 	    data: 使用*getData()*取到的表单数据，在此指定时，参数会附加到参数里面
 	}
 	```
+
+**store(fn: Function)**: Object
+> 存储表单数据
+> **fn** 存储前的回调函数，用于在存储前处理数据，这个函数有一个参数**data**，是表单的数据，修改后的数据通过**return**返回
+> **return** 表单实例
+
+**load(fill: Boolean, fn: Function)**: Object
+> 读取存储的表单数据，读取后会自动加载到表单
+> **fill**是否在读取数据后自动将数据填充到表单中。注意：如果填充，动作发生在回调后
+> **fn** 读取后的回调函数，用于在读取后处理数据，这个函数有一个参数**data**，是表单的数据，修改后的数据通过**return**返回
+> **return** 从存储读取的数据(没有被回调处理过)
+
+**abandon()**: Object
+> 读取存储的表单数据，然后清除存储的数据
+> **return** 从存储读取的数据
 
 ## 扩展/Extend
 > TinyForm支持添加自定义功能扩展。

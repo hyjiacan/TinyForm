@@ -13,7 +13,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         jshint: {
-            files: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js'],
+            files: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js', 'src/tinyform.storage.js'],
             options: {
                 globals: {
                     jQuery: true,

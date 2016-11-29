@@ -1,3 +1,6 @@
+/**
+ * TinyForm 数据读写组件，负责从表单控件读取值以及向其写入值
+ */
 (function($, TF) {
     'use strict';
     TF.extend({

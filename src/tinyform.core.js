@@ -1,3 +1,6 @@
+/**
+ * TinyForm 核心组件，提供form实例化以及表单控件获取功能
+ */
 (function($, win) {
     'use strict';
     /**

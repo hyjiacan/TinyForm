@@ -86,8 +86,17 @@ $(function() {
 
     $('#b8').click(function() {
         console.log(form.setData({
-            username: 'hyjiacan-data',
-            email: 'me@hyjiacan.com'
+            username: 'hyjiacan',
+            gender: 0,
+            job: 'code',
+            phone: '1222222222',
+            hobby: ['coding', 'reading', 'girl'],
+            'name-en': 'hyjiacan-en',
+            email: 'me@hyjiacan.com',
+            postcode: '610000',
+            website: 'http://www.hyjiacan.com',
+            signature: '没有签名',
+            remark: '几个字的备注'
         }));
     });
 
@@ -113,5 +122,16 @@ $(function() {
 
     $('#b14').click(function() {
         console.log(form.setData(['girl', 'coding'], 'hobby'));
+    });
+
+    $('#b15').click(function() {
+        console.log(form.store());
+    });
+    
+    $('#b16').click(function() {
+        console.log(form.load());
+    });
+     $('#b17').click(function() {
+        console.log(form.abandon());
     });
 });

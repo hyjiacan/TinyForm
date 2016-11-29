@@ -143,8 +143,17 @@
 
                 <button id="b8">设置所有控件的值</button>
                 <textarea class="code">form.setData({
-	username: 'hyjiacan-data',
-	email: 'me@hyjiacan.com'
+    username: 'hyjiacan',
+    gender: 0,
+    job: 'code',
+    hobby: ['coding', 'reading', 'girl'],
+    phone: '1222222222',
+    'name-en': 'hyjiacan-en',
+    email: 'me@hyjiacan.com',
+    postcode: '610000',
+    website: 'http://www.hyjiacan.com',
+    signature: '没有签名',
+    remark: '几个字的备注'
 });</textarea>
                 <button id="b9">重置表单</button>
                 <textarea class="code">form.reset();</textarea>
@@ -161,6 +170,16 @@
                 <button id="b12">提交表单，通过事件*beforeSubmit*修改请求参数</button>
                 <textarea class="code">// submit可以有参数，结构与jQuery的$.ajax参数一致
 form.submit();</textarea>
+
+                <button id="b15">保存表单数据到存储</button>
+                <textarea class="code">// 数据存储后，下次打开浏览器可以读取出来
+form.store();</textarea>
+
+                <button id="b16">刷新页面/重启浏览器从这里加载存储数据</button>
+                <textarea class="code">form.load();</textarea>
+
+                <button id="b17">清空这个表单的存储数据</button>
+                <textarea class="code">form.abandon();</textarea>
             </div>
 
             <h3>关于</h3>
@@ -198,6 +217,6 @@ form.submit();</textarea>
         var f2 = new TinyForm('.f2');
     </script>
 
-    <script type="text/javascript" src="example-resource/example.js" ></script>
+    <script type="text/javascript" src="example-resource/example.js"></script>
 
 </html>
