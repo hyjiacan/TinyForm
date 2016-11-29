@@ -1,0 +1,149 @@
+html,
+body {
+    color: #333;
+    font-size: 16px;
+    width: 1020px;
+    margin: 0 auto;
+    font-family: "微软雅黑";
+    color: #333;
+    .left {
+        width: 600px;
+        float: left;
+        padding-bottom: 60px;
+        .title {
+            color: #333;
+            padding-bottom: 6px;
+            border-bottom: 10px solid #CCC;
+            small {
+                font-size: 14px;
+                color: #666;
+            }
+        }
+        #f1 {
+            >div {
+                min-height: 40px;
+                clear: both;
+                margin: 20px 0 10px;
+                label {
+                    display: inline-block;
+                    float: left;
+                    padding-right: 5px;
+                    line-height: 24px;
+                }
+                select,
+                input[type=text] {
+                    width: 200px;
+                    border:1px solid #AAA;
+                }
+                label,
+                select,
+                input,
+                textarea:not(.code) {
+                    &:hover {
+                        border:1px solid #666666;
+                        &+.code {
+                            background-color: darken(#FAFAFA, 3%);
+                        }
+                    }
+                }
+            }
+        }
+        .f2 {
+            margin: 20px 0;
+            border: 4px solid #CCC;
+            padding: 10px;
+        }
+    }
+    .right {
+        width: 400px;
+        float: right;
+        .notsupport {
+            background-color: #f00;
+            color: #fff;
+            text-align: center;
+            padding: 5px 10px;
+            margin: 10px 0;
+        }
+        .outstand {
+            color: #FF0C00;
+            font-weight: bold;
+            font-size: 1em;
+            font-family: "黑体";
+            line-height: 40px;
+            text-align: center;
+            border-radius: 3px;
+        }
+        .features {
+            line-height: 28px;
+        }
+        .buttons {
+            clear: both;
+            button {
+                background: #F8F8F8;
+                color: #333;
+                border: 1px solid #CCC;
+                padding: 5px 10px;
+                cursor: pointer;
+                &:hover {
+                    background: #F0F0F0;
+                    border-color: #666666;
+                    &+.code {
+                        background-color: darken(#FAFAFA, 3%);
+                    }
+                }
+            }
+            >.code {
+                margin: 5px 0 20px;
+            }
+        }
+        a,
+        a:visited,
+        a:link,
+        a:hover,
+        a:focus {
+            color: #303030;
+        }
+    }
+    h3 {
+        color: #333;
+        padding: 10px 0 3px;
+        border-bottom: 4px solid #CCC;
+    }
+    textarea.code,
+    .quote {
+        clear: both;
+        background-color: #FAFAFA;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: small;
+        display: block;
+    }
+    .quote {
+        margin-top: 10px;
+        color: #333;
+    }
+    textarea.code {
+        font-family: 'Courier New';
+        font-size: 0.8em;
+        color: #6B6868;
+        resize: initial;
+        width: 100%;
+        border: none;
+        line-height: 28px;
+        overflow: hidden;
+        &:hover {
+            background-color: darken(#FAFAFA, 2%);
+        }
+    }
+    input[type=text],
+    input[type=password],
+    select {
+        min-height: 28px;
+        line-height: 28px;
+    }
+    input,
+    select,
+    textarea {
+        outline: none;
+    }
+}
