@@ -42,7 +42,7 @@
 
 			// 绑定事件 失去焦点时调用验证函数
 			if(me.option.autoValidate) {
-				$.each(this._cache.fields, function(name) {
+				$.each(this.getField(), function(name) {
 					bindValidateEvent(me, name);
 				});
 			}
@@ -78,7 +78,6 @@
 
 			if(arguments.length > 0) {
 				if(typeof fieldName !== 'string') {
-					console.error(STR_REQUIRED);
 					return false;
 				}
 				return validateField(me, fieldName);
@@ -118,7 +117,7 @@
 	 * @returns {} 没有返回值
 	 */
 	function bindValidateEvent(fm, fieldName) {
-		$.each(fm._cache.fields[fieldName], function(index, item) {
+		$.each(fm.getField(fieldName), function(index, item) {
 			item.blur(function() {
 				fm.validate(fieldName);
 			});
@@ -132,11 +131,9 @@
 	 */
 	function getAllRules(fm) {
 		// 清空原有的数据
-		$.each(fm._cache.rules, function(name) {
-			delete fm._cache.rules[name];
-		});
+		fm._cache.rules = {};
 
-		$.each(fm._cache.fields, function(name, field) {
+		$.each(fm.getField(), function(name, field) {
 			var rule = $.trim(field[0].attr(ATTRS.rule));
 			var msg = field[0].attr(ATTRS.msg);
 
@@ -222,7 +219,7 @@
 			}
 
 			if(lendef[0] === lendef[1]) {
-				alidation.rule = new RegExp('^.{' + lendef[0] + '}$', 'g');
+				validation.rule = new RegExp('^.{' + lendef[0] + '}$', 'g');
 				validation.msg = msg || '长度需要' + lendef[0] + '个字';
 
 				return validation;
@@ -246,11 +243,10 @@
 	function validateField(fm, fieldName) {
 		var field = fm.getField(fieldName);
 		if(field.length === 0) {
-			console.error(CONTROL_NOT_FOUND + f);
 			return false;
 		}
 
-		var rule = fm._cache.rules[fieldName];
+		var rule = fm.getRule(fieldName);
 		if(typeof rule === 'undefined' || rule === false) {
 			return true;
 		}

@@ -1,31 +1,30 @@
 {
-	"name": "tinyform",
-	"version": "0.3.0",
-	"description": "基于jQuery的WEB表单处理工具库，努力搞一个简单的表单工具",
-	"keywords": [
-		"form"
-	],
-	"homepage": "http://git.oschina.net/hyjiacan/TinyForm",
-	"example": "http://hyjiacan.oschina.io/tinyform",
-	"bugs": {
-		"url": "http://git.oschina.net/hyjiacan/TinyForm/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://git.oschina.net/hyjiacan/TinyForm.git"
-	},
-	"license": "MIT",
-	"author": "hyjiacan <dev@hyjiacan.com> (http://www.hyjiacan.com)",
-	"main": "Gruntfile.js",
-	"devDependencies": {},
-	"devDependencies": {
-		"grunt": "^1.0.1",
-		"grunt-contrib-concat": "^1.0.1",
-		"grunt-contrib-jshint": "^1.1.0",
-		"grunt-contrib-uglify": "^2.0.0",
-		"grunt-contrib-watch": "^1.0.0"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	}
+  "name": "tinyform",
+  "version": "0.3.2",
+  "description": "基于jQuery的WEB表单处理工具库，努力搞一个简单的表单工具",
+  "keywords": [
+    "form"
+  ],
+  "homepage": "http://git.oschina.net/hyjiacan/TinyForm",
+  "example": "http://hyjiacan.oschina.io/tinyform",
+  "bugs": {
+    "url": "http://git.oschina.net/hyjiacan/TinyForm/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.oschina.net/hyjiacan/TinyForm.git"
+  },
+  "license": "MIT",
+  "author": "hyjiacan <dev@hyjiacan.com> (http://www.hyjiacan.com)",
+  "main": "Gruntfile.js",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }

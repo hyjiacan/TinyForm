@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.3.0 2016-11-28
+ * TinyForm 0.3.2 2016-11-29
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -14,16 +14,6 @@
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
     var CONTROL_SELECTOR = 'input[name]:not([type=button][type=submit][type=reset]), select[name], textarea[name]';
-
-    /**
-     * 找不到控件时的提示消息
-     */
-    var CONTROL_NOT_FOUND = '找不到此控件: ';
-
-    /**
-     * 在需要字符串参数的地方，没有给字符串参数时输出这个消息
-     */
-    var STR_REQUIRED = '需要字符串';
 
     /**
      * 扩展的初始化方法数组，每个插件的初始化方法都会注册到这个数组中
@@ -51,6 +41,7 @@
             id = 'tiny' + Math.random().toString().substring(2);
             $me.attr('data-tiny-id', id);
             tinyformInstance[id] = new TinyForm.prototype.setup($me, option);
+            tinyformInstance[id].id = id;
         }
         return tinyformInstance[id];
     }
@@ -80,7 +71,7 @@
             me.context = formContainer;
 
             // 缓存对象
-            this._cache = {
+            me._cache = {
                 fields: {}
             };
 
@@ -104,12 +95,10 @@
                 return all;
             }
             if(typeof fieldName !== 'string') {
-                console.error(STR_REQUIRED);
                 return;
             }
             var field = all[fieldName];
             if(!all.hasOwnProperty(fieldName) || field.length === 0) {
-                console.error(CONTROL_NOT_FOUND + fieldName);
                 return [];
             }
             return field;
@@ -161,9 +150,7 @@
      */
     function getAllFields(fm) {
         // 清空原有的数据
-        $.each(fm._cache.fields, function(name, field) {
-            field.length = 0;
-        });
+        fm._cache.fields = {};
 
         fm.context.find(fm.option.fieldSelector).each(function() {
             var name = $.trim($(this).attr('name'));
@@ -198,7 +185,7 @@
     TF.extend({
         setup: function() {
             // 保存初始数据，用于重置
-            this.originData = this.getData();
+            this._oriData = this.getData();
         },
         /**
          * 获取所有控件的值，返回对象
@@ -208,186 +195,177 @@
         getData: function(fieldName) {
             var me = this;
 
-            if(arguments.length === 0) {
-                return getAllData(me);
-            }
+			if(arguments.length === 0) {
+				return getAllData(me);
+			}
+			if(typeof fieldName !== 'string') {
+				return;
+			}
+			return getFieldData(me, fieldName);
+		},
 
-            if(typeof fieldName !== 'string') {
-                console.error(STR_REQUIRED);
-                return;
-            }
-            return getFieldData(me, fieldName);
-        },
+		/**
+		 * 设置控件的值
+		 * @param {String|Object} data 要设置的值
+		 * @param {String} fieldName 控件的name名称，如果指定了此参数，则只设置name=此值的控件的值
+		 * @returns {Object}  表单实例
+		 */
+		setData: function(data, fieldName) {
+			var me = this;
+			if(arguments.length === 0) {
+				console.error('setData 需要至少1个参数');
+				return me;
+			}
 
-        /**
-         * 设置控件的值
-         * @param {String|Object} data 要设置的值
-         * @param {String} fieldName 控件的name名称，如果指定了此参数，则只设置name=此值的控件的值
-         * @returns {Object}  表单实例
-         */
-        setData: function(data, fieldName) {
-            var me = this;
-            if(arguments.length === 0) {
-                console.error('setData 需要至少1个参数');
-                return me;
-            }
+			if(arguments.length >= 2) {
+				if(typeof fieldName !== 'string') {
+					return me;
+				}
 
-            if(arguments.length >= 2) {
-                if(typeof fieldName !== 'string') {
-                    console.error(STR_REQUIRED);
-                    return me;
-                }
+				setFieldData(me, data, fieldName);
+				return me;
+			}
 
-                setFieldData(me, data, fieldName);
-                return me;
-            }
+			// 未指定参数，设置表单所有项
+			$.each(me.getField(), function(name, field) {
+				var val = data[name];
+				if(typeof val === 'undefined' || val === null) {
+					val = '';
+				}
 
-            // 未指定参数，设置表单所有项
-            $.each(me._cache.fields, function(name, field) {
-                var val = data[name];
-                if(typeof val === 'undefined' || val === null) {
-                    val = '';
-                }
+				setFieldData(me, val, field);
+			});
+			return me;
+		},
+		/**
+		 * 使用jQuery异步提交表单
+		 * @param {Object} option Ajax参数项
+		 * @returns {Object}  表单实例
+		 */
+		submit: function(option) {
+			var me = this;
+			option = $.extend({
+				url: me.context.attr('action'),
+				type: me.context.attr('method') || 'post',
+				async: true,
+				data: {},
+				success: false,
+				error: false,
+				cache: false
+			}, option);
 
-                setFieldData(me, val, field);
-            });
-            return me;
-        },
-        /**
-         * 使用jQuery异步提交表单
-         * @param {Object} option Ajax参数项
-         * @returns {Object}  表单实例
-         */
-        submit: function(option) {
-            var me = this;
-            option = $.extend({
-                url: me.context.attr('action'),
-                type: me.context.attr('method') || 'post',
-                async: true,
-                data: {},
-                success: false,
-                error: false,
-                cache: false
-            }, option);
+			option.data = $.extend({}, option.data, me.getData());
+			if($.isFunction(me.option.beforeSubmit)) {
+				me.option.beforeSubmit.call(me, option);
+			}
+			$.ajax(option);
 
-            option.data = $.extend({}, option.data, me.getData());
-            if($.isFunction(me.option.beforeSubmit)) {
-                me.option.beforeSubmit.call(me, option);
-            }
-            $.ajax(option);
+			return me;
+		},
 
-            return me;
-        },
+		/**
+		 * 重置表单所有项
+		 * @returns {Object} 表单实例 
+		 */
+		reset: function() {
+			if($.isFunction(this.context.get(0).reset)) {
+				this.context.get(0).reset();
+			} else {
+				this.setData(this._oriData);
+			}
+			return this;
+		}
+	});
 
-        /**
-         * 重置表单所有项
-         * @returns {Object} 表单实例 
-         */
-        reset: function() {
-            if($.isFunction(this.context.get(0).reset)) {
-                this.context.get(0).reset();
-            } else {
-                this.setData(this.originData);
-            }
-            return this;
-        }
-    });
+	/**
+	 * 设置某个控件的值
+	 * @param {Object} fm 表单实例
+	 * @param {String|Object} data 要设置的值
+	 * @param {String|Array} field 控件的name名称或对象数组
+	 */
+	function setFieldData(fm, data, field) {
+		if(!$.isArray(field)) {
+			field = fm.getField(field);
+			if(!$.isArray(field) || field.length === 0) {
+				return;
+			}
+		}
 
-    /**
-     * 设置某个控件的值
-     * @param {Object} fm 表单实例
-     * @param {String|Object} data 要设置的值
-     * @param {String|Array} field 控件的name名称或对象数组
-     */
-    function setFieldData(fm, data, field) {
-        if(!$.isArray(field)) {
-            field = fm.getField(field);
-            if(!$.isArray(field) || field.length === 0) {
-                console.error(CONTROL_NOT_FOUND + f);
-                return;
-            }
-        }
+		$.each(field, function(index, item) {
+			item = $(item);
+			if(!item.is('input')) {
+				item.val(data);
+				return;
+			}
 
-        $.each(field, function(index, item) {
-            item = $(item);
-            if(!item.is('input')) {
-                item.val(data);
-                return;
-            }
+			if(item.is('[type=radio]')) {
+				item.prop('checked', (item.val() || '').toString() === data.toString());
+			} else if(item.is('[type=checkbox]')) {
+				item.prop('checked', data);
+			} else {
+				item.val(data);
+			}
+		});
+	}
 
-            if(item.is('[type=radio]')) {
-                item.prop('checked', (item.val() || '').toString() === data.toString());
-            } else if(item.is('[type=checkbox]')) {
-                item.prop('checked', data);
-            } else {
-                item.val(data);
-            }
-        });
-    }
+	/**
+	 * 获取表单的所有数据
+	 * @param {Object} fm
+	 */
+	function getAllData(fm) {
+		var data = {};
+		$.each(fm.getField(), function(name, field) {
+			data[name] = getFieldData(fm, name);
+		});
+		return data;
+	}
 
-    /**
-     * 获取表单的所有数据
-     * @param {Object} fm
-     */
-    function getAllData(fm) {
-        var data = {};
-        $.each(fm._cache.fields, function(name, field) {
-            data[name] = getFieldData(fm, field);
-        });
-        return data;
-    }
+	/**
+	 * 设置某个控件的值
+	 * @param {Object} fm 表单实例
+	 * @param {String} fieldName 控件的name名称
+	 * @return {String} 控件的值
+	 */
+	function getFieldData(fm, fieldName) {
+		
+		var field = fm.getField(fieldName);
 
-    /**
-     * 设置某个控件的值
-     * @param {Object} fm 表单实例
-     * @param {String|Array} field 控件的name名称或对象数组
-     * @return {String} 控件的值
-     */
-    function getFieldData(fm, field) {
-        if(!$.isArray(field)) {
-            field = fm._cache.fields[field];
-            if(!$.isArray(field) || field.length === 0) {
-                console.error(CONTROL_NOT_FOUND + f);
-                return '';
-            }
-        }
+		if(field[0].is('input')) {
+			return getInputValue(field);
+		}
 
-        if(field[0].is('input')) {
-            return getInputValue(field);
-        }
+		if(field[0].is('select[multiple]')) {
+			return field[0].val() || [];
+		}
 
-        if(field[0].is('select[multiple]')) {
-            return field[0].val() || [];
-        }
+		return field[0].val();
+	}
 
-        return field[0].val();
-    }
+	/**
+	 * 获取input控件的值
+	 * @param {Array} field 控件数组
+	 * @return {Any} 控件的值
+	 */
+	function getInputValue(field) {
+		var value = '';
+		var item = field[0];
+		if(item.is('[type=radio]')) {
+			for(var i = 0; i < field.length; i++) {
+				item = field[i];
+				if(item.is(':checked')) {
+					value = item.val();
+					break;
+				}
+			}
+			return value;
+		}
 
-    /**
-     * 获取input控件的值
-     * @param {Array} field 控件数组
-     * @return {Any} 控件的值
-     */
-    function getInputValue(field) {
-        var value = '';
-        var item = field[0];
-        if(item.is('[type=radio]')) {
-            for(var i = 0; i < field.length; i++) {
-                item = field[i];
-                if(item.is(':checked')) {
-                    value = item.val();
-                    break;
-                }
-            }
-            return value;
-        }
+		if(item.is('[type=checkbox]')) {
+			return item.is(':checked');
+		}
 
-        if(item.is('[type=checkbox]')) {
-            return item.is(':checked');
-        }
-
-        return item.val();
-    }
+		return item.val();
+	}
 })(jQuery, TinyForm);(function($, TF) {
 	'use strict';
 	/**
@@ -432,7 +410,7 @@
 
 			// 绑定事件 失去焦点时调用验证函数
 			if(me.option.autoValidate) {
-				$.each(this._cache.fields, function(name) {
+				$.each(this.getField(), function(name) {
 					bindValidateEvent(me, name);
 				});
 			}
@@ -468,7 +446,6 @@
 
 			if(arguments.length > 0) {
 				if(typeof fieldName !== 'string') {
-					console.error(STR_REQUIRED);
 					return false;
 				}
 				return validateField(me, fieldName);
@@ -508,7 +485,7 @@
 	 * @returns {} 没有返回值
 	 */
 	function bindValidateEvent(fm, fieldName) {
-		$.each(fm._cache.fields[fieldName], function(index, item) {
+		$.each(fm.getField(fieldName), function(index, item) {
 			item.blur(function() {
 				fm.validate(fieldName);
 			});
@@ -522,11 +499,9 @@
 	 */
 	function getAllRules(fm) {
 		// 清空原有的数据
-		$.each(fm._cache.rules, function(name) {
-			delete fm._cache.rules[name];
-		});
+		fm._cache.rules = {};
 
-		$.each(fm._cache.fields, function(name, field) {
+		$.each(fm.getField(), function(name, field) {
 			var rule = $.trim(field[0].attr(ATTRS.rule));
 			var msg = field[0].attr(ATTRS.msg);
 
@@ -612,7 +587,7 @@
 			}
 
 			if(lendef[0] === lendef[1]) {
-				alidation.rule = new RegExp('^.{' + lendef[0] + '}$', 'g');
+				validation.rule = new RegExp('^.{' + lendef[0] + '}$', 'g');
 				validation.msg = msg || '长度需要' + lendef[0] + '个字';
 
 				return validation;
@@ -636,11 +611,10 @@
 	function validateField(fm, fieldName) {
 		var field = fm.getField(fieldName);
 		if(field.length === 0) {
-			console.error(CONTROL_NOT_FOUND + f);
 			return false;
 		}
 
-		var rule = fm._cache.rules[fieldName];
+		var rule = fm.getRule(fieldName);
 		if(typeof rule === 'undefined' || rule === false) {
 			return true;
 		}

@@ -18,8 +18,23 @@ module.exports = function(grunt) {
                 globals: {
                     jQuery: true,
                     console: true,
-                    window: true
-                }
+                    window: true,
+                    'TinyForm': true,
+                },
+                // 写完一行必须加个分号
+                asi: false,
+                // 不要在条件语句中赋值
+                boss: false,
+                // 语句块请使用{}包围
+                curly: true,
+                // 始终使用 === 和 !== 作比较
+                eqeqeq: true,
+                // 不想在程序中用 eval这种危险的东西
+                evil: false,
+                // 变量都应该先声明后使用
+                undef: true,
+                // 我想在代码里面使用严格模式
+                strict: true
             }
         },
         watch: {

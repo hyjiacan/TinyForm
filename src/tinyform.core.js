@@ -6,16 +6,6 @@
     var CONTROL_SELECTOR = 'input[name]:not([type=button][type=submit][type=reset]), select[name], textarea[name]';
 
     /**
-     * 找不到控件时的提示消息
-     */
-    var CONTROL_NOT_FOUND = '找不到此控件: ';
-
-    /**
-     * 在需要字符串参数的地方，没有给字符串参数时输出这个消息
-     */
-    var STR_REQUIRED = '需要字符串';
-
-    /**
      * 扩展的初始化方法数组，每个插件的初始化方法都会注册到这个数组中
      */
     var extsetupfn = [];
@@ -41,6 +31,7 @@
             id = 'tiny' + Math.random().toString().substring(2);
             $me.attr('data-tiny-id', id);
             tinyformInstance[id] = new TinyForm.prototype.setup($me, option);
+            tinyformInstance[id].id = id;
         }
         return tinyformInstance[id];
     }
@@ -70,7 +61,7 @@
             me.context = formContainer;
 
             // 缓存对象
-            this._cache = {
+            me._cache = {
                 fields: {}
             };
 
@@ -94,12 +85,10 @@
                 return all;
             }
             if(typeof fieldName !== 'string') {
-                console.error(STR_REQUIRED);
                 return;
             }
             var field = all[fieldName];
             if(!all.hasOwnProperty(fieldName) || field.length === 0) {
-                console.error(CONTROL_NOT_FOUND + fieldName);
                 return [];
             }
             return field;
@@ -151,9 +140,7 @@
      */
     function getAllFields(fm) {
         // 清空原有的数据
-        $.each(fm._cache.fields, function(name, field) {
-            field.length = 0;
-        });
+        fm._cache.fields = {};
 
         fm.context.find(fm.option.fieldSelector).each(function() {
             var name = $.trim($(this).attr('name'));
