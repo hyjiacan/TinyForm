@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.4.1 2016-11-30
+ * TinyForm 0.4.2 2016-11-30
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -386,7 +386,9 @@
                 // 初始化时自动加载存储数据
                 autoload: false,
                 // 自动保存存储数据周期（毫秒），为0时不自动保存
-                interval: 0
+                interval: 0,
+                // 保存数据后的回调函数
+                onstore: false,
             }, me.option);
 
             Object.defineProperty(this.option, 'uniquepath', {
@@ -399,7 +401,16 @@
                 me.load();
             }
 
-            autoSave(me);
+            if(!me.option.interval) {
+                return;
+            }
+
+            win.setInterval(function() {
+                me.store();
+                if($.isFunction(me.option.onstore)) {
+                    me.option.onstore.call(me);
+                }
+            }, parseInt(me.option.interval));
         },
         /**
          * 保存数据到缓存中
@@ -476,21 +487,6 @@
         }
 
         return path.join('_').replace(/[^0-9a-z_]/ig, '_').toUpperCase();
-    }
-
-    /**
-     * 根据配置自动保存数据到存储
-     * @param {Object} fm
-     */
-    function autoSave(fm) {
-        if(!fm.option.interval) {
-            return;
-        }
-
-        win.setInterval(function() {
-            fm.save();
-        }, parseInt(fm.option.interval));
-
     }
 })(window, jQuery, TinyForm);/**
  * TinyForm 数据校验组件

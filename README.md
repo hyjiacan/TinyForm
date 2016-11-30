@@ -85,7 +85,7 @@ var form = TinyForm('#f1', {
 
 ### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/tinyform/)** 吧
 
-## 选项/option
+## 选项/Option
 **fieldSelector** String
 > 自定义的表单控件选择器，用于选择表单控件。注：一定要包含*[name]*，否则会导致表单功能的异常
 
@@ -113,7 +113,7 @@ var form = TinyForm('#f1', {
 > **ajaxOption** 异步请求的数据对象
 
 **storage** Storage
-> 使用的存储，可以设置  *localStorage*(默认)或*sessionStorage*
+> 使用的存储，可以设置  *localStorage*(默认)或*sessionStorage*(当表单数据需要在浏览器关闭后就丢弃)
 
 **autoload** Boolean
 > 是否在初始化时加载存储的数据，默认为*false*
@@ -244,6 +244,12 @@ var form = TinyForm('#f1', {
 **abandon()**: Object
 > 读取存储的表单数据，然后清除存储的数据
 > **return** 从存储读取的数据
+
+## 属性/Property
+**context** 表单DOM上下文的jQuery对象，可以通过这个属性来访问DOM，如：
+    ```
+    var defaultbtn = form.context.find('input[type=button].default');
+    ```
 
 ## 扩展/Extend
 > TinyForm支持添加自定义功能扩展。
