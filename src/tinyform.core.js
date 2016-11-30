@@ -132,8 +132,6 @@
 
     /**
      * 搞一个全局的 TinyForm
-     * @param {} option 表单初始化参数，可选
-     * @returns {Object} 表单实例对象；当选择器为空时，返回 undefined 
      */
     win.TinyForm = TinyForm;
 

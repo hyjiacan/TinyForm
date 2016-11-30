@@ -19,7 +19,8 @@
 			</h1>
             <h3>无参数初始化</h3>
 
-            <textarea class="code">var form = new TinyForm('#f1');</textarea>
+            <textarea class="code">var form = TinyForm('#f1');
+            var f2 = TinyForm('.f2');</textarea>
 
             <h3>带参数初始化</h3>
 
@@ -193,7 +194,7 @@ form.store();</textarea>
         </div>
     </body>
     <script type="text/javascript" data-target="1">
-        var form = new TinyForm('#f1', {
+        var form = TinyForm('#f1', {
             autoValidate: true, // 是否在输入控件失去焦点时自动验证
             stopOnFail: false, // 是否在第一次验证失败时停止验证
             afterValidate: function(e) {
@@ -215,7 +216,7 @@ form.store();</textarea>
             }
         });
 
-        var f2 = new TinyForm('.f2');
+        var f2 = TinyForm('.f2');
     </script>
 
     <script type="text/javascript" src="example-resource/example.js"></script>

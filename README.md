@@ -57,7 +57,7 @@ TinyForm 是一个基于jQuery的WEB表单处理工具。他根据传入的*选�
 
 **js**
 ```
-var form = new TinyForm('#f1', {
+var form = TinyForm('#f1', {
 	autoValidate: true, // 是否在输入控件失去焦点时自动验证，默认为false
 	stopOnFail: false, // 是否在第一次验证失败时停止验证，默认为true
 	storage: localStorage, // 使用的存储，可以设置  localStorage(默认)或sessionStorage
