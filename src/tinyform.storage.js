@@ -70,11 +70,11 @@
             }
 
             if(fill) {
-                var temp;
                 if($.isFunction(fn)) {
-                    temp = fn.call(this, data);
+                    this.setData(fn.call(this, data));
+                } else {
+                    this.setData(data);
                 }
-                this.setData(data);
             }
 
             return data;
