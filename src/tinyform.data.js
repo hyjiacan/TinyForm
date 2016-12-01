@@ -43,7 +43,7 @@
                     return me;
                 }
 
-                setFieldData(me, data, fieldName);
+                setFieldData(me, data, me.getField(fieldName));
                 return me;
             }
 
@@ -102,14 +102,11 @@
      * 设置某个控件的值
      * @param {Object} fm 表单实例
      * @param {String|Object} data 要设置的值
-     * @param {String|Array} field 控件的name名称或对象数组
+     * @param {Array} field 控件对象数组
      */
-    function setFieldData(fm, data, field) {
-        if(!$.isArray(field)) {
-            field = fm.getField(field);
-            if(!$.isArray(field) || field.length === 0) {
-                return;
-            }
+    function setFieldData(fm, data, field) {        
+        if(!$.isArray(field) || field.length === 0) {
+            return;
         }
 
         $.each(field, function(index, item) {
@@ -135,7 +132,7 @@
      */
     function getAllData(fm) {
         var data = {};
-        $.each(fm.getField(), function(name, field) {
+        $.each(fm.getField(), function(name) {
             data[name] = getFieldData(fm, name);
         });
         return data;
