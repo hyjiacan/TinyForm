@@ -139,7 +139,12 @@ var form = TinyForm('#f1', {
 当有相同*name*的控件时，只读取第一个控件的*data-rule*和data-msg*
 
 ## 实例属性/Property
-**context** 表单的DOM上下文，这是一个指向实例化表单的DOM的jQuery对象，可以通过这个对象去操作表单表的DOM。
+**context**
+> 表单的DOM上下文，这是一个指向实例化表单的DOM的jQuery对象，可以通过这个对象去操作表单表的DOM。
+    ```
+    // 查找表单内的按钮
+    form.context.find('input[type=button]');
+    ```
 
 ## 方法/Method
 > 说明：除了获取数据类(包括验证)的函数，其它都会返回*miniform*的实例对象。
