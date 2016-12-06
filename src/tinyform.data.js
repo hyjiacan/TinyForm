@@ -104,13 +104,13 @@
      * @param {String|Object} data 要设置的值
      * @param {Array} field 控件对象数组
      */
-    function setFieldData(fm, data, field) {        
-        if(!$.isArray(field) || field.length === 0) {
+    function setFieldData(fm, data, field) {
+        if(field.length === 0) {
             return;
         }
 
-        $.each(field, function(index, item) {
-            item = $(item);
+        field.each(function() {
+            var item = $(this);
             if(!item.is('input')) {
                 item.val(data);
                 return;
@@ -119,7 +119,7 @@
             if(item.is('[type=radio]')) {
                 item.prop('checked', (item.val() || '').toString() === data.toString());
             } else if(item.is('[type=checkbox]')) {
-                item.prop('checked', data);
+                item.prop('checked', !!data);
             } else {
                 item.val(data);
             }
@@ -148,15 +148,15 @@
 
         var field = fm.getField(fieldName);
 
-        if(field[0].is('input')) {
+        if(field.is('input')) {
             return getInputValue(field);
         }
 
-        if(field[0].is('select[multiple]')) {
-            return field[0].val() || [];
+        if(field.is('select[multiple]')) {
+            return field.val() || [];
         }
 
-        return field[0].val();
+        return field.val();
     }
 
     /**
@@ -166,10 +166,10 @@
      */
     function getInputValue(field) {
         var value = '';
-        var item = field[0];
-        if(item.is('[type=radio]')) {
+        var item;
+        if(field.is('[type=radio]')) {
             for(var i = 0; i < field.length; i++) {
-                item = field[i];
+                item = field.eq(i);
                 if(item.is(':checked')) {
                     value = item.val();
                     break;
@@ -178,10 +178,10 @@
             return value;
         }
 
-        if(item.is('[type=checkbox]')) {
-            return item.is(':checked');
+        if(field.is('[type=checkbox]')) {
+            return field.is(':checked');
         }
 
-        return item.val();
+        return field.val();
     }
 })(jQuery, TinyForm);

@@ -139,8 +139,8 @@
         fm._cache.rules = {};
 
         $.each(fm.getField(), function(name, field) {
-            var rule = $.trim(field[0].attr(ATTRS.rule));
-            var msg = field[0].attr(ATTRS.msg);
+            var rule = $.trim(field.attr(ATTRS.rule));
+            var msg = field.attr(ATTRS.msg);
 
             if(rule === '') {
                 fm._cache.rules[name] = false;

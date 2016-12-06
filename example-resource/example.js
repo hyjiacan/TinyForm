@@ -51,7 +51,7 @@ $(function() {
     for(var name in fields) {
         var option = $('<option>');
         option.val(name);
-        option.text($.trim(fields[name][0].prev().text()));
+        option.text($.trim(fields[name].prev().text()));
         $('#fields').append(option);
     }
 
@@ -127,11 +127,11 @@ $(function() {
     $('#b15').click(function() {
         console.log(form.store());
     });
-    
+
     $('#b16').click(function() {
         console.log(form.load());
     });
-     $('#b17').click(function() {
+    $('#b17').click(function() {
         console.log(form.abandon());
     });
 });

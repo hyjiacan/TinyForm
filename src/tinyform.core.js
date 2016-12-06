@@ -150,20 +150,16 @@
                 return;
             }
 
-            if(typeof fm._cache.fields[name] === 'undefined') {
+            if(typeof fm._cache.fields[name] === 'undefined' || fm._cache.fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
                 // 这里搞数组，就是为了将相同name的控件集中起来
-                fm._cache.fields[name] = [];
-            }
-
-            if(fm._cache.fields[name].length === 0) {
-                fm._cache.fields[name].push($(this));
+                fm._cache.fields[name] = $(this);
                 return;
             }
 
             // 存在name，追加到数组后头
             if($(this).is('[type=radio]')) {
-                fm._cache.fields[name].push($(this));
+                Array.prototype.push.apply(fm._cache.fields[name], $(this));
                 return;
             }
 

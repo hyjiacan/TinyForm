@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.4.2 2016-11-30
+ * TinyForm 0.4.2 2016-12-06
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -160,20 +160,16 @@
                 return;
             }
 
-            if(typeof fm._cache.fields[name] === 'undefined') {
+            if(typeof fm._cache.fields[name] === 'undefined' || fm._cache.fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
                 // 这里搞数组，就是为了将相同name的控件集中起来
-                fm._cache.fields[name] = [];
-            }
-
-            if(fm._cache.fields[name].length === 0) {
-                fm._cache.fields[name].push($(this));
+                fm._cache.fields[name] = $(this);
                 return;
             }
 
             // 存在name，追加到数组后头
             if($(this).is('[type=radio]')) {
-                fm._cache.fields[name].push($(this));
+                Array.prototype.push.apply(fm._cache.fields[name], $(this));
                 return;
             }
 
@@ -226,7 +222,7 @@
                     return me;
                 }
 
-                setFieldData(me, data, fieldName);
+                setFieldData(me, data, me.getField(fieldName));
                 return me;
             }
 
@@ -285,18 +281,15 @@
      * 设置某个控件的值
      * @param {Object} fm 表单实例
      * @param {String|Object} data 要设置的值
-     * @param {String|Array} field 控件的name名称或对象数组
+     * @param {Array} field 控件对象数组
      */
     function setFieldData(fm, data, field) {
-        if(!$.isArray(field)) {
-            field = fm.getField(field);
-            if(!$.isArray(field) || field.length === 0) {
-                return;
-            }
+        if(field.length === 0) {
+            return;
         }
 
-        $.each(field, function(index, item) {
-            item = $(item);
+        field.each(function() {
+            var item = $(this);
             if(!item.is('input')) {
                 item.val(data);
                 return;
@@ -305,7 +298,7 @@
             if(item.is('[type=radio]')) {
                 item.prop('checked', (item.val() || '').toString() === data.toString());
             } else if(item.is('[type=checkbox]')) {
-                item.prop('checked', data);
+                item.prop('checked', !!data);
             } else {
                 item.val(data);
             }
@@ -318,7 +311,7 @@
      */
     function getAllData(fm) {
         var data = {};
-        $.each(fm.getField(), function(name, field) {
+        $.each(fm.getField(), function(name) {
             data[name] = getFieldData(fm, name);
         });
         return data;
@@ -334,15 +327,15 @@
 
         var field = fm.getField(fieldName);
 
-        if(field[0].is('input')) {
+        if(field.is('input')) {
             return getInputValue(field);
         }
 
-        if(field[0].is('select[multiple]')) {
-            return field[0].val() || [];
+        if(field.is('select[multiple]')) {
+            return field.val() || [];
         }
 
-        return field[0].val();
+        return field.val();
     }
 
     /**
@@ -352,10 +345,10 @@
      */
     function getInputValue(field) {
         var value = '';
-        var item = field[0];
-        if(item.is('[type=radio]')) {
+        var item;
+        if(field.is('[type=radio]')) {
             for(var i = 0; i < field.length; i++) {
-                item = field[i];
+                item = field.eq(i);
                 if(item.is(':checked')) {
                     value = item.val();
                     break;
@@ -364,11 +357,11 @@
             return value;
         }
 
-        if(item.is('[type=checkbox]')) {
-            return item.is(':checked');
+        if(field.is('[type=checkbox]')) {
+            return field.is(':checked');
         }
 
-        return item.val();
+        return field.val();
     }
 })(jQuery, TinyForm);/**
  * TinyForm 数据存储组件，用于将表单数据持久化到浏览器存储中
@@ -461,7 +454,9 @@
             if(data) {
                 try {
                     data = JSON.parse(data);
-                } catch(e) {}
+                } catch(e) {
+                    console.log('broken data');
+                }
             }
 
             return data;
@@ -629,8 +624,8 @@
         fm._cache.rules = {};
 
         $.each(fm.getField(), function(name, field) {
-            var rule = $.trim(field[0].attr(ATTRS.rule));
-            var msg = field[0].attr(ATTRS.msg);
+            var rule = $.trim(field.attr(ATTRS.rule));
+            var msg = field.attr(ATTRS.msg);
 
             if(rule === '') {
                 fm._cache.rules[name] = false;

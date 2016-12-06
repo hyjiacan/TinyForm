@@ -197,7 +197,7 @@ form.store();</textarea>
         var form = TinyForm('#f1', {
             autoValidate: true, // 是否在输入控件失去焦点时自动验证
             stopOnFail: false, // 是否在第一次验证失败时停止验证
-            interval: 5000, // 自动保存数据周期
+            interval: 0, // 自动保存数据周期
             onstore: function() {   // 自动保存数据后的回调函数
                 console.log('已经自动保存数据');
             },
