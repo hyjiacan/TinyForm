@@ -202,7 +202,7 @@ form.store();</textarea>
                 console.log('已经自动保存数据');
             },
             afterValidate: function(e) {
-                console.log('字段:' + e.field[0].attr('name'));
+                console.log('字段:' + e.field.attr('name'));
                 console.log('值:' + e.value);
                 console.log('结果:' + e.pass);
                 console.log('消息:' + e.msg);

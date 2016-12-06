@@ -1,6 +1,6 @@
 {
   "name": "tinyform",
-  "version": "0.4.2",
+  "version": "0.4.5",
   "description": "基于jQuery的WEB表单处理工具库，努力搞一个简单的表单工具",
   "keywords": [
     "form"
@@ -21,6 +21,7 @@
     "grunt": "^1.0.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-less": "^1.4.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0"
   },

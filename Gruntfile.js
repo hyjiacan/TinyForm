@@ -9,7 +9,7 @@ module.exports = function(grunt) {
         '\n * @浏览器支持: 不支持IE7及更低版本' +
         '\n * @QQ群: 187786345 (Javascript爱好者)' +
         '\n */\n';
-        
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         jshint: {
@@ -38,8 +38,14 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['<%= jshint.files %>'],
-            tasks: ['jshint']
+            scripts: {
+                files: ['<%= jshint.files %>'],
+                tasks: ['jshint']
+            },
+            css: {
+                files: ['example-resource/example.less'],
+                tasks: ['less']
+            }
         },
         concat: {
             options: {
@@ -53,6 +59,24 @@ module.exports = function(grunt) {
                 // 合并后的JS文件的存放位置
                 dest: 'dist/<%= pkg.name %>.js'
             }
+        },
+        less: {
+            compile: {
+                files: {
+                    'example-resource/example.css': 'example-resource/example.less'
+                }
+            },
+            options: {
+                banner: '/* <%=pkg.namexxx %> 示例 */'
+            }
+            //          yuicompress: {
+            //              files: {
+            //                  'css/test-min.css': 'css/test.css'
+            //              },
+            //              options: {
+            //                  yuicompress: true
+            //              }
+            //          }
         },
         uglify: {
             options: {
@@ -70,8 +94,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
-    grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'concat', 'less', 'uglify']);
 
 };
