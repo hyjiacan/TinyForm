@@ -14,8 +14,8 @@
     <body>
         <div class="left">
             <h1 class="title">
-			    TinyForm 示例
-			    <small>基于jQuery的WEB表单工具库</small>
+			    TinyForm
+			    <small>一个简单的WEB表单工具</small>
 			</h1>
             <h3>无参数初始化</h3>
 
@@ -73,7 +73,7 @@
                 </div>
                 <div>
                     <label for="">网址</label>
-                    <input type="text" name="website" value="" data-rule="site" placeholder="只能输入网址" />
+                    <input type="text" name="website" value="" data-rule="url" placeholder="只能输入网址" />
                 </div>
                 <div>
                     <label for="">签名</label>
@@ -195,17 +195,29 @@ form.store();</textarea>
     </body>
     <script type="text/javascript" data-target="1">
         var form = TinyForm('#f1', {
-            autoValidate: true, // 是否在输入控件失去焦点时自动验证
-            stopOnFail: false, // 是否在第一次验证失败时停止验证
-            interval: 0, // 自动保存数据周期
-            onstore: function() {   // 自动保存数据后的回调函数
-                console.log('已经自动保存数据');
+            validate: {
+                auto: true, // 是否在输入控件失去焦点时自动验证
+                stop: false, // 是否在第一次验证失败时停止验证
+                callback: function(e) {
+                    console.log('字段:' + e.field.attr('name'));
+                    console.log('值:' + e.value);
+                    console.log('结果:' + e.pass);
+                    console.log('消息:' + e.msg);
+                }
             },
-            afterValidate: function(e) {
-                console.log('字段:' + e.field.attr('name'));
-                console.log('值:' + e.value);
-                console.log('结果:' + e.pass);
-                console.log('消息:' + e.msg);
+            storage: {
+                // 存储的唯一名称，如果不指定，会自动计算一个唯一名称
+                name: 'xxx',
+                // 数据存储的容器，可以设置为 localStorage或sessionStorage
+                container: localStorage,
+                // 是否在实例化的时候加载存储的数据，默认为false
+                load: false,
+                // 自动保存数据周期
+                time: 0,
+                // 自动保存数据后的回调函数
+                onstore: function() {
+                    console.log('表单数据已经自动保存');
+                },
             },
             beforeSubmit: function(ajaxOption) {
                 var data = ajaxOption.data || {};

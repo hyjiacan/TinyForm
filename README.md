@@ -2,6 +2,19 @@
 TinyForm 是一个基于jQuery的WEB表单处理工具。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单控件。
 >默认的选择器是**input[name]:not([type=button][type=submit][type=reset]), select[name], textarea[name]**，这项是写在文件*src/tinyform.core.js*里面的全局变量*CONTROL_SELECTOR*中。
 
+## 目录结构
+**dist**
+> 生成目录
+    - tinyform.core[.min].js 包含基本的表单控件获取和数据读写功能
+    - tinyform.common[.min].js 含基本的表单控件获取、数据读写、表单的重置、异步提交和数据验证功能
+    - tinyform.all[.min].js 包含所有功能
+**src**
+> 源码目录
+    - tinyform.core.js 包含表单实例化，控件获取和刷新缓存以及扩展接口
+    - tinyform.data.js 包含数据的读写、重置和异步提交
+    - tinyform.validate.js 验证控件的输入
+    - tinyform.storage.js 操作数据存储
+ 
 ## 用法/Usage
 **html**
 ```
@@ -58,68 +71,69 @@ TinyForm 是一个基于jQuery的WEB表单处理工具。他根据传入的*选�
 **js**
 ```
 var form = TinyForm('#f1', {
-	autoValidate: true, // 是否在输入控件失去焦点时自动验证，默认为false
-	stopOnFail: false, // 是否在第一次验证失败时停止验证，默认为true
-	storage: localStorage, // 使用的存储，可以设置  localStorage(默认)或sessionStorage
-	autoload: true, // 是否在初始化时加载存储的数据，默认为false
-	interval: 3000, // 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
-	afterValidate: function(e) {
-		console.log('字段:' + e.field[0].attr('name'));
-		console.log('值:' + e.value);
-		console.log('结果:' + e.pass);
-		console.log('消息:' + e.msg);
-	},
-	beforeSubmit: function(ajaxOption) {
-		var data = ajaxOption.data || {};
-		data.addition = 'xxxxxxxxxxxxxx-fuck';
-		if(data.gender) {
-			if(data.gender == '0') {
-				data.gender = '男的';
-			} else {
-				data.gender = '女的';
-			}
-		}
-	}
+    validate: {
+    // 是否在输入控件失去焦点时自动验证，默认为false
+        auto: true, 
+        // 是否在第一次验证失败时停止验证，默认为true
+        stop: false,
+        // 每个控件验证后的回调函数
+        callback: function(e) {
+            //正在验证的控件的jQuery对象
+            console.log('字段:' + e.field.attr('name'));
+            //此控件的值
+            console.log('值:' + e.value);
+            //表单验证是否通过
+            console.log('结果:' + e.pass);
+            // 验证的提示消息，无论验证是否通过都有
+            console.log('消息:' + e.msg);
+            // 可以通过 return来改变验证的结果，若不想改变原验证结果，可以不返回任何值
+        }
+    },
+    storage: {
+        // 存储的唯一名称，如果不指定，会自动计算一个唯一名称
+        name: 'xxx',
+        // 数据存储的容器，根据应用场景可以设置为 localStorage或sessionStorage
+        container: localStorage,
+        // 是否在实例化的时候加载存储的数据，默认为false
+        load: false,
+        // // 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
+        time: 0,
+        // 自动保存数据后的回调函数
+        onstore: function(data) {
+            console.log('表单数据已经自动保存');
+        }
+    },
+    // 调用ajax前的数据处理
+    beforeSubmit: function(ajaxOption) {
+        var data = ajaxOption.data || {};
+        data.addition = 'xxxxxxxxxxxxxx-fuck';
+        if(data.gender) {
+            if(data.gender == '0') {
+                data.gender = '男的';
+            } else {
+                data.gender = '女的';
+            }
+        }
+    }
 });
 ```
 
 ### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/tinyform/)** 吧
 
 ## 选项/Option
-**fieldSelector** String
+
+**selector** String
 > 自定义的表单控件选择器，用于选择表单控件。注：一定要包含*[name]*，否则会导致表单功能的异常
 
-**autoValidate** Boolean
-> 是否在输入控件失去焦点时自动验证输入，默认为*false*
+**validate** Object
+> 验证相关的参数对象，详细参数详见上方示例
 
-**stopOnFail** Boolean
-> 是否在第一个验证失败的时停止验证，默认为 *true*
-
-**afterValidate** Function( e: Object): Boolean
-> 验证后的回调函数，上下文this指向 *minifom* 对象。此回调在验证每个输入控件时都会调用
-> **e** 回调事件参数，结构如下：
-	```
-	{
-		result: Boolean, //表单验证是否通过
-		field: Array, //正在验证的控件的对象数组
-		value: String, //此控件的值
-		message: String // 验证未通过时的消息
-	}
-	```
-> **return** 验证是否通过，可以通过修改这个返回值来改变验证结果。如果没有返回或返回*undefined*，那么保留原验证结果
+**storage** Object
+> 存储相关的参数对象，详细参数详见上方示例
 
 **beforeSubmit** Function(ajaxOption: Object)
 > 异步提交表单前的回调函数，上下文this指向 *minifom* 对象。可以通过此函数改变提交的数据
 > **ajaxOption** 异步请求的数据对象
-
-**storage** Storage
-> 使用的存储，可以设置  *localStorage*(默认)或*sessionStorage*(当表单数据需要在浏览器关闭后就丢弃)
-
-**autoload** Boolean
-> 是否在初始化时加载存储的数据，默认为*false*
-
-**interval** Number
-> 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
 
 ## 标签属性/Tag Attribute
 **data-rule**
@@ -136,7 +150,7 @@ var form = TinyForm('#f1', {
 **data-msg**
 > 此控件验证失败时的提示消息，若不指定则使用默认消息
 
-当有相同*name*的控件时，只读取第一个控件的*data-rule*和data-msg*
+当有相同*name*的控件时，只读取第一个控件的*data-rule*和*data-msg*
 
 ## 实例属性/Property
 **context**
@@ -145,10 +159,29 @@ var form = TinyForm('#f1', {
     // 查找表单内的按钮
     form.context.find('input[type=button]');
     ```
+**option**
+> 表单的选项，部分参数可以在运行时变更
+    ```
+    // 将存储切换为sessionStorage
+    form.option.storage.container = window.sessionStorage;
+    ```
+    
+可以在运行时变更的选项：
+- data
+    - selector 可以动态地设置控件选择器，重设后需要调用**refresh**方法刷新缓存
+- storage
+    - container 切换存储容器
+    - time  设置为0可以停止自动存储数据，停止后不能再次启用自动存储(实例生命周期内)
+    - onstore 改变自动存储的回调函数
+    - name 改变存储项的名称，，不推荐修改这项，因为运行时修改可能导致已经存储的数据无法读取
+- validate
+    - stop 可以改变：是否在第一次验证失败后停止验证
+    - callback 改变控件验证的回调函数
 
 ## 方法/Method
 > 说明：除了获取数据类(包括验证)的函数，其它都会返回*miniform*的实例对象。
 
+### tinyform.core
 **getField(fieldName: String): Array**
 > 根据name属性获取控件 返回数组，因为可能存在同name情况
 > **fieldName** 要获取的控件的name值，如果不指定这个属性，那么返回所有控件
@@ -164,6 +197,10 @@ var form = TinyForm('#f1', {
 	[Object], // 用户名
 	[Object, Object] // 男 女
 	```
+
+**refresh(): Instance**
+> 重新获取所有控件和验证规则，适用于表单有动态改动时
+> **return** miniform实例
 
 **getData(fieldName: String): Object**
 > 获取输入控件的值。
@@ -187,10 +224,18 @@ var form = TinyForm('#f1', {
 > 重置表单的值（清空所有数据）
 > **return** miniform实例
 
-**refresh(): Instance**
-> 重新获取所有控件和验证规则，适用于表单有动态改动时
-> **return** miniform实例
+**submit(option: Object)**
+> 异步提交表单
+> **option** ajax选项，参数与*jQuery*的ajax选项相同，默认参数如下：
+    ```
+    {
+        url: 使用表单的action属性，
+        type: 使用表单的method属性，如果没有则使用*post*,
+        data: 使用*getData()*取到的表单数据，在此指定时，参数会附加到参数里面
+    }
+    ```
 
+### tinyform.common
 **getRule(fieldName: String): Object**
 > 获取表单指定控件的验证规则或所有规则
 > **fieldName** 件的name名称，不指定此值时获取所有规则
@@ -227,17 +272,7 @@ var form = TinyForm('#f1', {
 	}
 	```
 
-**submit(option: Object)**
-> 异步提交表单
-> **option** ajax选项，参数与*jQuery*的ajax选项相同，默认参数如下：
-	```
-	{
-	    url: 使用表单的action属性，
-	    type: 使用表单的method属性，如果没有则使用*post*,
-	    data: 使用*getData()*取到的表单数据，在此指定时，参数会附加到参数里面
-	}
-	```
-
+### tinyform.all
 **store(fn: Function)**: Object
 > 存储表单数据
 > **fn** 存储前的回调函数，用于在存储前处理数据，这个函数有一个参数**data**，是表单的数据，修改后的数据通过**return**返回
@@ -252,12 +287,6 @@ var form = TinyForm('#f1', {
 **abandon()**: Object
 > 读取存储的表单数据，然后清除存储的数据
 > **return** 从存储读取的数据
-
-## 属性/Property
-**context** 表单DOM上下文的jQuery对象，可以通过这个属性来访问DOM，如：
-    ```
-    var defaultbtn = form.context.find('input[type=button].default');
-    ```
 
 ## 扩展/Extend
 > TinyForm支持添加自定义功能扩展。

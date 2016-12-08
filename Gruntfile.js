@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
     var headerinfo = '/**' +
-        '\n * TinyForm <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %>' +
+        '\n * TinyForm <%= pkg.version %> {edition} <%= grunt.template.today("yyyy-mm-dd") %>' +
         '\n * @作者: hyjiacan' +
         '\n * @源码: <%= pkg.repository.url %>' +
         '\n * @示例: <%= pkg.example %>' +
@@ -50,14 +50,34 @@ module.exports = function(grunt) {
         concat: {
             options: {
                 // 定义一个用于插入合并输出文件之间的字符
-                separator: '',
-                banner: headerinfo
+                separator: ''
             },
-            dist: {
+            core: {
+                options: {
+                    banner: headerinfo.replace('{edition}', 'core')
+                },
+                // 将要被合并的文件
+                src: ['src/tinyform.core.js', 'src/tinyform.data.js'],
+                // 合并后的JS文件的存放位置
+                dest: 'dist/<%= pkg.name %>.core.js'
+            },
+            common: {
+                options: {
+                    banner: headerinfo.replace('{edition}', 'common')
+                },
+                // 将要被合并的文件
+                src: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js'],
+                // 合并后的JS文件的存放位置
+                dest: 'dist/<%= pkg.name %>.common.js'
+            },
+            all: {
+                options: {
+                    banner: headerinfo.replace('{edition}', '')
+                },
                 // 将要被合并的文件
                 src: ['src/*.js'],
                 // 合并后的JS文件的存放位置
-                dest: 'dist/<%= pkg.name %>.js'
+                dest: 'dist/<%= pkg.name %>.all.js'
             }
         },
         less: {
@@ -69,23 +89,30 @@ module.exports = function(grunt) {
             options: {
                 banner: '/* <%=pkg.namexxx %> 示例 */'
             }
-            //          yuicompress: {
-            //              files: {
-            //                  'css/test-min.css': 'css/test.css'
-            //              },
-            //              options: {
-            //                  yuicompress: true
-            //              }
-            //          }
         },
         uglify: {
-            options: {
-                // 此处定义的banner注释将插入到输出文件的顶部
-                banner: headerinfo
-            },
-            dist: {
+            core: {
+                options: {
+                    banner: headerinfo.replace('{edition}', 'core')
+                },
                 files: {
-                    'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+                    'dist/<%= pkg.name %>.core.min.js': ['<%= concat.core.dest %>']
+                }
+            },
+            common: {
+                options: {
+                    banner: headerinfo.replace('{edition}', 'common')
+                },
+                files: {
+                    'dist/<%= pkg.name %>.common.min.js': ['<%= concat.common.dest %>']
+                }
+            },
+            all: {
+                options: {
+                    banner: headerinfo.replace('{edition}', '')
+                },
+                files: {
+                    'dist/<%= pkg.name %>.all.min.js': ['<%= concat.all.dest %>']
                 }
             }
         }

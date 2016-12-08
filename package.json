@@ -1,7 +1,7 @@
 {
   "name": "tinyform",
-  "version": "0.4.5",
-  "description": "基于jQuery的WEB表单处理工具库，努力搞一个简单的表单工具",
+  "version": "0.5.0",
+  "description": "一个简单的WEB表单工具",
   "keywords": [
     "form"
   ],
