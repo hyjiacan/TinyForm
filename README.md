@@ -15,6 +15,19 @@ TinyForm 是一个基于jQuery的WEB表单处理工具。他根据传入的*选�
 - tinyform.data.js 包含数据的读写、重置和异步提交
 - tinyform.validate.js 验证控件的输入
 - tinyform.storage.js 操作数据存储
+
+## 安装/Install
+
+npm
+```
+$ npm install tinyform
+```
+
+Bower
+
+```
+$ bower install tinyform
+```
  
 ## 用法/Usage
 
