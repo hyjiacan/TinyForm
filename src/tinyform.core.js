@@ -9,8 +9,8 @@
     /**
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
-    var CONTROL_SELECTOR = 'input[name]:not([type=button][type=submit][type=reset]), select[name], textarea[name]';
-
+    var CONTROL_SELECTOR = 'input[name]:not(:button,:submit,:reset), select[name], textarea[name]';
+   
     /**
      * 附加到元素上的表单实例的id属性
      */
@@ -44,7 +44,7 @@
      * 表单实例的控件集合
      */
     var fieldSet = {};
-
+    
     /**
      * 生成一个新的表单实例id
      * 结构为： tiny+ 时间戳 + 随机数
@@ -229,7 +229,7 @@
         }
     });
 
-    // 这句，我没搞懂是做啥的，学jQuery写的。。
+    // 搞懂，因为真正创建实例是通过 setup ，所以需要把 TinyForm 的原型交给 setup，以通过 setup 来产生一个 TinyForm 的实例
     TinyForm.prototype.setup.prototype = TinyForm.prototype;
 
     /**
@@ -247,7 +247,7 @@
 
         // 根据配置的选择器来查找控件
         fm.context.find(fm.option.selector).each(function() {
-            // 尝试取出name属性，顺便trim一下，要是有人喜欢搞懂，给弄点空白呢
+            // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
             // 如果name为空，则跳过
             if(name === '') {
@@ -265,8 +265,8 @@
                 return;
             }
 
-            // 存在name，，如果是radio的话就追加到jQuery数组后头
-            if($(this).is('[type=radio]')) {
+            // 存在name，如果是radio的话就追加到jQuery数组后头
+            if($(this).is(':radio')) {
                 // 将DOM控件对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个控件，所以直接使用  this
                 fields[name].push(this);

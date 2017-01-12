@@ -165,7 +165,7 @@
         }
 
         // 控件是radio，那么可能有多个
-        if(field.is('[type=radio]')) {
+        if(field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false)
                 // 找出value与数据相等的控件设置选中
@@ -175,7 +175,7 @@
         }
 
         // 如果是checkbox，那么直接控件选中
-        if(field.is('[type=checkbox]')) {
+        if(field.is(':checkbox')) {
             // 强制数据转换成bool类型来控制控件的选中状态
             field.prop('checked', !!data);
             // 可以返回了
@@ -206,7 +206,7 @@
      * 设置某个控件的值
      * @param {Object} fm 表单实例
      * @param {String} fieldName 控件的name名称
-     * @return {String} 控件的值
+     * @return {Any} 控件的值
      */
     function getFieldData(fm, fieldName) {
         // 根据控件的name找到控件
@@ -231,13 +231,13 @@
         // 声明一个存放控件值的变量，默认值为空字符串
         var value = '';
         // 取radio的值
-        if(field.is('[type=radio]')) {
+        if(field.is(':radio')) {
             // 取选中的radio的值就行了
             return field.filter(':checked').val();
         }
 
         // checkbox 的值返回true和false
-        if(field.is('[type=checkbox]')) {
+        if(field.is(':checkbox')) {
             return field.is(':checked');
         }
 
