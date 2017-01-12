@@ -56,6 +56,12 @@
                     </select>
                 </div>
                 <div>
+                    <label for="">擅长</label>
+                    <input type="checkbox" name="js" />Javascript
+                    <input type="checkbox" name="css" />CSS
+                    <input type="checkbox" name="html" />HTML
+                </div>
+                <div>
                     <label for="">电话号码</label>
                     <input type="text" name="phone" value="" data-rule="number" placeholder="只能是数字" />
                 </div>
@@ -92,12 +98,7 @@
                     <option value="2">中学</option>
                     <option value="3">大学</option>
                 </select>
-                <input type="text" name="t[0]" />
-                <input type="text" name="t[1]" />
-                <input type="text" name="t[2]" />
-                <input type="text" name="t[3]" />
-                <input type="text" name="t[4]" />
-                
+
                 <input type="button" value="这里是一些按钮" />
                 <input type="submit" value="这里写按钮没有实际用处" />
                 <input type="reset" value="只是为了展示它们不会被TinyForm获取" />
@@ -205,14 +206,16 @@ form.store();</textarea>
     </body>
     <script type="text/javascript" data-target="1">
         var form = TinyForm('#f1', {
+            // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值
+            checkbox: [1, 0],
             validate: {
                 auto: true, // 是否在输入控件失去焦点时自动验证
                 stop: false, // 是否在第一次验证失败时停止验证
                 callback: function(e) {
                     console.log('字段:' + e.field.attr('name'));
                     console.log('值:' + e.value);
-                    console.log('结果:' + e.pass);
-                    console.log('消息:' + e.msg);
+                    console.log('验证结果:' + e.pass);
+                    console.log('验证失败的消息:' + e.msg);
                 }
             },
             storage: {

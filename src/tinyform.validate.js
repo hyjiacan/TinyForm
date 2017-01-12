@@ -170,7 +170,7 @@
             if(arguments.length > 0) {
                 // 参数需要字符串，类型不对
                 if(typeof fieldName !== 'string') {
-                    // 因为这种情况应该是开发的错误，所以返回验证失败 
+                    // 因为这种情况应该是开发的错误，所以返回验证失败
                     return false;
                 }
 
@@ -228,7 +228,7 @@
     /**
      * 获取表单所有控件的验证规则
      * @param {Object} fm 表单实例
-     * @returns {Object} 验证规则对象  
+     * @returns {Object} 验证规则对象
      */
     function getAllTagRules(fm) {
         // 清空原有的数据
@@ -311,7 +311,7 @@
      * @returns {Object|Boolean} 需要验证时返回对象，否则返回false
      */
     function resolveLengthRule(rule, msg) {
-        // 创建一个存放验证规则和提示消息的对象        
+        // 创建一个存放验证规则和提示消息的对象
         var validation = {};
 
         // 长度定义格式: length: start [, end]
@@ -321,7 +321,7 @@
         if(lendef.length === 1) {
             // 搞成int类型 如果搞不成，那数据格式就不对了
             var len = parseInt(lendef[0]);
-            // 不能搞成数字 或者是负数 
+            // 不能搞成数字 或者是负数
             if(isNaN(len) || len < 0) {
                 // 给开发输出提示消息
                 console.error(INT_REQUIRED + ' "' + rule + '"');
@@ -344,7 +344,7 @@
             var len1 = parseInt(lendef[0]);
             // 把第二个值弄成int
             var len2 = parseInt(lendef[1]);
-            // 不能搞成数字 或者是负数 
+            // 不能搞成数字 或者是负数
             if(isNaN(len1) || len1 < 0 || isNaN(len2) || len2 < 0) {
                 // 给开发输出提示消息
                 console.error(INT_REQUIRED + ' "' + rule + '"');

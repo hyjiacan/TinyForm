@@ -22,6 +22,10 @@
         setup: function() {
             // 保存初始数据，用于重置
             originalData[this.id] = this.getData();
+
+            this.option = $.extend(true, {
+                checkbox: [true, false]
+            }, this.option);
         },
         /**
          * 获取所有控件的值，返回对象
@@ -132,7 +136,7 @@
 
         /**
          * 重置表单所有项
-         * @returns {Object} 表单实例 
+         * @returns {Object} 表单实例
          */
         reset: function() {
             // 看一下表单dom元素对象上有没有一个叫做reset的方法
@@ -176,8 +180,8 @@
 
         // 如果是checkbox，那么直接控件选中
         if(field.is(':checkbox')) {
-            // 强制数据转换成bool类型来控制控件的选中状态
-            field.prop('checked', !!data);
+            // 强制数据转换成字符串来比较，以控制控件的选中状态
+            field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
             // 可以返回了
             return;
         }
@@ -215,7 +219,7 @@
         // 如果控件是input标签的元素，使用独特的取值技巧
         if(field.is('input')) {
             // 返回获取到的值
-            return getInputValue(field);
+            return getInputValue(fm, field);
         }
 
         // 其它的控件直接取值并返回
@@ -224,10 +228,11 @@
 
     /**
      * 获取input控件的值
+     * @param {Object} fm 表单实例
      * @param {Array} field 控件数组
      * @return {Any} 控件的值
      */
-    function getInputValue(field) {
+    function getInputValue(fm, field) {
         // 声明一个存放控件值的变量，默认值为空字符串
         var value = '';
         // 取radio的值
@@ -236,9 +241,9 @@
             return field.filter(':checked').val();
         }
 
-        // checkbox 的值返回true和false
+        // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
         if(field.is(':checkbox')) {
-            return field.is(':checked');
+            return field.is(':checked') ? fm.option.checkbox[0] : fm.option.checkbox[1];
         }
 
         // 其它的直接返回值
