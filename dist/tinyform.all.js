@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.5.0  2016-12-08
+ * TinyForm 0.5.0  2017-01-12
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -19,8 +19,8 @@
     /**
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
-    var CONTROL_SELECTOR = 'input[name]:not([type=button][type=submit][type=reset]), select[name], textarea[name]';
-
+    var CONTROL_SELECTOR = 'input[name]:not(:button,:submit,:reset), select[name], textarea[name]';
+   
     /**
      * 附加到元素上的表单实例的id属性
      */
@@ -54,7 +54,7 @@
      * 表单实例的控件集合
      */
     var fieldSet = {};
-
+    
     /**
      * 生成一个新的表单实例id
      * 结构为： tiny+ 时间戳 + 随机数
@@ -239,7 +239,7 @@
         }
     });
 
-    // 这句，我没搞懂是做啥的，学jQuery写的。。
+    // 搞懂，因为真正创建实例是通过 setup ，所以需要把 TinyForm 的原型交给 setup，以通过 setup 来产生一个 TinyForm 的实例
     TinyForm.prototype.setup.prototype = TinyForm.prototype;
 
     /**
@@ -257,7 +257,7 @@
 
         // 根据配置的选择器来查找控件
         fm.context.find(fm.option.selector).each(function() {
-            // 尝试取出name属性，顺便trim一下，要是有人喜欢搞懂，给弄点空白呢
+            // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
             // 如果name为空，则跳过
             if(name === '') {
@@ -275,8 +275,8 @@
                 return;
             }
 
-            // 存在name，，如果是radio的话就追加到jQuery数组后头
-            if($(this).is('[type=radio]')) {
+            // 存在name，如果是radio的话就追加到jQuery数组后头
+            if($(this).is(':radio')) {
                 // 将DOM控件对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个控件，所以直接使用  this
                 fields[name].push(this);
@@ -312,6 +312,10 @@
         setup: function() {
             // 保存初始数据，用于重置
             originalData[this.id] = this.getData();
+
+            this.option = $.extend(true, {
+                checkbox: [true, false]
+            }, this.option);
         },
         /**
          * 获取所有控件的值，返回对象
@@ -422,7 +426,7 @@
 
         /**
          * 重置表单所有项
-         * @returns {Object} 表单实例 
+         * @returns {Object} 表单实例
          */
         reset: function() {
             // 看一下表单dom元素对象上有没有一个叫做reset的方法
@@ -455,7 +459,7 @@
         }
 
         // 控件是radio，那么可能有多个
-        if(field.is('[type=radio]')) {
+        if(field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false)
                 // 找出value与数据相等的控件设置选中
@@ -465,9 +469,9 @@
         }
 
         // 如果是checkbox，那么直接控件选中
-        if(field.is('[type=checkbox]')) {
-            // 强制数据转换成bool类型来控制控件的选中状态
-            field.prop('checked', !!data);
+        if(field.is(':checkbox')) {
+            // 强制数据转换成字符串来比较，以控制控件的选中状态
+            field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
             // 可以返回了
             return;
         }
@@ -496,7 +500,7 @@
      * 设置某个控件的值
      * @param {Object} fm 表单实例
      * @param {String} fieldName 控件的name名称
-     * @return {String} 控件的值
+     * @return {Any} 控件的值
      */
     function getFieldData(fm, fieldName) {
         // 根据控件的name找到控件
@@ -505,7 +509,7 @@
         // 如果控件是input标签的元素，使用独特的取值技巧
         if(field.is('input')) {
             // 返回获取到的值
-            return getInputValue(field);
+            return getInputValue(fm, field);
         }
 
         // 其它的控件直接取值并返回
@@ -514,21 +518,22 @@
 
     /**
      * 获取input控件的值
+     * @param {Object} fm 表单实例
      * @param {Array} field 控件数组
      * @return {Any} 控件的值
      */
-    function getInputValue(field) {
+    function getInputValue(fm, field) {
         // 声明一个存放控件值的变量，默认值为空字符串
         var value = '';
         // 取radio的值
-        if(field.is('[type=radio]')) {
+        if(field.is(':radio')) {
             // 取选中的radio的值就行了
             return field.filter(':checked').val();
         }
 
-        // checkbox 的值返回true和false
-        if(field.is('[type=checkbox]')) {
-            return field.is(':checked');
+        // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
+        if(field.is(':checkbox')) {
+            return field.is(':checked') ? fm.option.checkbox[0] : fm.option.checkbox[1];
         }
 
         // 其它的直接返回值
@@ -899,7 +904,7 @@
             if(arguments.length > 0) {
                 // 参数需要字符串，类型不对
                 if(typeof fieldName !== 'string') {
-                    // 因为这种情况应该是开发的错误，所以返回验证失败 
+                    // 因为这种情况应该是开发的错误，所以返回验证失败
                     return false;
                 }
 
@@ -957,7 +962,7 @@
     /**
      * 获取表单所有控件的验证规则
      * @param {Object} fm 表单实例
-     * @returns {Object} 验证规则对象  
+     * @returns {Object} 验证规则对象
      */
     function getAllTagRules(fm) {
         // 清空原有的数据
@@ -1040,7 +1045,7 @@
      * @returns {Object|Boolean} 需要验证时返回对象，否则返回false
      */
     function resolveLengthRule(rule, msg) {
-        // 创建一个存放验证规则和提示消息的对象        
+        // 创建一个存放验证规则和提示消息的对象
         var validation = {};
 
         // 长度定义格式: length: start [, end]
@@ -1050,7 +1055,7 @@
         if(lendef.length === 1) {
             // 搞成int类型 如果搞不成，那数据格式就不对了
             var len = parseInt(lendef[0]);
-            // 不能搞成数字 或者是负数 
+            // 不能搞成数字 或者是负数
             if(isNaN(len) || len < 0) {
                 // 给开发输出提示消息
                 console.error(INT_REQUIRED + ' "' + rule + '"');
@@ -1073,7 +1078,7 @@
             var len1 = parseInt(lendef[0]);
             // 把第二个值弄成int
             var len2 = parseInt(lendef[1]);
-            // 不能搞成数字 或者是负数 
+            // 不能搞成数字 或者是负数
             if(isNaN(len1) || len1 < 0 || isNaN(len2) || len2 < 0) {
                 // 给开发输出提示消息
                 console.error(INT_REQUIRED + ' "' + rule + '"');
