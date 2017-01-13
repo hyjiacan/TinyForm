@@ -1,6 +1,6 @@
 # TinyForm
 
-**TinyForm**是一个基于j*Query*的WEB表单处理工具。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单控件。
+**TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单控件。
 >默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，这项是写在文件*src/tinyform.core.js*里面的全局变量*CONTROL_SELECTOR*中。当然，也可以通过实例化表单的参数*selector*来自定义。
 
 ## 目录结构
