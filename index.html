@@ -12,154 +12,183 @@
     </head>
 
     <body>
-        <div class="left">
+        <div class="top">
             <h1 class="title">
                 TinyForm
                 <small>一个简单的WEB表单工具</small>
+                <ul class="links">
+                    <li>
+                        <a href="http://git.oschina.net/hyjiacan/TinyForm">打开项目主页</a>
+                    </li>
+                    <li>
+                        <a href="http://git.oschina.net/hyjiacan/TinyForm/blob/master/README.md">查看文档</a>
+                    </li>
+                    <li>
+                        <a href="http://git.oschina.net/hyjiacan/TinyForm/tree/master/dist">下载</a>
+                    </li>
+                    <li>
+                        <a href="http://git.oschina.net/hyjiacan/TinyForm/issues">提交bug或建议</a>
+                    </li>
+                </ul>
             </h1>
-            <h3>无参数初始化</h3>
+        </div>
+        <div class="content">
+            <div class="left">
+                <h3>无参数初始化</h3>
 
-            <textarea class="code">var form = TinyForm('#f1');
+                <textarea class="code">var form = TinyForm('#f1');
             var f2 = TinyForm('.f2');</textarea>
 
-            <h3>带参数初始化</h3>
+                <h3>带参数初始化</h3>
 
-            <textarea class="code" data-target="1"></textarea>
+                <textarea class="code" data-target="1"></textarea>
 
-            <h3>表单    </h3>
-            <div id="f1" action="#">
-                <div>
-                    <label for="">用户名</label>
-                    <input type="text" name="username" data-rule="required" data-msg="有本事你写下你的名字" placeholder="不能为空" />
+                <h3>表单    </h3>
+                <div id="f1" action="#">
+                    <div>
+                        <label for="">用户名</label>
+                        <input type="text" name="username" data-rule="required" data-msg="有本事你写下你的名字" placeholder="不能为空" />
+                    </div>
+                    <div>
+                        <label for="">性别</label>
+                        <input type="radio" data-rule="required" name="gender" value="0" data-rule="required" data-msg="咋，你是人妖？" />男的
+                        <input type="radio" data-rule="required" name="gender" value="1" />女的
+                    </div>
+                    <div>
+                        <label for="">做啥的</label>
+                        <select name="job" id="">
+                            <option value="freedom">自由职业</option>
+                            <option value="it">IT玩家</option>
+                            <option value="code">码农</option>
+                            <option value="programmer">程序猿</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="">爱好</label>
+                        <select name="hobby" id="" multiple="multiple" data-rule="required">
+                            <option value="reading">看书</option>
+                            <option value="coding">写代码</option>
+                            <option value="traval">旅行</option>
+                            <option value="girl">妹子</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="">擅长</label>
+                        <label for="">
+                        <input type="checkbox" name="js" />
+                        Javascript
+                    </label>
+                        <label for="">
+                        <input type="checkbox" name="css" />
+                        CSS
+                    </label>
+                        <label for="">
+                        <input type="checkbox" name="html" />
+                        HTML
+                    </label>
+                    </div>
+                    <div>
+                        <label for="">电话号码</label>
+                        <input type="text" name="phone" value="" data-rule="number" placeholder="只能是数字" />
+                    </div>
+                    <div>
+                        <label for="">英文名字</label>
+                        <input type="text" name="name-en" value="" data-rule="alpha" placeholder="只能是字母" />
+                    </div>
+                    <div>
+                        <label for="">邮箱</label>
+                        <input type="text" name="email" value="" data-rule="email" placeholder="只能输入邮箱" />
+                    </div>
+                    <div>
+                        <label for="">邮编</label>
+                        <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="请输入正确的6位数字" placeholder="只能输入6位数字" />
+                    </div>
+                    <div>
+                        <label for="">网址</label>
+                        <input type="text" name="website" value="" data-rule="url" placeholder="只能输入网址" />
+                    </div>
+                    <div>
+                        <label for="">签名</label>
+                        <input type="text" name="signature" value="" data-rule="length: 12" placeholder="至少要12个字符" />
+                    </div>
+                    <div>
+                        <label for="">备注</label>
+                        <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
+                    </div>
                 </div>
-                <div>
-                    <label for="">性别</label>
-                    <input type="radio" data-rule="required" name="gender" value="0" data-rule="required" data-msg="咋，你是人妖？" />男的
-                    <input type="radio" data-rule="required" name="gender" value="1" />女的
-                </div>
-                <div>
-                    <label for="">做啥的</label>
-                    <select name="job" id="">
-                        <option value="freedom">自由职业</option>
-                        <option value="it">IT玩家</option>
-                        <option value="code">码农</option>
-                        <option value="programmer">程序猿</option>
+                <form action="" class="f2">
+                    <p>这是另一个表单，用来测试实例共存</p>
+                    <label for="">学校</label>
+                    <select name="school">
+                        <option value="1">小学</option>
+                        <option value="2">中学</option>
+                        <option value="3">大学</option>
                     </select>
-                </div>
-                <div>
-                    <label for="">爱好</label>
-                    <select name="hobby" id="" multiple="multiple" data-rule="required">
-                        <option value="reading">看书</option>
-                        <option value="coding">写代码</option>
-                        <option value="traval">旅行</option>
-                        <option value="girl">妹子</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="">擅长</label>
-                    <input type="checkbox" name="js" />Javascript
-                    <input type="checkbox" name="css" />CSS
-                    <input type="checkbox" name="html" />HTML
-                </div>
-                <div>
-                    <label for="">电话号码</label>
-                    <input type="text" name="phone" value="" data-rule="number" placeholder="只能是数字" />
-                </div>
-                <div>
-                    <label for="">英文名字</label>
-                    <input type="text" name="name-en" value="" data-rule="alpha" placeholder="只能是字母" />
-                </div>
-                <div>
-                    <label for="">邮箱</label>
-                    <input type="text" name="email" value="" data-rule="email" placeholder="只能输入邮箱" />
-                </div>
-                <div>
-                    <label for="">邮编</label>
-                    <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="请输入正确的6位数字" placeholder="只能输入6位数字" />
-                </div>
-                <div>
-                    <label for="">网址</label>
-                    <input type="text" name="website" value="" data-rule="url" placeholder="只能输入网址" />
-                </div>
-                <div>
-                    <label for="">签名</label>
-                    <input type="text" name="signature" value="" data-rule="length: 12" placeholder="至少要12个字符" />
-                </div>
-                <div>
-                    <label for="">备注</label>
-                    <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
-                </div>
+
+                    <input type="button" value="这里是一些按钮" />
+                    <input type="submit" value="这里写按钮没有实际用处" />
+                    <input type="reset" value="只是为了展示它们不会被TinyForm获取" />
+                    <input type="button" name="name4button" value="即使设置了name属性" />
+
+                    <input type="button" onclick="console.log(f2.getField());" value="通过调用 f2.getField() 获取这个表单的所有控件" />
+                </form>
             </div>
-            <form action="" class="f2">
-                <p>这是另一个表单，用来测试实例共存</p>
-                <label for="">学校</label>
-                <select name="school">
-                    <option value="1">小学</option>
-                    <option value="2">中学</option>
-                    <option value="3">大学</option>
-                </select>
+            <div class="right">
 
-                <input type="button" value="这里是一些按钮" />
-                <input type="submit" value="这里写按钮没有实际用处" />
-                <input type="reset" value="只是为了展示它们不会被TinyForm获取" />
-                <input type="button" name="name4button" value="即使设置了name属性" />
-            </form>
-        </div>
-        <div class="right">
+                <div class="notsupport">
+                    <del>IE7及更低版本IE浏览器</del>
+                </div>
 
-            <div class="notsupport">
-                <del>IE7及更低版本IE浏览器</del>
-            </div>
+                <div class="quote outstand">
+                    所有输出数据请按F12打开开发者控制台查看
+                </div>
 
-            <div class="quote outstand">
-                所有输出数据请按F12打开开发者控制台查看
-            </div>
+                <h3>功能</h3>
+                <ul class="features">
+                    <li>实例化任何标签成form</li>
+                    <li>获取表单控件对象</li>
+                    <li>获取/设置表单控件的数据</li>
+                    <li>验证表单控件的数据有有效性</li>
+                    <li>异步提交表单</li>
+                    <li>使用Storage存储表单数据，定时自动保存数据</li>
+                </ul>
 
-            <h3>功能</h3>
-            <ul class="features">
-                <li>实例化任何标签成form</li>
-                <li>获取表单控件对象</li>
-                <li>获取/设置表单控件的数据</li>
-                <li>验证表单控件的数据有有效性</li>
-                <li>异步提交表单</li>
-                <li>使用Storage存储表单数据，定时自动保存数据</li>
-            </ul>
+                <h3>接口演示</h3>
 
-            <h3>接口演示</h3>
+                <div class="buttons">
+                    <select name="" id="fields"></select>
+                    <button id="b1">获取某个控件的值</button>
 
-            <div class="buttons">
-                <select name="" id="fields"></select>
-                <button id="b1">获取某个控件的值</button>
+                    <textarea class="code">var name = form.getData('username');</textarea>
 
-                <textarea class="code">var name = form.getData('username');</textarea>
+                    <button id="b2">获取所有控件的值</button>
+                    <textarea class="code">var formdata = form.getData();</textarea>
 
-                <button id="b2">获取所有控件的值</button>
-                <textarea class="code">var formdata = form.getData();</textarea>
+                    <button id="b3">获取"用户名"控件对象</button>
+                    <textarea class="code">var field = form.getField('username');</textarea>
 
-                <button id="b3">获取"用户名"控件对象</button>
-                <textarea class="code">var field = form.getField('username');</textarea>
+                    <button id="b4">获取"性别"控件对象</button>
+                    <textarea class="code">var field = form.getField('gender');</textarea>
 
-                <button id="b4">获取"性别"控件对象</button>
-                <textarea class="code">var field = form.getField('gender');</textarea>
+                    <button id="b5">获取所有控件对象</button>
+                    <textarea class="code">var fields = form.getField();</textarea>
 
-                <button id="b5">获取所有控件对象</button>
-                <textarea class="code">var fields = form.getField();</textarea>
+                    <button id="b6">设置"用户名"控件的值</button>
+                    <textarea class="code">form.setData('hyjiacan', 'username');</textarea>
 
-                <button id="b6">设置"用户名"控件的值</button>
-                <textarea class="code">form.setData('hyjiacan', 'username');</textarea>
+                    <button id="b7">设置"性别"控件的值</button>
+                    <textarea class="code">form.setData(0, 'gender');</textarea>
 
-                <button id="b7">设置"性别"控件的值</button>
-                <textarea class="code">form.setData(0, 'gender');</textarea>
+                    <button id="b14">设置"爱好"的值</button>
+                    <textarea class="code">var hobby = form.setData(['girl', 'coding'], 'hobby');</textarea>
 
-                <button id="b14">设置"爱好"的值</button>
-                <textarea class="code">var hobby = form.setData(['girl', 'coding'], 'hobby');</textarea>
-
-                <button id="b8">设置所有控件的值</button>
-                <textarea class="code">form.setData({
+                    <button id="b8">设置所有控件的值</button>
+                    <textarea class="code">form.setData({
     username: 'hyjiacan',
     gender: 0,
     job: 'code',
     hobby: ['coding', 'reading', 'girl'],
+  js: 1, css: 0, html: 1,
     phone: '1222222222',
     'name-en': 'hyjiacan-en',
     email: 'me@hyjiacan.com',
@@ -168,39 +197,41 @@
     signature: '没有签名',
     remark: '几个字的备注'
 });</textarea>
-                <button id="b9">重置表单</button>
-                <textarea class="code">form.reset();</textarea>
+                    <button id="b9">重置表单</button>
+                    <textarea class="code">form.reset();</textarea>
 
-                <button id="b10">验证"用户名"不为空</button>
-                <textarea class="code">form.validate('username');</textarea>
+                    <button id="b10">验证"用户名"不为空</button>
+                    <textarea class="code">form.validate('username');</textarea>
 
-                <button id="b13">验证备注长度</button>
-                <textarea class="code">form.validate('remark');</textarea>
+                    <button id="b13">验证备注长度</button>
+                    <textarea class="code">form.validate('remark');</textarea>
 
-                <button id="b11">验证所有验证的控件</button>
-                <textarea class="code">form.validate();</textarea>
+                    <button id="b11">验证所有验证的控件</button>
+                    <textarea class="code">form.validate();</textarea>
 
-                <button id="b12">提交表单，通过事件*beforeSubmit*修改请求参数</button>
-                <textarea class="code">// submit可以有参数，结构与jQuery的$.ajax参数一致
+                    <button id="b12">提交表单，通过事件*beforeSubmit*修改请求参数</button>
+                    <textarea class="code">// submit可以有参数，结构与jQuery的$.ajax参数一致
 form.submit();</textarea>
 
-                <button id="b15">保存表单数据到存储</button>
-                <textarea class="code">// 数据存储后，下次打开浏览器可以读取出来
+                    <button id="b15">保存表单数据到存储</button>
+                    <textarea class="code">// 数据存储后，下次打开浏览器可以读取出来
 form.store();</textarea>
 
-                <button id="b16">刷新页面/重启浏览器从这里加载存储数据</button>
-                <textarea class="code">form.load();</textarea>
+                    <button id="b16">刷新页面/重启浏览器从这里加载存储数据</button>
+                    <textarea class="code">form.load();</textarea>
 
-                <button id="b17">清空这个表单的存储数据</button>
-                <textarea class="code">form.abandon();</textarea>
-            </div>
+                    <button id="b17">清空这个表单的存储数据</button>
+                    <textarea class="code">form.abandon();</textarea>
+                </div>
 
-            <h3>关于</h3>
-            <div>QQ群: 187786345 (Javascript爱好者)</div>
-
-            <div>
-                <span>项目主页:</span>
-                <a href="http://git.oschina.net/hyjiacan/TinyForm">http://git.oschina.net/hyjiacan/TinyForm</a>
+                <h3>关于</h3>
+                <div>
+                    <p>QQ群: 187786345
+                        (<a target="_blank" title="点击加入"
+                            href="//shang.qq.com/wpa/qunwpa?idkey=591bf1fd7527b4d695de442bb5ef6d368abe8f72a430b274809b5d5f9a4a8e90">Javascript爱好者</a>)
+                    </p>
+                    <p>邮箱: dev#hyjiacan.com</p>
+                </div>
             </div>
         </div>
     </body>
@@ -234,7 +265,7 @@ form.store();</textarea>
             },
             beforeSubmit: function(ajaxOption) {
                 var data = ajaxOption.data || {};
-                data.addition = 'xxxxxxxxxxxxxx-fuck';
+                data.addition = 'xxxxxxxxxxxxxx';
                 if(data.gender) {
                     if(data.gender == '0') {
                         data.gender = '男的';

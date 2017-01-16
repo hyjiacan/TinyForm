@@ -2,93 +2,163 @@
 html {
   height: 100%;
   width: 100%;
+  scrollbar-base-color: transparent;
+  scrollbar-face-color: #AAA;
+}
+html ::-webkit-scrollbar {
+  width: 6px;
+  border: none;
+}
+html ::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background-color: #AAA;
 }
 body {
   color: #333;
   font-size: 16px;
-  width: 1020px;
   margin: 0 auto;
   font-family: "微软雅黑";
   height: 100%;
-  overflow: hidden;
+  padding: 0 10px;
+  min-width: 480px;
   padding-bottom: 20px;
   box-sizing: border-box;
 }
-body .left,
-body .right {
-  height: 100%;
-  overflow: auto;
-  scrollbar-base-color: transparent;
-  scrollbar-face-color: #AAA;
+@media (min-width: 1080px) {
+  body {
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: 1080px;
+  }
 }
-body .left::-webkit-scrollbar,
-body .right::-webkit-scrollbar {
-  width: 6px;
-  border: none;
+body a,
+body a:focus,
+body a:hover,
+body a:link,
+body a:visited {
+  color: #303030;
 }
-body .left::-webkit-scrollbar-thumb,
-body .right::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background-color: #AAA;
+body a:hover {
+  color: orangered;
 }
-body .left {
-  width: 600px;
-  float: left;
+body .top {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 120px;
+  background-color: #FFFFFF;
 }
-body .left .title {
+@media (min-width: 800px) {
+  body .top {
+    height: 80px;
+  }
+}
+body .top .title {
   color: #333;
   padding-bottom: 6px;
   border-bottom: 10px solid #CCC;
 }
-body .left .title small {
+@media (min-width: 1080px) {
+  body .top .title {
+    width: 1080px;
+    margin: 0 auto;
+  }
+}
+body .top .title small {
   font-size: 14px;
   color: #666;
 }
-body .left #f1 > div {
+body .top .title .links {
+  padding-left: 0;
+  font-size: 14px;
+  list-style: none;
+  font-weight: normal;
+}
+@media (min-width: 800px) {
+  body .top .title .links {
+    display: inline;
+    padding-left: 40px;
+  }
+}
+body .top .title .links li {
+  display: inline;
+  width: 120px;
+  margin: 0 10px;
+  text-align: center;
+}
+body .content {
+  height: 100%;
+  clear: both;
+  box-sizing: border-box;
+  padding-top: 124px;
+  overflow: auto;
+}
+@media (min-width: 800px) {
+  body .content {
+    padding-top: 84px;
+  }
+}
+@media (min-width: 1080px) {
+  body .content .left,
+  body .content .right {
+    height: 100%;
+    overflow: auto;
+  }
+}
+@media (min-width: 1080px) {
+  body .content .left {
+    float: left;
+    width: 600px;
+  }
+}
+body .content .left #f1 > div {
   min-height: 40px;
   clear: both;
   margin: 20px 0 10px;
 }
-body .left #f1 > div label {
+body .content .left #f1 > div label {
   display: inline-block;
   float: left;
   padding-right: 5px;
   line-height: 24px;
 }
-body .left #f1 > div select,
-body .left #f1 > div input[type=text] {
+body .content .left #f1 > div input[type=text],
+body .content .left #f1 > div select {
   width: 200px;
   border: 1px solid #AAA;
 }
-body .left #f1 > div label:hover,
-body .left #f1 > div select:hover,
-body .left #f1 > div input:hover,
-body .left #f1 > div textarea:not(.code):hover {
+body .content .left #f1 > div input:hover,
+body .content .left #f1 > div label:hover,
+body .content .left #f1 > div select:hover,
+body .content .left #f1 > div textarea:not(.code):hover {
   border: 1px solid #666666;
 }
-body .left #f1 > div label:hover + .code,
-body .left #f1 > div select:hover + .code,
-body .left #f1 > div input:hover + .code,
-body .left #f1 > div textarea:not(.code):hover + .code {
+body .content .left #f1 > div input:hover + .code,
+body .content .left #f1 > div label:hover + .code,
+body .content .left #f1 > div select:hover + .code,
+body .content .left #f1 > div textarea:not(.code):hover + .code {
   background-color: #f2f2f2;
 }
-body .left .f2 {
+body .content .left .f2 {
   margin: 20px 0;
   border: 4px solid #CCC;
   padding: 10px;
 }
-body .right {
-  width: 400px;
-  float: right;
+@media (min-width: 1080px) {
+  body .content .right {
+    float: right;
+    width: 400px;
+  }
 }
-body .right .notsupport {
+body .content .right .notsupport {
   background-color: #f00;
   color: #fff;
   text-align: center;
   padding: 5px 10px;
   margin: 10px 0;
 }
-body .right .outstand {
+body .content .right .outstand {
   color: #FF0C00;
   font-weight: bold;
   font-size: 1em;
@@ -97,43 +167,36 @@ body .right .outstand {
   text-align: center;
   border-radius: 3px;
 }
-body .right .features {
+body .content .right .features {
   line-height: 28px;
 }
-body .right .buttons {
+body .content .right .buttons {
   clear: both;
 }
-body .right .buttons button {
+body .content .right .buttons button {
   background: #F8F8F8;
   color: #333;
   border: 1px solid #CCC;
   padding: 5px 10px;
   cursor: pointer;
 }
-body .right .buttons button:hover {
+body .content .right .buttons button:hover {
   background: #F0F0F0;
   border-color: #666666;
 }
-body .right .buttons button:hover + .code {
+body .content .right .buttons button:hover + .code {
   background-color: #f2f2f2;
 }
-body .right .buttons > .code {
+body .content .right .buttons > .code {
   margin: 5px 0 20px;
-}
-body .right a,
-body .right a:visited,
-body .right a:link,
-body .right a:hover,
-body .right a:focus {
-  color: #303030;
 }
 body h3 {
   color: #333;
   padding: 10px 0 3px;
   border-bottom: 4px solid #CCC;
 }
-body textarea.code,
-body .quote {
+body .quote,
+body textarea.code {
   clear: both;
   background-color: #FAFAFA;
   padding: 10px;
@@ -158,8 +221,8 @@ body textarea.code {
 body textarea.code:hover {
   background-color: #f5f5f5;
 }
-body input[type=text],
 body input[type=password],
+body input[type=text],
 body select {
   min-height: 28px;
   line-height: 28px;

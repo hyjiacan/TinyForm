@@ -51,7 +51,9 @@ $(function() {
     for(var name in fields) {
         var option = $('<option>');
         option.val(name);
-        option.text($.trim(fields[name].prev().text()));
+        var field = fields[name];
+
+        option.text($.trim((field.is(':checkbox') ? field.parent() : field.prev()).text()));
         $('#fields').append(option);
     }
 
@@ -89,6 +91,9 @@ $(function() {
             username: 'hyjiacan',
             gender: 0,
             job: 'code',
+            js: 1,
+            css: 0,
+            html: 1,
             phone: '1222222222',
             hobby: ['coding', 'reading', 'girl'],
             'name-en': 'hyjiacan-en',

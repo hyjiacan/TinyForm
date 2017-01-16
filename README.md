@@ -18,7 +18,12 @@
 - tinyform.validate.js 验证控件的输入
 - tinyform.storage.js 操作数据存储
 
-## 安装/Install
+## 源码/SourceCode
+
+git
+```shell
+$ git clone https://git.oschina.net/hyjiacan/TinyForm.git
+```
 
 npm
 ```shell
