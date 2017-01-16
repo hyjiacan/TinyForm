@@ -278,9 +278,9 @@ form.option.storage.container = window.sessionStorage;
 
 ```javascript
 {
-    url: 使用表单的action属性，
-    type: 使用表单的method属性，如果没有则使用*post*,
-    data: 使用*getData()*取到的表单数据，在此指定时，参数会附加到参数里面
+    url: 'String', // 使用表单的action属性
+    type: 'String', 使用表单的method属性，如果没有则使用"post"
+    data: 'Object', 使用"getData()"取到的表单数据，在此指定时，参数会附加到参数里面
 }
 ```
 
