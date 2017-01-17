@@ -1,4 +1,3 @@
-/*  示例 */
 html {
   height: 100%;
   width: 100%;
@@ -20,7 +19,6 @@ body {
   font-family: "微软雅黑";
   height: 100%;
   padding: 0 10px;
-  min-width: 480px;
   padding-bottom: 20px;
   box-sizing: border-box;
 }
@@ -92,7 +90,7 @@ body .content {
   clear: both;
   box-sizing: border-box;
   padding-top: 124px;
-  overflow: auto;
+  overflow-y: auto;
 }
 @media (min-width: 800px) {
   body .content {
@@ -231,4 +229,7 @@ body input,
 body select,
 body textarea {
   outline: none;
+}
+body textarea {
+  width: 100%;
 }

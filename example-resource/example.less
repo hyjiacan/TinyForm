@@ -19,7 +19,6 @@ body {
     font-family: "微软雅黑";
     height: 100%;
     padding: 0 10px;
-    min-width: 480px;
 
     @media (min-width: 1080px) {
         overflow-y: hidden;
@@ -92,7 +91,7 @@ body {
         clear: both;
         box-sizing: border-box;
         padding-top: 124px;
-        overflow: auto;
+        overflow-y: auto;
 
         @media (min-width: 800px) {
             padding-top: 84px;
@@ -233,5 +232,9 @@ body {
     select,
     textarea {
         outline: none;
+    }
+
+    textarea {
+        width: 100%;
     }
 }
