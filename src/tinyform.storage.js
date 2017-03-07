@@ -17,6 +17,20 @@
      */
     var interval;
 
+    // 默认配置
+    TinyForm.defaults.storage = {
+        // 存储的唯一名称，如果不指定，会自动计算一个唯一名称
+        name: null,
+        // 数据存储的容器，根据应用场景可以设置为 localStorage或sessionStorage
+        container: win.localStorage,
+        // 是否在实例化的时候加载存储的数据，默认为false
+        load: false,
+        // // 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
+        time: 0,
+        // 自动保存数据后的回调函数
+        onstore: false
+    };
+
     /**
      * TinyForm 本地存储组件
      * 提供将表单数据存放到localStorage或sessionStorage的功能
@@ -26,24 +40,16 @@
             // 照惯例保存一个表单实例对象到变量
             var me = this;
 
-            // 初始化数据存储部分的参数
-            var storage = me.option.storage = $.extend(true, {
-                // 数据存储的容器
-                container: win.localStorage,
-                // 初始化时自动加载存储数据
-                load: false,
-                // 自动保存存储数据周期（毫秒），为0时不自动保存
-                time: 0,
-                // 保存数据后的回调函数 只有这个参数是函数时才有效
-                onstore: false,
-                // 这个表单数据存储的唯一名称
-                // 类型: 字符串，如果不指定这个参数，那么会使用url+DOM构建一个唯一名称
-                name: getUniquePath(me.context)
-            }, me.option.storage);
+            var storage = me.option.storage;
 
+            // 这个表单数据存储的唯一名称
+            // 类型: 字符串，如果不指定这个参数，那么会使用url+DOM构建一个唯一名称
+            if (!storage.name) {
+                storage.name = getUniquePath(me.context);
+            }
             // 如果需要初始化时从存储加载数据，那么就调用加载函数
             // 如果存储中没有数据会清空现有的数据
-            if(storage.load) {
+            if (storage.load) {
                 // 加载数据
                 me.load();
             }
@@ -64,7 +70,7 @@
             this.option.storage.container.setItem(this.option.storage.name, JSON.stringify(data));
 
             // 如果参数大于0，那么就是传入了存储数据前的处理函数
-            if(arguments.length > 0) {
+            if (arguments.length > 0) {
                 // 调用回调函数
                 fn.call(this, data);
             }
@@ -81,21 +87,21 @@
             // 从存储中读取出来数据
             var data = this.option.storage.container.getItem(this.option.storage.name);
             // 如果有数据，就通过JSON搞成对象
-            if(data) {
+            if (data) {
                 // 这里弄个try catch，是考虑到存储被篡改的情况
                 try {
                     // 解析字符串为对象
                     data = JSON.parse(data);
-                } catch(e) {
+                } catch (e) {
                     // 解析失败，在控制台输出信息
                     console.error(INVALID_STORAGE_DATA);
                 }
             }
 
             // 如果指定了填充参数
-            if(fill) {
+            if (fill) {
                 // 如果指定了填充表单数据前的处理函数
-                if($.isFunction(fn)) {
+                if ($.isFunction(fn)) {
                     // 那么就调用这个处理函数，并将其返回值作为要填充的数据填入
                     this.setData(fn.call(this, data));
                 } else {
@@ -114,12 +120,12 @@
             var storage = this.option.storage;
             var data = storage.container.getItem(storage.name);
             storage.container.removeItem(storage.name);
-            if(data) {
+            if (data) {
                 // 这里弄个try catch，是考虑到存储被篡改的情况
                 try {
                     // 解析字符串为对象
                     data = JSON.parse(data);
-                } catch(e) {
+                } catch (e) {
                     // 解析失败，在控制台输出信息
                     console.error(INVALID_STORAGE_DATA);
                 }
@@ -154,7 +160,7 @@
         path.push($(element).siblings().andSelf().index(element));
 
         // 判断表单元素是否指定了ID
-        if($(element).is('[id]')) {
+        if ($(element).is('[id]')) {
             // 指定了ID就把ID添加到数组中
             path.push($(element).attr('id'));
         }
@@ -172,7 +178,7 @@
         interval = parseInt(storage.time);
 
         // 是否配置了定时存储数据
-        if(isNaN(interval) || interval <= 0) {
+        if (isNaN(interval) || interval <= 0) {
             // 如果没有定义或格式不正确或是负数就直接返回
             return;
         }
@@ -182,7 +188,7 @@
             // 存储数据
             fm.store();
             // 如果指定了存储数据的事件处理函数
-            if($.isFunction(storage.onstore)) {
+            if ($.isFunction(storage.onstore)) {
                 // 调用存储数据的处理函数
                 storage.onstore.call(fm);
             }

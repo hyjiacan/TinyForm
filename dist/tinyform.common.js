@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.6.0 common 2017-03-03
+ * TinyForm 0.7.0 common 2017-03-07
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -20,7 +20,7 @@
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
     var CONTROL_SELECTOR = 'input[name]:not(:button,:submit,:reset), select[name], textarea[name]';
-   
+
     /**
      * 附加到元素上的表单实例的id属性
      */
@@ -54,7 +54,7 @@
      * 表单实例的控件集合
      */
     var fieldSet = {};
-    
+
     /**
      * 生成一个新的表单实例id
      * 结构为： tiny+ 时间戳 + 随机数
@@ -79,7 +79,7 @@
         // 如果取到就表示真的已经实例化了，取不到表示还没有实例化
         // 要注意：取到后还有个条件，那就是在实例对象集合  instanceSet 中存在这个id的实例
         // 以防止有小人故意在标签上加个假冒的属性
-        if(!id || !instanceSet.hasOwnProperty(id)) {
+        if (!id || !instanceSet.hasOwnProperty(id)) {
             // 搞一个新的id
             id = idGenerator();
             // 把这个新id弄到标签的属性上面
@@ -114,7 +114,7 @@
             me.id = id;
 
             // 合并选项参数
-            me.option = $.extend(true, {
+            me.option = $.extend(true, {}, TinyForm.defaults, {
                 // 表单控件的选择器
                 selector: CONTROL_SELECTOR
             }, option);
@@ -144,20 +144,20 @@
             var all = $.extend(true, {}, fieldSet[this.id]);
 
             // 不传参数表示获取所有的控件
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 返回所的控件集合的副本
                 return all;
             }
 
             // 如果传的参数不是字符串，那就是不合法的
-            if(typeof fieldName !== 'string') {
+            if (typeof fieldName !== 'string') {
                 // 参数错误，此时返回空
                 return;
             }
             // 尝试获取控件对象（这里得到的是jQuery对象）
             var field = all[fieldName];
             // 判断是否存在这个名字的控件
-            if(!all.hasOwnProperty(fieldName) || field.length === 0) {
+            if (!all.hasOwnProperty(fieldName) || field.length === 0) {
                 // 如不存在，返回空
                 return;
             }
@@ -210,13 +210,13 @@
             // 或者是原有的对象改变后影响已经绑定的功能
             var temp = $.extend(true, {}, extension);
             // 判断插件是否有初始化方法
-            if(temp.hasOwnProperty('setup')) {
+            if (temp.hasOwnProperty('setup')) {
                 // 有初始化方法，将其添加到扩展方法数组中
                 extfn.setup.push(temp.setup);
                 // 删掉插件参数上面的setup方法，以阻止其污染核心组件的setup
                 delete temp.setup;
             }
-            if(temp.hasOwnProperty('refresh')) {
+            if (temp.hasOwnProperty('refresh')) {
                 // 有刷新方法，将其添加到扩展方法数组中
                 extfn.refresh.push(temp.refresh);
                 // 删掉插件参数上面的refresh方法，以阻止其污染核心组件的refresh
@@ -226,7 +226,7 @@
             // 添加插件方法到实例上
             $.each(temp, function(name, fn) {
                 // 检查方法是否存在
-                if(this.hasOwnProperty(name)) {
+                if (this.hasOwnProperty(name)) {
                     // 方法存在，插件不能添加这个方法
                     console.error(METHOD_EXISTS);
                     // 既然不能添加，那就直接返回吧
@@ -238,6 +238,10 @@
             });
         }
     });
+
+    // 提供默认的配置修改入口
+    // 扩展通过  TinyForm.defaults.xxx 来设置默认参数
+    TinyForm.defaults = {};
 
     // 搞懂，因为真正创建实例是通过 setup ，所以需要把 TinyForm 的原型交给 setup，以通过 setup 来产生一个 TinyForm 的实例
     TinyForm.prototype.setup.prototype = TinyForm.prototype;
@@ -260,14 +264,14 @@
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
             // 如果name为空，则跳过
-            if(name === '') {
+            if (name === '') {
                 // 没有name属性，那就对不起了
                 return;
             }
 
             // 控件缓存集合中还不存在这个name的控件
             // 不存在，可能是还没有这个name的属性或者长度为0，感觉这个判断有点冗余，先不管了
-            if(typeof fields[name] === 'undefined' || fields[name].length === 0) {
+            if (typeof fields[name] === 'undefined' || fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
                 // 这里搞数组，就是为了将相同name的控件集中起来
                 fields[name] = $(this);
@@ -276,7 +280,7 @@
             }
 
             // 存在name，如果是radio的话就追加到jQuery数组后头
-            if($(this).is(':radio')) {
+            if ($(this).is(':radio')) {
                 // 将DOM控件对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个控件，所以直接使用  this
                 fields[name].push(this);
@@ -291,7 +295,7 @@
 })(jQuery, window);/**
  * TinyForm 数据读写组件，负责从表单控件读取值以及向其写入值
  */
-(function($, TF) {
+(function($, TinyForm) {
     /**
      * 我要使用严格模式
      */
@@ -302,20 +306,25 @@
      */
     var originalData = {};
 
+    // 默认配置
+    // 因为 data 是核心组件，所以配置项就不单独放到一个对象中
+    $.extend(true, TinyForm.defaults, {
+        // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 [true, false]
+        checkbox: [true, false],
+        // 调用ajax前的数据处理
+        beforeSubmit: false
+    });
+
     /**
      * 这个是数据读写（获取和设置）的组件
      */
-    TF.extend({
+    TinyForm.extend({
         /**
          * 初始化
          */
         setup: function() {
             // 保存初始数据，用于重置
             originalData[this.id] = this.getData();
-
-            this.option = $.extend(true, {
-                checkbox: [true, false]
-            }, this.option);
         },
         /**
          * 获取所有控件的值，返回对象
@@ -324,12 +333,12 @@
          */
         getData: function(fieldName) {
             // 没有参数，要获取所有控件的数据
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 返回所有控件的数据
                 return getAllData(this);
             }
             // 参数需要控件的name字符串，类型不对
-            if(typeof fieldName !== 'string') {
+            if (typeof fieldName !== 'string') {
                 // 返回空
                 return;
             }
@@ -349,7 +358,7 @@
             var me = this;
 
             // 这个函数需要至少一个参数，你一个都不传，这是想造反么？
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 这属性开发错误，我要在控制台给你报个错
                 console.error('setData 需要至少1个参数');
                 // 还是返回个实例给你
@@ -357,9 +366,9 @@
             }
 
             // 如果传的参数>=2个，就是要设置指定name的控件的值，后面多余的参数直接忽略
-            if(arguments.length >= 2) {
+            if (arguments.length >= 2) {
                 //  第二个参数还是要个字符串，格式不对没法玩
-                if(typeof fieldName !== 'string') {
+                if (typeof fieldName !== 'string') {
                     // 返回给你个实例对象
                     return me;
                 }
@@ -375,7 +384,7 @@
                 // 从传入数据对象里面取出这个name的值
                 var val = data[name];
                 // 如果数据对象里面没有指定这个name，或值为null
-                if(typeof val === 'undefined' || val === null) {
+                if (typeof val === 'undefined' || val === null) {
                     // 那就把值设置成空字符串
                     val = '';
                 }
@@ -411,17 +420,16 @@
             }, option);
 
             // option 构建完了，这里看看有没有设置提交前的回调函数
-            if($.isFunction(me.option.beforeSubmit)) {
+            if ($.isFunction(me.option.beforeSubmit)) {
                 // 设置了提交前的回调函数，就调用一下
                 // 回调函数的上下文this是表单实例对象，有个参数option，可以直接进行改动
-                me.option.beforeSubmit.call(me, option);
+                if (me.option.beforeSubmit.call(me, option) === false) {
+                    return;
+                }
             }
 
             // 发送ajax请求
-            $.ajax(option);
-
-            // 返回表单实例对象
-            return me;
+            return $.ajax(option);
         },
 
         /**
@@ -432,7 +440,7 @@
             // 看一下表单dom元素对象上有没有一个叫做reset的方法
             // 如果有，那就说明这个表单的DOM元素是form标签
             // 这时就有浏览器内置的reset能用
-            if($.isFunction(this.context.get(0).reset)) {
+            if ($.isFunction(this.context.get(0).reset)) {
                 // 调用浏览器内置的表单reset方法
                 this.context.get(0).reset();
             } else {
@@ -453,13 +461,13 @@
      */
     function setFieldData(fm, data, field) {
         // 如果控件不存在（长度为0），那么啥都不做
-        if(field.length === 0) {
+        if (field.length === 0) {
             // 返回吧
             return;
         }
 
         // 控件是radio，那么可能有多个
-        if(field.is(':radio')) {
+        if (field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false)
                 // 找出value与数据相等的控件设置选中
@@ -469,7 +477,7 @@
         }
 
         // 如果是checkbox，那么直接控件选中
-        if(field.is(':checkbox')) {
+        if (field.is(':checkbox')) {
             // 强制数据转换成字符串来比较，以控制控件的选中状态
             field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
             // 可以返回了
@@ -507,7 +515,7 @@
         var field = fm.getField(fieldName);
 
         // 如果控件是input标签的元素，使用独特的取值技巧
-        if(field.is('input')) {
+        if (field.is('input')) {
             // 返回获取到的值
             return getInputValue(fm, field);
         }
@@ -526,13 +534,13 @@
         // 声明一个存放控件值的变量，默认值为空字符串
         var value = '';
         // 取radio的值
-        if(field.is(':radio')) {
+        if (field.is(':radio')) {
             // 取选中的radio的值就行了
             return field.filter(':checked').val();
         }
 
         // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
-        if(field.is(':checkbox')) {
+        if (field.is(':checkbox')) {
             return field.is(':checked') ? fm.option.checkbox[0] : fm.option.checkbox[1];
         }
 
@@ -542,7 +550,7 @@
 })(jQuery, TinyForm);/**
  * TinyForm 数据校验组件
  */
-(function($, TF) {
+(function($, TinyForm) {
     /**
      * 我要使用严格模式
      */
@@ -631,30 +639,33 @@
     var ruleSet = {};
 
     /**
+     * 默认配置
+     */
+    TinyForm.defaults.validate = {
+        // 是否在输入控件失去焦点时自动验证，默认为false
+        auto: false,
+        // 是否在第一次验证失败时停止验证，默认为true
+        stop: false,
+        // 每个控件验证后的回调函数
+        callback: function() {}
+    };
+
+    /**
      * 验证组件
      */
-    TF.extend({
+    TinyForm.extend({
         /**
          * 初始化
          */
         setup: function() {
             // 后面有回调要用这个实例对象，所以先存一下
             var me = this;
-            // 合并配置项 传参数时要使用  {validate:{}} 这样的形式
-            me.option.validate = $.extend(true, {
-                // 是否在失去焦点时自动验证
-                auto: false,
-                // 是否在第一个验证失败时停止验证
-                stop: true,
-                // 每个控件被验证后触发的回调
-                callback: function() {}
-            }, me.option.validate);
 
             // 获取所有在元素标签属性上指定的验证规则和提示消息
             getAllTagRules(this);
 
             // 绑定事件 失去焦点时调用验证函数
-            if(!me.option.validate.auto) {
+            if (!me.option.validate.auto) {
                 // 不自动验证 就直接返回好了
                 return;
             }
@@ -684,7 +695,7 @@
             var all = $.extend(true, {}, ruleSet[this.id]);
 
             // 没有参数
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 返回所有的规则对象
                 return all;
             }
@@ -708,9 +719,9 @@
             var me = this;
 
             // 指定了参数，说明只验证指定name的控件，这里只取第一个参数
-            if(arguments.length > 0) {
+            if (arguments.length > 0) {
                 // 参数需要字符串，类型不对
-                if(typeof fieldName !== 'string') {
+                if (typeof fieldName !== 'string') {
                     // 因为这种情况应该是开发的错误，所以返回验证失败
                     return false;
                 }
@@ -730,9 +741,9 @@
             // 取到所有的控件准备验证
             var fields = me.getField();
             // 开始遍历控件验证
-            for(var name in fields) {
+            for (var name in fields) {
                 // 这个name无效
-                if(!fields.hasOwnProperty(name)) {
+                if (!fields.hasOwnProperty(name)) {
                     // 进行下一次
                     continue;
                 }
@@ -747,7 +758,7 @@
                 //}
                 var r = validateField(me, name);
                 // 在第一次验证失败后停止验证
-                if(!r && me.option.validate.stop) {
+                if (!r && me.option.validate.stop) {
                     // 验证失败了，返回false
                     return false;
                 }
@@ -755,7 +766,7 @@
                 // 将返回的验证详细信息保存起来，
                 // 这个函数完了后，如果验证失败就将所有验证结果返回
                 data.detail[name] = r;
-                if(!r && data.pass) {
+                if (!r && data.pass) {
                     // 验证不通过  整体结果为不通过
                     data.pass = false;
                 }
@@ -783,7 +794,7 @@
             var msg = field.attr(ATTRS.msg);
 
             // 规则为空，返回一个false
-            if(rule === '') {
+            if (rule === '') {
                 // 设置 false ，表示没有验证规则
                 rules[name] = false;
                 // 没有规则就不用再去取提示消息了，直接返回去取下一个控件
@@ -791,11 +802,11 @@
             }
 
             // 如果自定义规则 RULES 中存在这个名称的规则，那么直接取出正则
-            if(RULES.hasOwnProperty(rule)) {
+            if (RULES.hasOwnProperty(rule)) {
                 // 取出正则
                 rules[name] = $.extend(true, {}, RULES[rule]);
                 // 标签上没有设置提示消息
-                if(typeof msg !== 'undefined') {
+                if (typeof msg !== 'undefined') {
                     // 使用默认的提示消息(也就是在RULES中设置的消息)
                     rules[name].msg = msg;
                 }
@@ -818,12 +829,12 @@
         // 创建一个存放验证规则和提示消息的对象
         var validation = {};
         // 参数传入的rule为空
-        if(!rule) {
+        if (!rule) {
             // 不需要验证，返回一个false
             return false;
         }
         // 如果验证以regex:开头，表示需要使用正则验证
-        if(rule.indexOf('regex:') === 0) {
+        if (rule.indexOf('regex:') === 0) {
             // 本来这里有 try catch 的，但是考虑到，
             // 要是有异常，这就是开发的问题了，这种错误还是保留比较好
             // 替换掉原串的 regox: 字符，后面的就应该是验证用的正则
@@ -835,7 +846,7 @@
         }
 
         // 如果验证以 length: 开头，表示要控制输入长度
-        if(rule.indexOf('length:') === 0) {
+        if (rule.indexOf('length:') === 0) {
             return resolveLengthRule(rule, msg);
         }
 
@@ -859,11 +870,11 @@
         // 所以通过分隔逗号(,)来搞成数组
         var lendef = rule.replace('length:', '').split(',');
         // 如果只提供了一个值，表示长度不能小于设定值
-        if(lendef.length === 1) {
+        if (lendef.length === 1) {
             // 搞成int类型 如果搞不成，那数据格式就不对了
             var len = parseInt(lendef[0]);
             // 不能搞成数字 或者是负数
-            if(isNaN(len) || len < 0) {
+            if (isNaN(len) || len < 0) {
                 // 给开发输出提示消息
                 console.error(INT_REQUIRED + ' "' + rule + '"');
                 // 错了就不验证了
@@ -880,13 +891,13 @@
         }
 
         //提供了两个值，表示要限制长度起始范围
-        if(lendef.length === 2) {
+        if (lendef.length === 2) {
             // 把第一个值弄成int
             var len1 = parseInt(lendef[0]);
             // 把第二个值弄成int
             var len2 = parseInt(lendef[1]);
             // 不能搞成数字 或者是负数
-            if(isNaN(len1) || len1 < 0 || isNaN(len2) || len2 < 0) {
+            if (isNaN(len1) || len1 < 0 || isNaN(len2) || len2 < 0) {
                 // 给开发输出提示消息
                 console.error(INT_REQUIRED + ' "' + rule + '"');
                 // 错了就不验证了
@@ -918,7 +929,7 @@
         //根据name取到控件
         var field = fm.getField(fieldName);
         // 控件不存在
-        if(field.length === 0) {
+        if (field.length === 0) {
             // 返回false表示验证失败
             // 为啥呢？
             // 开发专门来验证，却出现了控件不存在的情况，
@@ -930,7 +941,7 @@
         var rule = fm.getRule(fieldName);
 
         // 没有规则或为false就不需要验证
-        if(typeof rule === 'undefined' || rule === false) {
+        if (typeof rule === 'undefined' || rule === false) {
             // 返回一个true，表示验证通过
             return true;
         }
@@ -944,7 +955,7 @@
         //验证的回调函数，这个太长了，弄个短名字要写些
         var cb = fm.option.validate.callback;
         // 回调不是函数，直接返回验证的结果
-        if(!$.isFunction(cb)) {
+        if (!$.isFunction(cb)) {
             // 返回验证的结果  true 或者 false
             return pass;
         }
@@ -962,7 +973,7 @@
         });
 
         // 判断回调的返回值是不是 undefined，如果是那么就是用户并没有返回值
-        if(typeof custompass !== 'undefined') {
+        if (typeof custompass !== 'undefined') {
             // 用户返回了值，强制搞成boolean然后作为这个控件的验证结果
             pass = !!custompass;
         }

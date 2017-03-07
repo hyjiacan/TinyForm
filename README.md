@@ -7,7 +7,7 @@
 
 **dist** 生成目录
 
-- tinyform.core[.min].js 基本的表单控件获取和数据读写功能
+- tinyform.core[.min].js 基本的表单控件获取和数据读写功能、表单的重置、异步提交
 - tinyform.common[.min].js 含基本的表单控件获取、数据读写、表单的重置、异步提交和数据验证功能
 - tinyform.all[.min].js 包含所有功能
 
@@ -17,6 +17,22 @@
 - tinyform.data.js 包含数据的读写、重置和异步提交
 - tinyform.validate.js 验证控件的输入
 - tinyform.storage.js 操作数据存储
+
+## 下载
+
+> 请使用 **右键->另存为** 下载文件
+
+如果只需要表单控件的获取以及表单数据的读写和异步提交，用这个就够了
+[tinyform.core.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.js)(开发版)
+[tinyform.core.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.min.js)(生产版)
+
+如果还想要用到数据的验证，那就用这个
+[tinyform.common.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.common.js)(开发版)
+[tinyform.common.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.common.js)(生产版)
+
+如果还想用到表单数据的本地存储，那就只能选这个了
+[tinyform.all.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.all.js)(开发版)
+[tinyform.all.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.all.min.js)(生产版)
 
 ## 源码/SourceCode
 
@@ -171,7 +187,16 @@ var form = TinyForm('#f1', {
 **beforeSubmit** Function(ajaxOption: Object)
 
 > 异步提交表单前的回调函数，上下文`this`指向 表单实例对象。可以通过此函数改变提交的数据
-> **ajaxOption** 异步请求的数据对象
+> **ajaxOption** 异步请求的数据对象，参数与jQuery的ajax参数一致。修改这个对象会直接影响ajax请求的参数。
+> **return** 此函数返回 false 会阻止表单的提交(仅阻止通过`form.submit()`发起的提交)。
+
+这些选项的默认值可以通过：
+
+```javascript
+TinyForm.defaults.validate.auto = true;
+```
+
+这样的方式来修改，在执行这句后的所有`TinyForm`都会自动在失去焦点后验证
 
 ## 标签属性/Tag Attribute
 
@@ -271,7 +296,7 @@ form.option.storage.container = window.sessionStorage;
 > 重置表单的值（清空所有数据）
 > **return** 表单实例
 
-**submit(option: Object): Instance**
+**submit(option: Object): Instance|Promise**
 
 > 异步提交表单
 > **option** ajax选项，参数与jQuery的*ajax*选项相同，默认参数如下：
@@ -283,6 +308,10 @@ form.option.storage.container = window.sessionStorage;
     data: 'Object', // 使用"getData()"取到的表单数据，在此指定时，参数会附加到参数里面
 }
 ```
+
+> 注意：从版本 `0.7` 开始，这个函数的返回值发生了变化：
+> 如果`beforeSubmit`返回`false`，那么此函数不会提交表单，此时此函数会返回`undefined`，
+> 而如果提交了表单，那么此函数会返回`ajax`的`Promise`对象，以方便通过`form.submit().then(function(){})`的方式使用返回数据
 
 ### tinyform.common
 

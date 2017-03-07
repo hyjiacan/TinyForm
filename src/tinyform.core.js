@@ -10,7 +10,7 @@
      * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
      */
     var CONTROL_SELECTOR = 'input[name]:not(:button,:submit,:reset), select[name], textarea[name]';
-   
+
     /**
      * 附加到元素上的表单实例的id属性
      */
@@ -44,7 +44,7 @@
      * 表单实例的控件集合
      */
     var fieldSet = {};
-    
+
     /**
      * 生成一个新的表单实例id
      * 结构为： tiny+ 时间戳 + 随机数
@@ -69,7 +69,7 @@
         // 如果取到就表示真的已经实例化了，取不到表示还没有实例化
         // 要注意：取到后还有个条件，那就是在实例对象集合  instanceSet 中存在这个id的实例
         // 以防止有小人故意在标签上加个假冒的属性
-        if(!id || !instanceSet.hasOwnProperty(id)) {
+        if (!id || !instanceSet.hasOwnProperty(id)) {
             // 搞一个新的id
             id = idGenerator();
             // 把这个新id弄到标签的属性上面
@@ -104,7 +104,7 @@
             me.id = id;
 
             // 合并选项参数
-            me.option = $.extend(true, {
+            me.option = $.extend(true, {}, TinyForm.defaults, {
                 // 表单控件的选择器
                 selector: CONTROL_SELECTOR
             }, option);
@@ -134,20 +134,20 @@
             var all = $.extend(true, {}, fieldSet[this.id]);
 
             // 不传参数表示获取所有的控件
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 返回所的控件集合的副本
                 return all;
             }
 
             // 如果传的参数不是字符串，那就是不合法的
-            if(typeof fieldName !== 'string') {
+            if (typeof fieldName !== 'string') {
                 // 参数错误，此时返回空
                 return;
             }
             // 尝试获取控件对象（这里得到的是jQuery对象）
             var field = all[fieldName];
             // 判断是否存在这个名字的控件
-            if(!all.hasOwnProperty(fieldName) || field.length === 0) {
+            if (!all.hasOwnProperty(fieldName) || field.length === 0) {
                 // 如不存在，返回空
                 return;
             }
@@ -200,13 +200,13 @@
             // 或者是原有的对象改变后影响已经绑定的功能
             var temp = $.extend(true, {}, extension);
             // 判断插件是否有初始化方法
-            if(temp.hasOwnProperty('setup')) {
+            if (temp.hasOwnProperty('setup')) {
                 // 有初始化方法，将其添加到扩展方法数组中
                 extfn.setup.push(temp.setup);
                 // 删掉插件参数上面的setup方法，以阻止其污染核心组件的setup
                 delete temp.setup;
             }
-            if(temp.hasOwnProperty('refresh')) {
+            if (temp.hasOwnProperty('refresh')) {
                 // 有刷新方法，将其添加到扩展方法数组中
                 extfn.refresh.push(temp.refresh);
                 // 删掉插件参数上面的refresh方法，以阻止其污染核心组件的refresh
@@ -216,7 +216,7 @@
             // 添加插件方法到实例上
             $.each(temp, function(name, fn) {
                 // 检查方法是否存在
-                if(this.hasOwnProperty(name)) {
+                if (this.hasOwnProperty(name)) {
                     // 方法存在，插件不能添加这个方法
                     console.error(METHOD_EXISTS);
                     // 既然不能添加，那就直接返回吧
@@ -228,6 +228,10 @@
             });
         }
     });
+
+    // 提供默认的配置修改入口
+    // 扩展通过  TinyForm.defaults.xxx 来设置默认参数
+    TinyForm.defaults = {};
 
     // 搞懂，因为真正创建实例是通过 setup ，所以需要把 TinyForm 的原型交给 setup，以通过 setup 来产生一个 TinyForm 的实例
     TinyForm.prototype.setup.prototype = TinyForm.prototype;
@@ -250,14 +254,14 @@
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
             // 如果name为空，则跳过
-            if(name === '') {
+            if (name === '') {
                 // 没有name属性，那就对不起了
                 return;
             }
 
             // 控件缓存集合中还不存在这个name的控件
             // 不存在，可能是还没有这个name的属性或者长度为0，感觉这个判断有点冗余，先不管了
-            if(typeof fields[name] === 'undefined' || fields[name].length === 0) {
+            if (typeof fields[name] === 'undefined' || fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
                 // 这里搞数组，就是为了将相同name的控件集中起来
                 fields[name] = $(this);
@@ -266,7 +270,7 @@
             }
 
             // 存在name，如果是radio的话就追加到jQuery数组后头
-            if($(this).is(':radio')) {
+            if ($(this).is(':radio')) {
                 // 将DOM控件对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个控件，所以直接使用  this
                 fields[name].push(this);

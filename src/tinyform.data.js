@@ -1,7 +1,7 @@
 /**
  * TinyForm 数据读写组件，负责从表单控件读取值以及向其写入值
  */
-(function($, TF) {
+(function($, TinyForm) {
     /**
      * 我要使用严格模式
      */
@@ -12,20 +12,25 @@
      */
     var originalData = {};
 
+    // 默认配置
+    // 因为 data 是核心组件，所以配置项就不单独放到一个对象中
+    $.extend(true, TinyForm.defaults, {
+        // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 [true, false]
+        checkbox: [true, false],
+        // 调用ajax前的数据处理
+        beforeSubmit: false
+    });
+
     /**
      * 这个是数据读写（获取和设置）的组件
      */
-    TF.extend({
+    TinyForm.extend({
         /**
          * 初始化
          */
         setup: function() {
             // 保存初始数据，用于重置
             originalData[this.id] = this.getData();
-
-            this.option = $.extend(true, {
-                checkbox: [true, false]
-            }, this.option);
         },
         /**
          * 获取所有控件的值，返回对象
@@ -34,12 +39,12 @@
          */
         getData: function(fieldName) {
             // 没有参数，要获取所有控件的数据
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 返回所有控件的数据
                 return getAllData(this);
             }
             // 参数需要控件的name字符串，类型不对
-            if(typeof fieldName !== 'string') {
+            if (typeof fieldName !== 'string') {
                 // 返回空
                 return;
             }
@@ -59,7 +64,7 @@
             var me = this;
 
             // 这个函数需要至少一个参数，你一个都不传，这是想造反么？
-            if(arguments.length === 0) {
+            if (arguments.length === 0) {
                 // 这属性开发错误，我要在控制台给你报个错
                 console.error('setData 需要至少1个参数');
                 // 还是返回个实例给你
@@ -67,9 +72,9 @@
             }
 
             // 如果传的参数>=2个，就是要设置指定name的控件的值，后面多余的参数直接忽略
-            if(arguments.length >= 2) {
+            if (arguments.length >= 2) {
                 //  第二个参数还是要个字符串，格式不对没法玩
-                if(typeof fieldName !== 'string') {
+                if (typeof fieldName !== 'string') {
                     // 返回给你个实例对象
                     return me;
                 }
@@ -85,7 +90,7 @@
                 // 从传入数据对象里面取出这个name的值
                 var val = data[name];
                 // 如果数据对象里面没有指定这个name，或值为null
-                if(typeof val === 'undefined' || val === null) {
+                if (typeof val === 'undefined' || val === null) {
                     // 那就把值设置成空字符串
                     val = '';
                 }
@@ -121,17 +126,16 @@
             }, option);
 
             // option 构建完了，这里看看有没有设置提交前的回调函数
-            if($.isFunction(me.option.beforeSubmit)) {
+            if ($.isFunction(me.option.beforeSubmit)) {
                 // 设置了提交前的回调函数，就调用一下
                 // 回调函数的上下文this是表单实例对象，有个参数option，可以直接进行改动
-                me.option.beforeSubmit.call(me, option);
+                if (me.option.beforeSubmit.call(me, option) === false) {
+                    return;
+                }
             }
 
             // 发送ajax请求
-            $.ajax(option);
-
-            // 返回表单实例对象
-            return me;
+            return $.ajax(option);
         },
 
         /**
@@ -142,7 +146,7 @@
             // 看一下表单dom元素对象上有没有一个叫做reset的方法
             // 如果有，那就说明这个表单的DOM元素是form标签
             // 这时就有浏览器内置的reset能用
-            if($.isFunction(this.context.get(0).reset)) {
+            if ($.isFunction(this.context.get(0).reset)) {
                 // 调用浏览器内置的表单reset方法
                 this.context.get(0).reset();
             } else {
@@ -163,13 +167,13 @@
      */
     function setFieldData(fm, data, field) {
         // 如果控件不存在（长度为0），那么啥都不做
-        if(field.length === 0) {
+        if (field.length === 0) {
             // 返回吧
             return;
         }
 
         // 控件是radio，那么可能有多个
-        if(field.is(':radio')) {
+        if (field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false)
                 // 找出value与数据相等的控件设置选中
@@ -179,7 +183,7 @@
         }
 
         // 如果是checkbox，那么直接控件选中
-        if(field.is(':checkbox')) {
+        if (field.is(':checkbox')) {
             // 强制数据转换成字符串来比较，以控制控件的选中状态
             field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
             // 可以返回了
@@ -217,7 +221,7 @@
         var field = fm.getField(fieldName);
 
         // 如果控件是input标签的元素，使用独特的取值技巧
-        if(field.is('input')) {
+        if (field.is('input')) {
             // 返回获取到的值
             return getInputValue(fm, field);
         }
@@ -236,13 +240,13 @@
         // 声明一个存放控件值的变量，默认值为空字符串
         var value = '';
         // 取radio的值
-        if(field.is(':radio')) {
+        if (field.is(':radio')) {
             // 取选中的radio的值就行了
             return field.filter(':checked').val();
         }
 
         // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
-        if(field.is(':checkbox')) {
+        if (field.is(':checkbox')) {
             return field.is(':checked') ? fm.option.checkbox[0] : fm.option.checkbox[1];
         }
 
