@@ -48,7 +48,7 @@
             <div id="f1" action="#">
                 <div>
                     <label for="">用户名</label>
-                    <input type="text" name="username" data-rule="required" data-msg="有本事你写下你的名字" placeholder="不能为空" />
+                    <input type="text" name="username" data-rule="required number" data-msg="有本事你写下你的名字，只能是数字" placeholder="不能为空" />
                 </div>
                 <div>
                     <label for="">性别</label>
@@ -94,7 +94,7 @@
                 </div>
                 <div>
                     <label for="">英文名字</label>
-                    <input type="text" name="name-en" value="" data-rule="alpha" placeholder="只能是字母" />
+                    <input type="text" name="name-en" value="" data-rule="alpha lower" placeholder="只能是字母，还只能是小写" />
                 </div>
                 <div>
                     <label for="">邮箱</label>
@@ -241,12 +241,18 @@ form.store();</textarea>
         checkbox: [1, 0],
         validate: {
             auto: true, // 是否在输入控件失去焦点时自动验证
-            stop: false, // 是否在第一次验证失败时停止验证
+            stop: true, // 是否在第一次验证失败时停止验证
             callback: function(e) {
                 console.log('字段:' + e.field.attr('name'));
                 console.log('值:' + e.value);
                 console.log('验证结果:' + e.pass);
                 console.log('验证失败的消息:' + e.msg);
+            },
+            rules: {
+                lower: {
+                    rule: /^[a-z]$/i,
+                    msg: '请输入小写字母'
+                }
             }
         },
         storage: {

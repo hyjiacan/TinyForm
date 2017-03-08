@@ -60,7 +60,7 @@ $ bower install tinyform
 <div id="f1" action="#">
     <div>
         <label for="">用户名</label>
-        <input type="text" name="username" data-rule="required" data-msg="有本事你写下你的名字" placeholder="不能为空" />
+        <input type="text" name="username" data-rule="required number" data-msg="有本事你写下你的名字" placeholder="不能为空,只能数字" />
     </div>
     <div>
         <label for="">性别</label>
@@ -82,7 +82,7 @@ $ bower install tinyform
     </div>
     <div>
         <label for="">英文名字</label>
-        <input type="text" name="name-en" value="" data-rule="alpha" placeholder="只能是字母" />
+        <input type="text" name="name-en" value="" data-rule="alpha lower" placeholder="只能是字母，还只能是小写的" />
     </div>
     <div>
         <label for="">邮箱</label>
@@ -129,6 +129,15 @@ var form = TinyForm('#f1', {
             // 验证的提示消息，无论验证是否通过都有
             console.log('消息:' + e.msg);
             // 可以通过 return来改变验证的结果，若不想改变原验证结果，可以不返回任何值
+        },
+        // 这个表单实例附加的验证规则
+        rules: {
+            // 小写规则
+            lower: {
+                rule: /^[a-z]$/i,
+                msg: '请输入小写字母'
+            }
+            // 当然，还可以加上更多
         }
     },
     storage: {
@@ -193,7 +202,14 @@ var form = TinyForm('#f1', {
 这些选项的默认值可以通过：
 
 ```javascript
+// 设置所有的表单失去焦点时自动验证
 TinyForm.defaults.validate.auto = true;
+
+// 添加一个名为 xxx 的验证规则，在标签上可以通过  data-rule="xxx" 来使用
+TinyForm.defaults.validate.rules.xxx = {
+    rule: /xxx/,
+    msg: '需要xxx'
+};
 ```
 
 这样的方式来修改，在执行这句后的所有`TinyForm`都会自动在失去焦点后验证
@@ -212,6 +228,13 @@ TinyForm.defaults.validate.auto = true;
 - 留空 不验证
 - **regex:**打头 自定义的正则表达式，如：`regex: [0-7]`
 - **length:**打头 验证输入长度，若只有一个值则表示最短长度;两个值表示长度范围 `length: 6, 16`
+
+指定多个验证规则时，使用空格分隔：
+
+```html
+<input type="text" name="username" data-rule="required number" data-msg="有本事你写下你的名字，只能是数字" placeholder="不能为空" />
+```
+此时，验证消息最好通过规则对象指定，`data-msg`仅作为通用消息
 
 **data-msg**
 

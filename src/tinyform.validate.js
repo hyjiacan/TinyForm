@@ -98,7 +98,9 @@
         // 是否在第一次验证失败时停止验证，默认为true
         stop: false,
         // 每个控件验证后的回调函数
-        callback: function() {}
+        callback: function() {},
+        // 提供规则可编辑的接口
+        rules: RULES
     };
 
     /**
@@ -152,7 +154,7 @@
             }
 
             // 控件不存在
-            if(this.getField(fieldName).length === 0) {
+            if (this.getField(fieldName).length === 0) {
                 // 返回空对象
                 return {};
             }
@@ -236,6 +238,8 @@
     function getAllTagRules(fm) {
         // 清空原有的数据
         var rules = ruleSet[fm.id] = {};
+        // 所有可用的规则
+        var validRules = fm.option.validate.rules;
 
         // 遍历控件，获取验证规则
         $.each(fm.getField(), function(name, field) {
@@ -252,20 +256,34 @@
                 return;
             }
 
-            // 如果自定义规则 RULES 中存在这个名称的规则，那么直接取出正则
-            if (RULES.hasOwnProperty(rule)) {
-                // 取出正则
-                rules[name] = $.extend(true, {}, RULES[rule]);
-                // 标签上没有设置提示消息
-                if (typeof msg !== 'undefined') {
-                    // 使用默认的提示消息(也就是在RULES中设置的消息)
-                    rules[name].msg = msg;
+            // 不包含 : 冒号，表示是普通规则
+            // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
+            if (rule.indexOf(':') === -1) {
+                // 字段的所有验证规则
+                var fieldRules = rule.split(' ');
+                rules[name] = [];
+
+                $.each(fieldRules, function(index, thisRule) {
+                    if (validRules.hasOwnProperty(thisRule)) {
+                        // 取出正则
+                        rules[name].push($.extend(true, {}, validRules[thisRule]));
+                        // 标签上没有设置提示消息
+                        if (typeof msg !== 'undefined') {
+                            // 使用默认的提示消息(也就是在validRules中设置的消息)
+                            rules[name].msg = msg;
+                        }
+                    }
+                });
+
+                // 如果所有验证规则都不存在，那么就认为不需要验证
+                if (!rules[name].length) {
+                    rules[name] = false;
                 }
                 // 可以返回了
                 return;
             }
 
-            // 解析在RULES中没有定义的规则，然后返回
+            // 解析在validRules中没有定义的规则，然后返回
             rules[name] = resolveValidateRule(rule, msg);
         });
     }
@@ -380,7 +398,7 @@
         //根据name取到控件
         var field = fm.getField(fieldName);
         // 控件不存在
-        if (field.length === 0) {
+        if (!field || field.length === 0) {
             // 返回false表示验证失败
             // 为啥呢？
             // 开发专门来验证，却出现了控件不存在的情况，
@@ -389,44 +407,58 @@
         }
 
         // 获取控件的验证规则
-        var rule = fm.getRule(fieldName);
+        var rules = fm.getRule(fieldName);
+        var pass = true;
+        for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            // 没有规则或为false就不需要验证
+            if (typeof rule === 'undefined' || rule === false) {
+                // 返回一个true，表示验证通过
+                return true;
+            }
 
-        // 没有规则或为false就不需要验证
-        if (typeof rule === 'undefined' || rule === false) {
-            // 返回一个true，表示验证通过
-            return true;
-        }
+            // 获取控件的值
+            var value = fm.getData(fieldName);
 
-        // 获取控件的值
-        var value = fm.getData(fieldName);
 
-        // 此处为了方便处理textarea中的换行，特意将获取到的值中的换行符 \r\n 替换成了 空格
-        var pass = !rule.rule || rule.rule.test((value || '').toString().replace(/[\r\n]/g, ' '));
+            // 此处为了方便处理textarea中的换行，特意将获取到的值中的换行符 \r\n 替换成了 空格
+            // 此处可能会出现BUG  现在还不晓得会出现啥BUG (在使用 textarea 的时候)
+            pass = !rule.rule || rule.rule.test((value || '').toString().replace(/[\r\n]/g, ' '));
 
-        //验证的回调函数，这个太长了，弄个短名字要写些
-        var cb = fm.option.validate.callback;
-        // 回调不是函数，直接返回验证的结果
-        if (!$.isFunction(cb)) {
-            // 返回验证的结果  true 或者 false
-            return pass;
-        }
+            //验证的回调函数，这个太长了，弄个短名字要写些
+            var cb = fm.option.validate.callback;
 
-        // 因为回调可以通过return来改变验证结果，所以这里要取得回调的返回值
-        var custompass = cb.call(fm, {
-            // 验证是否通过
-            pass: pass,
-            // 验证的控件对象
-            field: field,
-            // 控件的值
-            value: value,
-            // 提示消息
-            msg: rule.msg
-        });
+            // 回调不是函数，直接返回验证的结果
+            if (!$.isFunction(cb)) {
+                // 配置了stop参数么在第一次验证失败后就停止验证
+                if (fm.option.validate.stop && !pass) {
+                    return false;
+                }
+                continue;
+            }
 
-        // 判断回调的返回值是不是 undefined，如果是那么就是用户并没有返回值
-        if (typeof custompass !== 'undefined') {
-            // 用户返回了值，强制搞成boolean然后作为这个控件的验证结果
-            pass = !!custompass;
+            // 因为回调可以通过return来改变验证结果，所以这里要取得回调的返回值
+            var custompass = cb.call(fm, {
+                // 验证是否通过
+                pass: pass,
+                // 验证的控件对象
+                field: field,
+                // 控件的值
+                value: value,
+                // 提示消息
+                msg: rule.msg
+            });
+
+            // 判断回调的返回值是不是 undefined，如果是那么就是用户并没有返回值
+            if (typeof custompass !== 'undefined') {
+                // 用户返回了值，强制搞成boolean然后作为这个控件的验证结果
+                pass = !!custompass;
+            }
+
+            // 配置了stop参数么在第一次验证失败后就停止验证
+            if (fm.option.validate.stop && !pass) {
+                return false;
+            }
         }
         //返回验证结果   true 或者 false
         return pass;
