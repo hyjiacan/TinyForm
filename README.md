@@ -234,7 +234,17 @@ TinyForm.defaults.validate.rules.xxx = {
 ```html
 <input type="text" name="username" data-rule="required number" data-msg="有本事你写下你的名字，只能是数字" placeholder="不能为空" />
 ```
-此时，验证消息最好通过规则对象指定，`data-msg`仅作为通用消息
+此时，验证消息最好通过规则对象指定，`data-msg`仅作为通用消息，可使用如下方法更改提示消息：
+
+```javascript
+var form = $('#form', {
+    validate:{
+        required: {
+            msg: '请填写必填字段'
+        }
+    }
+})
+```
 
 **data-msg**
 

@@ -263,16 +263,18 @@
                 var fieldRules = rule.split(' ');
                 rules[name] = [];
 
-                $.each(fieldRules, function(index, thisRule) {
-                    if (validRules.hasOwnProperty(thisRule)) {
-                        // 取出正则
-                        rules[name].push($.extend(true, {}, validRules[thisRule]));
-                        // 标签上没有设置提示消息
-                        if (typeof msg !== 'undefined') {
-                            // 使用默认的提示消息(也就是在validRules中设置的消息)
-                            rules[name].msg = msg;
-                        }
+                $.each(fieldRules, function(index, ruleName) {
+                    if (!validRules.hasOwnProperty(ruleName)) {
+                        return;
                     }
+                    var thisRule = $.extend(true, {}, validRules[ruleName]);
+                    // 标签上没有设置提示消息
+                    if (typeof msg !== 'undefined') {
+                        // 使用默认的提示消息(也就是在validRules中设置的消息)
+                        thisRule.msg = msg;
+                    }
+                    // 添加规则
+                    rules[name].push(thisRule);
                 });
 
                 // 如果所有验证规则都不存在，那么就认为不需要验证
