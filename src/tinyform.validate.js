@@ -267,7 +267,9 @@
                     if (!validRules.hasOwnProperty(ruleName)) {
                         return;
                     }
-                    var thisRule = $.extend(true, {}, validRules[ruleName]);
+                    var thisRule = $.extend(true, {
+                        name: ruleName
+                    }, validRules[ruleName]);
                     // 标签上没有设置提示消息
                     if (typeof msg !== 'undefined') {
                         // 使用默认的提示消息(也就是在validRules中设置的消息)
@@ -416,7 +418,9 @@
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
         // 此时不需要验证，所以就不调用回调函数了
-        if (value === '' && rules.indexOf('required') === -1) {
+        if (value === '' && rules.every(function(rule) {
+                return rule.name !== 'required';
+            })) {
             return pass;
         }
 
