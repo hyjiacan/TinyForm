@@ -167,7 +167,7 @@
      */
     function setFieldData(fm, data, field) {
         // 如果控件不存在（长度为0），那么啥都不做
-        if (field.length === 0) {
+        if (!field || field.length === 0) {
             // 返回吧
             return;
         }
