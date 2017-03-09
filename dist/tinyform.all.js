@@ -486,6 +486,11 @@
 
         // 其它类型的input和非input控件，直接设置值
         field.val(data);
+
+        // 如果是select控件，那就触发一下change事件
+        if (field.is('select')) {
+            field.change();
+        }
     }
 
     /**
@@ -863,7 +868,7 @@
             var me = this;
 
             // 获取所有在元素标签属性上指定的验证规则和提示消息
-            getAllTagRules(this);
+            getAllRules(this);
 
             // 绑定事件 失去焦点时调用验证函数
             if (!me.option.validate.auto) {
@@ -884,7 +889,7 @@
          */
         refresh: function() {
             // 重新获取标签的验证规则
-            getAllTagRules(this);
+            getAllRules(this);
         },
         /**
          * 获取表单指定控件的验证规则或所有规则
@@ -983,7 +988,7 @@
      * @param {Object} fm 表单实例
      * @returns {Object} 验证规则对象
      */
-    function getAllTagRules(fm) {
+    function getAllRules(fm) {
         // 清空原有的数据
         var rules = ruleSet[fm.id] = {};
         // 所有可用的规则
@@ -1018,9 +1023,11 @@
                     var thisRule = $.extend(true, {
                         name: ruleName
                     }, validRules[ruleName]);
-                    // 标签上没有设置提示消息
-                    if (typeof msg !== 'undefined') {
-                        // 使用默认的提示消息(也就是在validRules中设置的消息)
+
+                    // 规则上没有配置提示信息，那么就使用标签上设置了提示消息
+                    // 要不你都不配置？那怪我咯？
+                    if (!thisRule.msg) {
+                        // 使用标签上配置的的提示消息(也就是在data-msg上配置的消息)
                         thisRule.msg = msg;
                     }
                     // 添加规则
