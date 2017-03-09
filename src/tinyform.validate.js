@@ -408,9 +408,18 @@
             return false;
         }
 
+        var pass = true;
         // 获取控件的验证规则
         var rules = fm.getRule(fieldName);
-        var pass = true;
+        // 获取控件的值
+        var value = fm.getData(fieldName);
+
+        // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
+        // 此时不需要验证，所以就不调用回调函数了
+        if (value === '' && rules.indexOf('required') === -1) {
+            return pass;
+        }
+
         for (var i = 0; i < rules.length; i++) {
             var rule = rules[i];
             // 没有规则或为false就不需要验证
@@ -419,15 +428,11 @@
                 return true;
             }
 
-            // 获取控件的值
-            var value = fm.getData(fieldName);
-
-
             // 此处为了方便处理textarea中的换行，特意将获取到的值中的换行符 \r\n 替换成了 空格
             // 此处可能会出现BUG  现在还不晓得会出现啥BUG (在使用 textarea 的时候)
             pass = !rule.rule || rule.rule.test((value || '').toString().replace(/[\r\n]/g, ' '));
 
-            //验证的回调函数，这个太长了，弄个短名字要写些
+            //验证的回调函数，这个太长了，弄个短名字好写些
             var cb = fm.option.validate.callback;
 
             // 回调不是函数，直接返回验证的结果
