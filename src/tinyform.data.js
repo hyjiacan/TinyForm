@@ -192,6 +192,11 @@
 
         // 其它类型的input和非input控件，直接设置值
         field.val(data);
+
+        // 如果是select控件，那就触发一下change事件
+        if (field.is('select')) {
+            field.change();
+        }
     }
 
     /**
