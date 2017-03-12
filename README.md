@@ -1,7 +1,7 @@
 # TinyForm
 
 **TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单控件。
->默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，这项是写在文件*src/tinyform.core.js*里面的全局变量*CONTROL_SELECTOR*中。当然，也可以通过实例化表单的参数*selector*来自定义。
+>默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，配置参数这`TinyForm.defaults.selector`，也就是说，也可以通过实例化表单的参数*selector*来自定义。
 
 ## 目录结构
 
@@ -104,6 +104,14 @@ $ bower install tinyform
         <label for="">备注</label>
         <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
     </div>
+    <div>
+        <label for="">标签忽略的控件</label>
+        <input type="text" name="ignore-field-1" data-ignore />
+    </div>
+    <div>
+        <label for="">配置忽略的控件</label>
+        <input type="text" name="ignore-field-2" />
+    </div>
 </div>
 ```
 
@@ -113,6 +121,13 @@ $ bower install tinyform
 var form = TinyForm('#f1', {
     // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 [true, false]
     checkbox: [1, 0],
+    // 在表单内查找控件时，要忽略的控件或控件集合
+    // 值可以为false、字符串或数组：
+    // boolean: 仅设置false有效，表示没有需要忽略的
+    // array: 要忽略的控件的name组成的数组
+    // 要注意的是：这里的优先级比标签上设置的优先级更低
+    // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
+    ignore: 'ignore-field-2',
     validate: {
         // 是否在输入控件失去焦点时自动验证，默认为false
         auto: true,

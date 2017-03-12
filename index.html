@@ -116,6 +116,14 @@
                     <label for="">备注</label>
                     <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
                 </div>
+                <div>
+                    <label for="">标签忽略的控件</label>
+                    <input type="text" name="ignore-field-1" data-ignore />
+                </div>
+                <div>
+                    <label for="">配置忽略的控件</label>
+                    <input type="text" name="ignore-field-2" />
+                </div>
             </div>
             <form action="" class="f2">
                 <p>这是另一个表单，用来测试实例共存</p>
@@ -125,7 +133,6 @@
                         <option value="2">中学</option>
                         <option value="3">大学</option>
                     </select>
-
                 <input type="button" value="这里是一些按钮" />
                 <input type="submit" value="这里写按钮没有实际用处" />
                 <input type="reset" value="只是为了展示它们不会被TinyForm获取" />
@@ -239,10 +246,11 @@ form.store();</textarea>
     var form = TinyForm('#f1', {
         // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值
         checkbox: [1, 0],
+        ignore: 'ignore-field-2',
         validate: {
             auto: true, // 是否在输入控件失去焦点时自动验证
             stop: true, // 是否在第一次验证失败时停止验证
-            callback: function(e) {
+            callback: function (e) {
                 console.log('字段:' + e.field.attr('name'));
                 console.log('值:' + e.value);
                 console.log('验证结果:' + e.pass);
@@ -265,11 +273,11 @@ form.store();</textarea>
             // 自动保存数据周期
             time: 0,
             // 自动保存数据后的回调函数
-            onstore: function() {
+            onstore: function () {
                 console.log('表单数据已经自动保存');
             },
         },
-        beforeSubmit: function(ajaxOption) {
+        beforeSubmit: function (ajaxOption) {
             var data = ajaxOption.data || {};
             data.addition = 'xxxxxxxxxxxxxx';
             if (data.gender) {

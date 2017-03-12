@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.7.3 common 2017-03-09
+ * TinyForm 0.7.3 common 2017-03-12
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -11,15 +11,11 @@
 /**
  * TinyForm 核心组件，提供form实例化以及表单控件获取功能
  */
-(function($, win) {
+(function ($, win) {
     /**
      * 我要使用严格模式
      */
     'use strict';
-    /**
-     * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
-     */
-    var CONTROL_SELECTOR = 'input[name]:not(:button,:submit,:reset), select[name], textarea[name]';
 
     /**
      * 附加到元素上的表单实例的id属性
@@ -107,17 +103,14 @@
          * @param {String} id TinyForm实例id
          * @returns {Object}  表单实例
          */
-        setup: function(formContainer, option, id) {
+        setup: function (formContainer, option, id) {
             // 保存实例对象到变量里面
             var me = this;
             // 设置实例的id
             me.id = id;
 
             // 合并选项参数
-            me.option = $.extend(true, {}, TinyForm.defaults, {
-                // 表单控件的选择器
-                selector: CONTROL_SELECTOR
-            }, option);
+            me.option = $.extend(true, {}, TinyForm.defaults, option);
             // 表单的DOM上下文
             me.context = formContainer;
 
@@ -126,7 +119,7 @@
 
             // 调用插件的初始化方法  这个调用要放到最后，
             // 确保所有需要的资源都就位
-            $.each(extfn.setup, function() {
+            $.each(extfn.setup, function () {
                 // 调用插件的初始化，并且设置插件的初始化方法的上下文this
                 this.call(me);
             });
@@ -139,7 +132,7 @@
          * @param {String} fieldName 要获取的控件的name值，如果不指定这个属性，那么返回所有控件
          * @returns {Array}  范围内所有name为指定值的控件数组或获取到的所有域对象
          */
-        getField: function(fieldName) {
+        getField: function (fieldName) {
             // 获取到所有控件，然后创建一个副本，以避免控件集合被修改
             var all = $.extend(true, {}, fieldSet[this.id]);
 
@@ -170,7 +163,7 @@
          * 重新获取表单的控件，此操作将更新缓存
          * @returns {Object} 表单实例
          */
-        refresh: function() {
+        refresh: function () {
             // 因为要在下面的回调里面使用表单实例，所以弄个变量把实例保存一下
             var me = this;
 
@@ -178,7 +171,7 @@
             getAllFields(me);
 
             // 调用插件的刷新方法
-            $.each(extfn.refresh, function() {
+            $.each(extfn.refresh, function () {
                 // 并且设置插件的refresh方法的上下文this
                 this.call(me);
             });
@@ -205,7 +198,7 @@
          * 这样就给TinyForm的实例添加了一个方法  xxxx，
          * 然后就可以通过  form.xxxx() 来调用
          */
-        value: function(extension) {
+        value: function (extension) {
             // 搞一个参数的副本，以防止改变原有的对象，
             // 或者是原有的对象改变后影响已经绑定的功能
             var temp = $.extend(true, {}, extension);
@@ -224,7 +217,7 @@
             }
 
             // 添加插件方法到实例上
-            $.each(temp, function(name, fn) {
+            $.each(temp, function (name, fn) {
                 // 检查方法是否存在
                 if (this.hasOwnProperty(name)) {
                     // 方法存在，插件不能添加这个方法
@@ -241,7 +234,19 @@
 
     // 提供默认的配置修改入口
     // 扩展通过  TinyForm.defaults.xxx 来设置默认参数
-    TinyForm.defaults = {};
+    TinyForm.defaults = {
+        /**
+         * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
+         */
+        selector: 'input[name]:not(:button,:submit,:reset,[data-ignore]), select[name]:not([data-ignore]), textarea[name]:not([data-ignore])',
+        // 在表单内查找控件时，要忽略的控件或控件集合
+        // 值可以为false、字符串或数组：
+        // boolean: 仅设置false有效，表示没有需要忽略的
+        // array: 要忽略的控件的name组成的数组
+        // 要注意的是：这里的优先级应该比标签上设置的优先级更低
+        // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
+        ignore: false
+    };
 
     // 搞懂，因为真正创建实例是通过 setup ，所以需要把 TinyForm 的原型交给 setup，以通过 setup 来产生一个 TinyForm 的实例
     TinyForm.prototype.setup.prototype = TinyForm.prototype;
@@ -259,13 +264,23 @@
         // 清空原有的数据
         var fields = fieldSet[fm.id] = {};
 
+        // 取出在实例化时传入的需要ignore的参数，然后始终搞成数组
+        // 后面会用这个数组去判断某个控件是否需要加载
+        var ignoreFields = $.makeArray(fm.option.ignore);
+
         // 根据配置的选择器来查找控件
-        fm.context.find(fm.option.selector).each(function() {
+        fm.context.find(fm.option.selector).each(function () {
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
+
             // 如果name为空，则跳过
             if (name === '') {
                 // 没有name属性，那就对不起了
+                return;
+            }
+
+            // 如果这个name是被ignore的，就跳过这个
+            if (ignoreFields.indexOf(name) !== -1) {
                 return;
             }
 
