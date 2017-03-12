@@ -151,6 +151,27 @@ var form = TinyForm('#f1', {
             lower: {
                 rule: /^[a-z]$/i,
                 msg: '请输入小写字母'
+            },
+            // 大写规则
+            upper: {
+                // @param value 控件的值
+                // @param name 控件的name属性
+                rule: function(value, name){
+                    if(value===''){
+                        // 输入为空  返回true表示验证通过
+                        return true;
+                    }
+
+                    if(/^[A-Z]$/i.test(value)){
+                        // 是大写的，返回true表示验证通过
+                        return true;
+                    }
+                    // 验证失败，返回提示消息
+                    return '请输入大写字母';
+                    // 或者，此时使用data-msg或下面的msg属性
+                    // return false;
+                },
+                msg: '只接收大写字母输入'
             }
             // 当然，还可以加上更多
         }
@@ -183,6 +204,8 @@ var form = TinyForm('#f1', {
     }
 });
 ```
+
+自定义`rule`为函数的写法，参见 [issue#4](http://git.oschina.net/hyjiacan/TinyForm/issues/4)
 
 ### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/tinyform/)** 吧
 
@@ -263,7 +286,11 @@ var form = $('#form', {
 
 **data-msg**
 
-> 此控件验证失败时的提示消息，若不指定则使用默认消息
+> 此控件验证失败时的提示消息，若不指定则使用默认消息，
+> data-msg消息的优先级最高，也就是说:
+> 如果配置了`data-msg`，那么验证失败始终提示此消息
+> 如果没有配置 `data-msg` ，那么就使用 `rule.msg` 作为提示消息
+> 如果想要尝试定制提示消息，那层就将`rule.rule`配置为函数，返回值将作为提示消息
 
 当有相同*name*的控件时，只读取第一个控件的*data-rule*和*data-msg*
 
@@ -371,7 +398,7 @@ form.option.storage.container = window.sessionStorage;
 
 ```javascript
 {
-    rule:  /^.+$/, // 必填
+    rule:  /^.+$/, // 这里可能是正则或函数
     msg: '不能为空' // 提示消息，通过标签的 *data-msg* 属性设置
 }
 ```

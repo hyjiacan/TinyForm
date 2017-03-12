@@ -48,7 +48,7 @@
             <div id="f1" action="#">
                 <div>
                     <label for="">用户名</label>
-                    <input type="text" name="username" data-rule="required number" data-msg="有本事你写下你的名字，只能是数字" placeholder="不能为空" />
+                    <input type="text" name="username" data-rule="required upper" data-msg="有本事你写下你的名字，只能是大写字母" placeholder="不能为空" />
                 </div>
                 <div>
                     <label for="">性别</label>
@@ -251,8 +251,9 @@ form.store();</textarea>
             auto: true, // 是否在输入控件失去焦点时自动验证
             stop: true, // 是否在第一次验证失败时停止验证
             callback: function (e) {
-                console.log('字段:' + e.field.attr('name'));
+                console.log('字段:' + e.name);
                 console.log('值:' + e.value);
+                console.log('规则:' + e.rule);
                 console.log('验证结果:' + e.pass);
                 console.log('验证失败的消息:' + e.msg);
             },
@@ -260,6 +261,25 @@ form.store();</textarea>
                 lower: {
                     rule: /^[a-z]$/i,
                     msg: '请输入小写字母'
+                },
+                // 大写规则
+                upper: {
+                    rule: function (value, name) {
+                        if (value === '') {
+                            // 输入为空  返回true表示验证通过
+                            return true;
+                        }
+
+                        if (/^[A-Z]$/i.test(value)) {
+                            // 是大写的，返回true表示验证通过
+                            return true;
+                        }
+                        // 验证失败，返回提示消息
+                        return '请输入大写字母';
+                        // 或者，此时使用data-msg或下面的msg属性
+                        // return false;
+                    },
+                    msg: '只接收大写字母输入'
                 }
             }
         },

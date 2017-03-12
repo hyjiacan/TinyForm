@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.7.3  2017-03-12
+ * TinyForm 0.7.4  2017-03-12
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -769,7 +769,7 @@
 })(window, jQuery, TinyForm);/**
  * TinyForm 数据校验组件
  */
-(function($, TinyForm) {
+(function ($, TinyForm) {
     /**
      * 我要使用严格模式
      */
@@ -866,7 +866,7 @@
         // 是否在第一次验证失败时停止验证，默认为true
         stop: false,
         // 每个控件验证后的回调函数
-        callback: function() {},
+        callback: function () {},
         // 提供规则可编辑的接口
         rules: RULES
     };
@@ -878,7 +878,7 @@
         /**
          * 初始化
          */
-        setup: function() {
+        setup: function () {
             // 后面有回调要用这个实例对象，所以先存一下
             var me = this;
 
@@ -891,9 +891,9 @@
                 return;
             }
             // 遍历控件，绑定失去焦点时验证的事件
-            $.each(this.getField(), function(name) {
+            $.each(this.getField(), function (name) {
                 // 绑定失去焦点事件
-                this.blur(function() {
+                this.blur(function () {
                     // 失去焦点时触发验证规则
                     me.validate(name);
                 });
@@ -902,7 +902,7 @@
         /**
          * 刷新接口
          */
-        refresh: function() {
+        refresh: function () {
             // 重新获取标签的验证规则
             getAllRules(this);
         },
@@ -911,7 +911,7 @@
          * @param {String} fieldName 控件的name名称，不指定此值时获取所有规则
          * @returns {Object|Boolean}  此控件未定义规则时，返回false；否则返回规则对象 {rule: /正则表达式/, msg: '消息'}
          */
-        getRule: function(fieldName) {
+        getRule: function (fieldName) {
             // 搞一个验证规则的副本，以防止意外改变验证规则
             var all = $.extend(true, {}, ruleSet[this.id]);
 
@@ -935,7 +935,7 @@
          * @param {String} fieldName 指定要验证控件的name名称，不指定时验证所有控件
          * @returns {Object|Boolean} 验证通过时返回true，失败时返回失败的详细信息对象{pass: Boolean, value: String, field: Array, msg: String}
          */
-        validate: function(fieldName) {
+        validate: function (fieldName) {
             // 后头到处要用，搞个变量保存起来，能减小压缩后的体积
             var me = this;
 
@@ -1010,7 +1010,7 @@
         var validRules = fm.option.validate.rules;
 
         // 遍历控件，获取验证规则
-        $.each(fm.getField(), function(name, field) {
+        $.each(fm.getField(), function (name, field) {
             // 从标签属性上获取规则描述  当然  还是要trim一下的
             var rule = $.trim(field.attr(ATTRS.rule));
             // 从标签属性上获取提示消息
@@ -1031,7 +1031,7 @@
                 var fieldRules = rule.split(' ');
                 rules[name] = [];
 
-                $.each(fieldRules, function(index, ruleName) {
+                $.each(fieldRules, function (index, ruleName) {
                     if (!validRules.hasOwnProperty(ruleName)) {
                         return;
                     }
@@ -1039,9 +1039,8 @@
                         name: ruleName
                     }, validRules[ruleName]);
 
-                    // 规则上没有配置提示信息，那么就使用标签上设置了提示消息
-                    // 要不你都不配置？那怪我咯？
-                    if (!thisRule.msg) {
+                    // 如果有配置data-msg，就使用data-msg作为默认的消息
+                    if (typeof msg !== 'undefined') {
                         // 使用标签上配置的的提示消息(也就是在data-msg上配置的消息)
                         thisRule.msg = msg;
                     }
@@ -1188,12 +1187,13 @@
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
         // 此时不需要验证，所以就不调用回调函数了
-        if (value === '' && rules.every(function(rule) {
+        if (value === '' && rules.every(function (rule) {
                 return rule.name !== 'required';
             })) {
             return pass;
         }
 
+        // 这里用for 而不是each，是为了方便在适当的时候 return ，以结束函数
         for (var i = 0; i < rules.length; i++) {
             var rule = rules[i];
             // 没有规则或为false就不需要验证
@@ -1202,9 +1202,26 @@
                 return true;
             }
 
-            // 此处为了方便处理textarea中的换行，特意将获取到的值中的换行符 \r\n 替换成了 空格
-            // 此处可能会出现BUG  现在还不晓得会出现啥BUG (在使用 textarea 的时候)
-            pass = !rule.rule || rule.rule.test((value || '').toString().replace(/[\r\n]/g, ' '));
+            if ($.isFunction(rule.rule)) {
+                // 验证规则是函数，调用它
+                var ret = rule.rule.call(field, value, fieldName);
+                // 验证通过时返回true
+                // 验证不通过时返回false
+                // 不通过时，使用默认的消息：data-msg 或者 rule.msg
+                // 返回字符串（或其它类型）的时候则认为验证不通过，同时这个字符串作为验证失败的提示消息
+                if (typeof ret === 'string') {
+                    pass = false;
+                    // 返回值作为提示消息
+                    rule.msg = ret;
+                } else if (ret === false) {
+                    // 返回值作为验证结果
+                    pass = !!ret;
+                }
+            } else {
+                // 不是函数，那就认为是下则表达式了
+                // 因为只支持这两种写法
+                pass = rule.rule.test(value);
+            }
 
             //验证的回调函数，这个太长了，弄个短名字好写些
             var cb = fm.option.validate.callback;
@@ -1224,6 +1241,10 @@
                 pass: pass,
                 // 验证的控件对象
                 field: field,
+                // 验证规则的名称
+                rule: rule.name,
+                // 控件的name名称
+                name: fieldName,
                 // 控件的值
                 value: value,
                 // 提示消息
