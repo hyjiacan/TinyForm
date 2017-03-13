@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.7.4 common 2017-03-12
+ * TinyForm 0.7.4 common 2017-03-13
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -570,7 +570,7 @@
 })(jQuery, TinyForm);/**
  * TinyForm 数据校验组件
  */
-(function ($, TinyForm) {
+(function($, TinyForm) {
     /**
      * 我要使用严格模式
      */
@@ -667,7 +667,7 @@
         // 是否在第一次验证失败时停止验证，默认为true
         stop: false,
         // 每个控件验证后的回调函数
-        callback: function () {},
+        callback: function() {},
         // 提供规则可编辑的接口
         rules: RULES
     };
@@ -679,7 +679,7 @@
         /**
          * 初始化
          */
-        setup: function () {
+        setup: function() {
             // 后面有回调要用这个实例对象，所以先存一下
             var me = this;
 
@@ -692,9 +692,9 @@
                 return;
             }
             // 遍历控件，绑定失去焦点时验证的事件
-            $.each(this.getField(), function (name) {
+            $.each(this.getField(), function(name) {
                 // 绑定失去焦点事件
-                this.blur(function () {
+                this.blur(function() {
                     // 失去焦点时触发验证规则
                     me.validate(name);
                 });
@@ -703,7 +703,7 @@
         /**
          * 刷新接口
          */
-        refresh: function () {
+        refresh: function() {
             // 重新获取标签的验证规则
             getAllRules(this);
         },
@@ -712,7 +712,7 @@
          * @param {String} fieldName 控件的name名称，不指定此值时获取所有规则
          * @returns {Object|Boolean}  此控件未定义规则时，返回false；否则返回规则对象 {rule: /正则表达式/, msg: '消息'}
          */
-        getRule: function (fieldName) {
+        getRule: function(fieldName) {
             // 搞一个验证规则的副本，以防止意外改变验证规则
             var all = $.extend(true, {}, ruleSet[this.id]);
 
@@ -736,7 +736,7 @@
          * @param {String} fieldName 指定要验证控件的name名称，不指定时验证所有控件
          * @returns {Object|Boolean} 验证通过时返回true，失败时返回失败的详细信息对象{pass: Boolean, value: String, field: Array, msg: String}
          */
-        validate: function (fieldName) {
+        validate: function(fieldName) {
             // 后头到处要用，搞个变量保存起来，能减小压缩后的体积
             var me = this;
 
@@ -811,7 +811,7 @@
         var validRules = fm.option.validate.rules;
 
         // 遍历控件，获取验证规则
-        $.each(fm.getField(), function (name, field) {
+        $.each(fm.getField(), function(name, field) {
             // 从标签属性上获取规则描述  当然  还是要trim一下的
             var rule = $.trim(field.attr(ATTRS.rule));
             // 从标签属性上获取提示消息
@@ -830,9 +830,32 @@
             if (rule.indexOf(':') === -1) {
                 // 字段的所有验证规则
                 var fieldRules = rule.split(' ');
+                // 这是|符号的占位符。
+                // 占位方法：将 || 替换成这个串，然后再map中替换成 |
+                var placeholder = '@tiny_form_msg_splitter@';
+                // 多个提示消息的分隔符
+                var splitter = '|';
+                // 多个消息使用 | 符号分隔，如果要在消息中显示 | 符号，那么就使用 ||
+                var msgs = typeof msg === 'undefined' ? false :
+                    $.map(msg.replace(/\|\|/g, placeholder).split(splitter), function(msgItem) {
+                        return msgItem.replace(new RegExp(placeholder), splitter);
+                    });
+
+                if (msgs) {
+                    // 让规则和消息长度一致
+                    if (msgs.length > fieldRules.length) {
+                        msgs.length = fieldRules.length;
+                    }
+
+                    // 如果只有一个消息，就搞成字符串
+                    if (msgs.length === 1) {
+                        msgs = msgs[0];
+                    }
+                }
+
                 rules[name] = [];
 
-                $.each(fieldRules, function (index, ruleName) {
+                $.each(fieldRules, function(index, ruleName) {
                     if (!validRules.hasOwnProperty(ruleName)) {
                         return;
                     }
@@ -840,10 +863,15 @@
                         name: ruleName
                     }, validRules[ruleName]);
 
-                    // 如果有配置data-msg，就使用data-msg作为默认的消息
-                    if (typeof msg !== 'undefined') {
-                        // 使用标签上配置的的提示消息(也就是在data-msg上配置的消息)
-                        thisRule.msg = msg;
+                    if (msgs && msgs.length) {
+                        // 如果有配置data-msg，就使用data-msg作为默认的消息
+                        if (typeof msgs === 'string') {
+                            // 使用标签上配置的的提示消息(也就是在data-msg上配置的消息)
+                            thisRule.msg = msgs;
+                        } else {
+                            // 取第一个消息
+                            thisRule.msg = msgs.shift();
+                        }
                     }
                     // 添加规则
                     rules[name].push(thisRule);
@@ -983,12 +1011,18 @@
         var pass = true;
         // 获取控件的验证规则
         var rules = fm.getRule(fieldName);
+
+        // 没有验证规则时，直接返回  true
+        if (rules === false) {
+            return pass;
+        }
+
         // 获取控件的值
         var value = fm.getData(fieldName);
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
         // 此时不需要验证，所以就不调用回调函数了
-        if (value === '' && rules.every(function (rule) {
+        if (rules === false || value === '' && rules.every(function(rule) {
                 return rule.name !== 'required';
             })) {
             return pass;
