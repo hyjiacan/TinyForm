@@ -250,7 +250,7 @@ form.store();</textarea>
         validate: {
             auto: true, // 是否在输入控件失去焦点时自动验证
             stop: true, // 是否在第一次验证失败时停止验证
-            callback: function (e) {
+            callback: function(e) {
                 console.log('字段:' + e.name);
                 console.log('值:' + e.value);
                 console.log('规则:' + e.rule);
@@ -259,18 +259,18 @@ form.store();</textarea>
             },
             rules: {
                 lower: {
-                    rule: /^[a-z]$/i,
+                    rule: /^[a-z]+$/,
                     msg: '请输入小写字母'
                 },
                 // 大写规则
                 upper: {
-                    rule: function (value, name) {
+                    rule: function(value, name) {
                         if (value === '') {
                             // 输入为空  返回true表示验证通过
                             return true;
                         }
 
-                        if (/^[A-Z]$/i.test(value)) {
+                        if (/^[A-Z]+$/.test(value)) {
                             // 是大写的，返回true表示验证通过
                             return true;
                         }
@@ -293,11 +293,11 @@ form.store();</textarea>
             // 自动保存数据周期
             time: 0,
             // 自动保存数据后的回调函数
-            onstore: function () {
+            onstore: function() {
                 console.log('表单数据已经自动保存');
             },
         },
-        beforeSubmit: function (ajaxOption) {
+        beforeSubmit: function(ajaxOption) {
             var data = ajaxOption.data || {};
             data.addition = 'xxxxxxxxxxxxxx';
             if (data.gender) {

@@ -149,7 +149,7 @@ var form = TinyForm('#f1', {
         rules: {
             // 小写规则
             lower: {
-                rule: /^[a-z]$/i,
+                rule: /^[a-z]+$/,
                 msg: '请输入小写字母'
             },
             // 大写规则
@@ -162,7 +162,7 @@ var form = TinyForm('#f1', {
                         return true;
                     }
 
-                    if(/^[A-Z]$/i.test(value)){
+                    if(/^[A-Z]+$/.test(value)){
                         // 是大写的，返回true表示验证通过
                         return true;
                     }
