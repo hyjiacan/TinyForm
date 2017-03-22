@@ -265,7 +265,7 @@
             // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
             if (rule.indexOf(':') === -1) {
                 // 字段的所有验证规则
-                var fieldRules = rule.split(' ');
+                var fieldRules = rule.split('|');
                 // 这是|符号的占位符。
                 // 占位方法：将 || 替换成这个串，然后再map中替换成 |
                 var placeholder = '@tiny_form_msg_splitter@';
@@ -322,7 +322,7 @@
             }
 
             // 解析在validRules中没有定义的规则，然后返回
-            rules[name] = resolveValidateRule(rule, msg);
+            rules[name] = [resolveValidateRule(rule, msg)];
         });
     }
 
