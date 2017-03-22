@@ -111,32 +111,13 @@
          * 初始化
          */
         setup: function() {
-            // 后面有回调要用这个实例对象，所以先存一下
-            var me = this;
-
-            // 获取所有在元素标签属性上指定的验证规则和提示消息
-            getAllRules(this);
-
-            // 绑定事件 失去焦点时调用验证函数
-            if (!me.option.validate.auto) {
-                // 不自动验证 就直接返回好了
-                return;
-            }
-            // 遍历控件，绑定失去焦点时验证的事件
-            $.each(this.getField(), function(name) {
-                // 绑定失去焦点事件
-                this.blur(function() {
-                    // 失去焦点时触发验证规则
-                    me.validate(name);
-                });
-            });
+            refresh(this);
         },
         /**
          * 刷新接口
          */
         refresh: function() {
-            // 重新获取标签的验证规则
-            getAllRules(this);
+            refresh(this);
         },
         /**
          * 获取表单指定控件的验证规则或所有规则
@@ -229,6 +210,30 @@
             return data.pass || data.detail;
         }
     });
+
+    /**
+     * 加载验证规则并根据配置绑定自动验证事件
+     * 
+     * @param {Object} fm 表单实例
+     */
+    function refresh(fm) {
+        // 重新获取标签的验证规则
+        getAllRules(fm);
+
+        // 绑定事件 失去焦点时调用验证函数
+        if (!fm.option.validate.auto) {
+            // 不自动验证 就直接返回好了
+            return;
+        }
+        // 遍历控件，绑定失去焦点时验证的事件
+        $.each(fm.getField(), function(name) {
+            // 绑定失去焦点事件
+            this.blur(function() {
+                // 失去焦点时触发验证规则
+                fm.validate(name);
+            });
+        });
+    }
 
     /**
      * 获取表单所有控件的验证规则

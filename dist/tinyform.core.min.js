@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.7.4 core 2017-03-13
+ * TinyForm 0.7.4 core 2017-03-22
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
