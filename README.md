@@ -267,22 +267,18 @@ TinyForm.defaults.validate.rules.xxx = {
 - **regex:**打头 自定义的正则表达式，如：`regex: [0-7]`
 - **length:**打头 验证输入长度，若只有一个值则表示最短长度;两个值表示长度范围 `length: 6, 16`
 
-指定多个验证规则时，使用空格分隔：
+指定多个验证规则时，使用 `|` 符号分隔：
 
 ```html
-<input type="text" name="username" data-rule="required number" data-msg="有本事你写下你的名字，只能是数字" placeholder="不能为空" />
+<input type="text" name="username" data-rule="required|number" data-msg="有本事你写下你的名字|只能是数字" placeholder="不能为空" />
 ```
-此时，验证消息最好通过规则对象指定，`data-msg`仅作为通用消息，可使用如下方法更改提示消息：
 
-```javascript
-var form = $('#form', {
-    validate:{
-        required: {
-            msg: '请填写必填字段'
-        }
-    }
-})
+需要注意的是，使用 `|` 符号分隔的规则仅在指定规则名称时有效，即不能将规则名称与正则混用，如：
+
+```html
+<input type="text" name="username" data-rule="regex: ^xxx$|number" data-msg="有本事你写下你的名字|只能是数字" placeholder="不能为空" />
 ```
+是错误的写法。
 
 **data-msg**
 
@@ -294,6 +290,18 @@ var form = $('#form', {
 > 如果要针对每一个规则设置不同的消息，可以将多个消息使用 `|` 符号分隔，如果消息中包含`|`符号，那么就写成`||`
 
 当有相同*name*的控件时，只读取第一个控件的*data-rule*和*data-msg*
+
+可使用如下方法更改提示消息：
+
+```javascript
+var form = $('#form', {
+    validate:{
+        required: {
+            msg: '请填写必填字段'
+        }
+    }
+})
+```
 
 ## 实例属性/Property
 

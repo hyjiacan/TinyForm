@@ -225,6 +225,12 @@
         // 根据控件的name找到控件
         var field = fm.getField(fieldName);
 
+        // field 不存在，即此时在请求不存在 
+        if (!field) {
+            console.error('cannot found field "' + fieldName + '"');
+            return;
+        }
+
         // 如果控件是input标签的元素，使用独特的取值技巧
         if (field.is('input')) {
             // 返回获取到的值

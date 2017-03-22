@@ -40,10 +40,10 @@ module.exports = function(grunt) {
         watch: {
             scripts: {
                 files: ['<%= jshint.files %>'],
-                tasks: ['jshint']
+                tasks: ['jshint', 'qunit']
             },
             css: {
-                files: ['example-resource/example.less'],
+                files: ['example-resource/example.less', 'test/style/*.less'],
                 tasks: ['less']
             }
         },
@@ -82,12 +82,13 @@ module.exports = function(grunt) {
         },
         less: {
             compile: {
-                files: {
-                    'example-resource/example.css': 'example-resource/example.less'
-                }
-            },
-            options: {
-                banner: '/* <%=pkg.namexxx %> 示例 */'
+                files: [{
+                    expand: true,
+                    cwd: 'example-resource/',
+                    src: '*.less',
+                    dest: 'example-resource/',
+                    ext: '.css'
+                }]
             }
         },
         uglify: {
@@ -115,6 +116,9 @@ module.exports = function(grunt) {
                     'dist/<%= pkg.name %>.all.min.js': ['<%= concat.all.dest %>']
                 }
             }
+        },
+        qunit: {
+            all: ['test/core.html', 'test/data.html', 'test/validate.html', 'test/storage.html']
         }
     });
 
@@ -123,7 +127,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-qunit');
 
-    grunt.registerTask('default', ['jshint', 'concat', 'less', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'less', 'uglify']);
 
 };
