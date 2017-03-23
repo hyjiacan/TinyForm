@@ -34,13 +34,15 @@ module.exports = function(grunt) {
                 // 变量都应该先声明后使用
                 undef: true,
                 // 我想在代码里面使用严格模式
-                strict: true
+                strict: true,
+                // 变量声明了就要用，不然声明来做啥
+                unused: true
             }
         },
         watch: {
             scripts: {
                 files: ['<%= jshint.files %>'],
-                tasks: ['jshint', 'qunit']
+                tasks: ['jshint']
             },
             css: {
                 files: ['example-resource/example.less', 'test/style/*.less'],

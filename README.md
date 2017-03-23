@@ -2,29 +2,29 @@
 
 # Instruction
 
-**TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单控件。
+**TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单字段。
 >默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，配置参数这`TinyForm.defaults.selector`，也就是说，也可以通过实例化表单的参数*selector*来自定义。
 
 ## 目录结构
 
 **dist** 生成目录
 
-- tinyform.core[.min].js 基本的表单控件获取和数据读写功能、表单的重置、异步提交
-- tinyform.common[.min].js 含基本的表单控件获取、数据读写、表单的重置、异步提交和数据验证功能
+- tinyform.core[.min].js 基本的表单字段获取和数据读写功能、表单的重置、异步提交
+- tinyform.common[.min].js 含基本的表单字段获取、数据读写、表单的重置、异步提交和数据验证功能
 - tinyform.all[.min].js 包含所有功能
 
 **src** 源码目录
 
-- tinyform.core.js 包含表单实例化，控件获取和刷新缓存以及扩展接口
+- tinyform.core.js 包含表单实例化，字段获取和刷新缓存以及扩展接口
 - tinyform.data.js 包含数据的读写、重置和异步提交
-- tinyform.validate.js 验证控件的输入
+- tinyform.validate.js 验证字段的输入
 - tinyform.storage.js 操作数据存储
 
 ## 下载
 
 > 请使用 **右键->另存为** 下载文件
 
-如果只需要表单控件的获取以及表单数据的读写和异步提交，用这个就够了
+如果只需要表单字段的获取以及表单数据的读写和异步提交，用这个就够了
 [tinyform.core.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.js)(开发版)
 [tinyform.core.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.min.js)(生产版)
 
@@ -107,11 +107,11 @@ $ bower install tinyform
         <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
     </div>
     <div>
-        <label for="">标签忽略的控件</label>
+        <label for="">标签忽略的字段</label>
         <input type="text" name="ignore-field-1" data-ignore />
     </div>
     <div>
-        <label for="">配置忽略的控件</label>
+        <label for="">配置忽略的字段</label>
         <input type="text" name="ignore-field-2" />
     </div>
 </div>
@@ -123,23 +123,23 @@ $ bower install tinyform
 var form = TinyForm('#f1', {
     // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 [true, false]
     checkbox: [1, 0],
-    // 在表单内查找控件时，要忽略的控件或控件集合
+    // 在表单内查找字段时，要忽略的字段或字段集合
     // 值可以为false、字符串或数组：
     // boolean: 仅设置false有效，表示没有需要忽略的
-    // array: 要忽略的控件的name组成的数组
+    // array: 要忽略的字段的name组成的数组
     // 要注意的是：这里的优先级比标签上设置的优先级更低
     // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
     ignore: 'ignore-field-2',
     validate: {
-        // 是否在输入控件失去焦点时自动验证，默认为false
+        // 是否在输入字段失去焦点时自动验证，默认为false
         auto: true,
         // 是否在第一次验证失败时停止验证，默认为true
         stop: false,
-        // 每个控件验证后的回调函数
+        // 每个字段验证后的回调函数
         callback: function(e) {
-            //正在验证的控件的jQuery对象
+            //正在验证的字段的jQuery对象
             console.log('字段:' + e.field.attr('name'));
-            //此控件的值
+            //此字段的值
             console.log('值:' + e.value);
             //表单验证是否通过
             console.log('结果:' + e.pass);
@@ -156,8 +156,8 @@ var form = TinyForm('#f1', {
             },
             // 大写规则
             upper: {
-                // @param value 控件的值
-                // @param name 控件的name属性
+                // @param value 字段的值
+                // @param name 字段的name属性
                 rule: function(value, name){
                     if(value===''){
                         // 输入为空  返回true表示验证通过
@@ -215,7 +215,7 @@ var form = TinyForm('#f1', {
 
 **selector** String
 
-> 自定义的表单控件选择器，用于选择表单控件。注：一定要包含*[name]*，否则会导致表单功能的异常
+> 自定义的表单字段选择器，用于选择表单字段。注：一定要包含*[name]*，否则会导致表单功能的异常
 
 **checkbox** Array
 
@@ -258,7 +258,7 @@ TinyForm.defaults.validate.rules.xxx = {
 
 **data-rule**
 
-> 此输入控件的验证规则，支持以下值：
+> 此输入字段的验证规则，支持以下值：
 
 - **required** 必填
 - **number** 数字
@@ -284,14 +284,14 @@ TinyForm.defaults.validate.rules.xxx = {
 
 **data-msg**
 
-> 此控件验证失败时的提示消息，若不指定则使用默认消息，
+> 此字段验证失败时的提示消息，若不指定则使用默认消息，
 > data-msg消息的优先级最高，也就是说:
 > 如果配置了`data-msg`，那么验证失败始终提示此消息
 > 如果没有配置 `data-msg` ，那么就使用 `rule.msg` 作为提示消息
 > 如果想要尝试定制提示消息，那层就将`rule.rule`配置为函数，返回值将作为提示消息
 > 如果要针对每一个规则设置不同的消息，可以将多个消息使用 `|` 符号分隔，如果消息中包含`|`符号，那么就写成`||`
 
-当有相同*name*的控件时，只读取第一个控件的*data-rule*和*data-msg*
+当有相同*name*的字段时，只读取第一个字段的*data-rule*和*data-msg*
 
 可使用如下方法更改提示消息：
 
@@ -328,7 +328,7 @@ form.option.storage.container = window.sessionStorage;
 可以在运行时变更的选项：
 
 - data
-    - selector 可以动态地设置控件选择器，重设后需要调用*refresh*方法刷新缓存
+    - selector 可以动态地设置字段选择器，重设后需要调用*refresh*方法刷新缓存
 - storage
     - container 切换存储容器
     - time  设置为*0*可以停止自动存储数据，停止后不能再次启用自动存储(实例生命周期内)
@@ -336,7 +336,7 @@ form.option.storage.container = window.sessionStorage;
     - name 改变存储项的名称，，不推荐修改这项，因为运行时修改可能导致已经存储的数据无法读取
 - validate
     - stop 可以改变：是否在第一次验证失败后停止验证
-    - callback 改变控件验证的回调函数
+    - callback 改变字段验证的回调函数
 
 ## 方法/Method
 
@@ -346,19 +346,19 @@ form.option.storage.container = window.sessionStorage;
 
 **getField(fieldName: String): Object**
 
-> 根据*name*属性获取控件 返回jQuery对象
-> **fieldName** 要获取的控件的*name*值，如果不指定这个属性，那么返回所有控件
-> **return** 范围内所有*name*为指定值的控件的jQuery对象或获取到的所有控件jQuery对象
+> 根据*name*属性获取字段 返回jQuery对象
+> **fieldName** 要获取的字段的*name*值，如果不指定这个属性，那么返回所有字段
+> **return** 范围内所有*name*为指定值的字段的jQuery对象或获取到的所有字段jQuery对象
 
 **refresh(): Instance**
 
-> 重新获取所有控件和验证规则，适用于表单有动态改动时
+> 重新获取所有字段和验证规则，适用于表单有动态改动时
 > **return** 表单实例
 
 **getData(fieldName: String): Object**
 
-> 获取输入控件的值。
-> **fieldName** 要获取值的控件。控件的*name*名称，如果指定了此参数，则只获取*name=此值*的控件的值
+> 获取输入字段的值。
+> **fieldName** 要获取值的字段。字段的*name*名称，如果指定了此参数，则只获取*name=此值*的字段的值
 > **return** 表单数据，结构如下：
 
 ```javascript
@@ -372,9 +372,9 @@ form.option.storage.container = window.sessionStorage;
 
 **setData(data: Any|Object, fieldName: String): Instance**
 
-> 设置控件的值
+> 设置字段的值
 > **data** 表单数据，*field*不指定时结构与`getData`返回结构一致，缺少的项使用空值；指定时可以设置任何合适的类型
-> **fieldName** 控件的*name*名称，如果指定了此参数，则只设置*name=此值*的控件的值
+> **fieldName** 字段的*name*名称，如果指定了此参数，则只设置*name=此值*的字段的值
 > **return** 表单实例
 
 **reset(): Instance**
@@ -403,9 +403,9 @@ form.option.storage.container = window.sessionStorage;
 
 **getRule(fieldName: String): Object**
 
-> 获取表单指定控件的验证规则或所有规则
+> 获取表单指定字段的验证规则或所有规则
 > **fieldName** 件的*name*名称，不指定此值时获取所有规则
-> **return** 获取单个控件规则时，返回结构如下：
+> **return** 获取单个字段规则时，返回结构如下：
 
 ```javascript
 {
@@ -414,7 +414,7 @@ form.option.storage.container = window.sessionStorage;
 }
 ```
 
-> 获取多个控件规则时，结构如下：
+> 获取多个字段规则时，结构如下：
 
 ```javascript
 {
@@ -432,7 +432,7 @@ form.option.storage.container = window.sessionStorage;
 **validate(field: String|Array): Boolean|Object**
 
 > 通过标签属性*data-rule*指定的规则验证表单
-> **fieldName** 指定要验证控件的*name*名称，不指定时验证所有控件
+> **fieldName** 指定要验证字段的*name*名称，不指定时验证所有字段
 > **return** 验证通过时，返回`true`，未通过时返回失败详细信息，结构如下：
 
 ```javascript

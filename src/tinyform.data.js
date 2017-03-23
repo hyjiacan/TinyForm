@@ -1,5 +1,5 @@
 /**
- * TinyForm 数据读写组件，负责从表单控件读取值以及向其写入值
+ * TinyForm 数据读写组件，负责从表单字段读取值以及向其写入值
  */
 (function($, TinyForm) {
     /**
@@ -33,30 +33,30 @@
             originalData[this.id] = this.getData();
         },
         /**
-         * 获取所有控件的值，返回对象
-         * @param {String} fieldName 控件的name名称，如果指定了此参数，则只获取name=此值的控件的值
-         * @returns {Object} 控件的name和值对象
+         * 获取所有字段的值，返回对象
+         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
+         * @returns {Object} 字段的name和值对象
          */
         getData: function(fieldName) {
-            // 没有参数，要获取所有控件的数据
+            // 没有参数，要获取所有字段的数据
             if (arguments.length === 0) {
-                // 返回所有控件的数据
+                // 返回所有字段的数据
                 return getAllData(this);
             }
-            // 参数需要控件的name字符串，类型不对
+            // 参数需要字段的name字符串，类型不对
             if (typeof fieldName !== 'string') {
                 // 返回空
                 return;
             }
 
-            // 返回指定控件的值
+            // 返回指定字段的值
             return getFieldData(this, fieldName);
         },
 
         /**
-         * 设置控件的值
+         * 设置字段的值
          * @param {String|Object} data 要设置的值
-         * @param {String} fieldName 控件的name名称，如果指定了此参数，则只设置name=此值的控件的值
+         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
          * @returns {Object}  表单实例
          */
         setData: function(data, fieldName) {
@@ -71,7 +71,7 @@
                 return me;
             }
 
-            // 如果传的参数>=2个，就是要设置指定name的控件的值，后面多余的参数直接忽略
+            // 如果传的参数>=2个，就是要设置指定name的字段的值，后面多余的参数直接忽略
             if (arguments.length >= 2) {
                 //  第二个参数还是要个字符串，格式不对没法玩
                 if (typeof fieldName !== 'string') {
@@ -79,7 +79,7 @@
                     return me;
                 }
 
-                // 设置指定name控件的值
+                // 设置指定name字段的值
                 setFieldData(me, data, me.getField(fieldName));
                 // 始终返回实例对象
                 return me;
@@ -95,7 +95,7 @@
                     val = '';
                 }
 
-                // 设置控件的值
+                // 设置字段的值
                 setFieldData(me, val, field);
             });
 
@@ -160,40 +160,40 @@
     });
 
     /**
-     * 设置某个控件的值
+     * 设置某个字段的值
      * @param {Object} fm 表单实例
      * @param {String|Object} data 要设置的值
-     * @param {Array} field 控件对象数组
+     * @param {Array} field 字段对象数组
      */
     function setFieldData(fm, data, field) {
-        // 如果控件不存在（长度为0），那么啥都不做
+        // 如果字段不存在（长度为0），那么啥都不做
         if (!field || field.length === 0) {
             // 返回吧
             return;
         }
 
-        // 控件是radio，那么可能有多个
+        // 字段是radio，那么可能有多个
         if (field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false)
-                // 找出value与数据相等的控件设置选中
+                // 找出value与数据相等的字段设置选中
                 .filter('[value=' + data + ']:first').prop('checked', true);
             // 可以返回了
             return;
         }
 
-        // 如果是checkbox，那么直接控件选中
+        // 如果是checkbox，那么直接字段选中
         if (field.is(':checkbox')) {
-            // 强制数据转换成字符串来比较，以控制控件的选中状态
+            // 强制数据转换成字符串来比较，以控制字段的选中状态
             field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
             // 可以返回了
             return;
         }
 
-        // 其它类型的input和非input控件，直接设置值
+        // 其它类型的input和非input字段，直接设置值
         field.val(data);
 
-        // 如果是select控件，那就触发一下change事件
+        // 如果是select字段，那就触发一下change事件
         if (field.is('select')) {
             field.change();
         }
@@ -206,9 +206,9 @@
     function getAllData(fm) {
         // 创建一个对象来存放数据
         var data = {};
-        // 遍历控件取值
+        // 遍历字段取值
         $.each(fm.getField(), function(name) {
-            // 获取某个name的控件的值(在radio时可能是多个)
+            // 获取某个name的字段的值(在radio时可能是多个)
             data[name] = getFieldData(fm, name);
         });
         // 返回所有数据
@@ -216,13 +216,13 @@
     }
 
     /**
-     * 设置某个控件的值
+     * 设置某个字段的值
      * @param {Object} fm 表单实例
-     * @param {String} fieldName 控件的name名称
-     * @return {Any} 控件的值
+     * @param {String} fieldName 字段的name名称
+     * @return {Any} 字段的值
      */
     function getFieldData(fm, fieldName) {
-        // 根据控件的name找到控件
+        // 根据字段的name找到字段
         var field = fm.getField(fieldName);
 
         // field 不存在，即此时在请求不存在 
@@ -231,25 +231,23 @@
             return;
         }
 
-        // 如果控件是input标签的元素，使用独特的取值技巧
+        // 如果字段是input标签的元素，使用独特的取值技巧
         if (field.is('input')) {
             // 返回获取到的值
             return getInputValue(fm, field);
         }
 
-        // 其它的控件直接取值并返回
+        // 其它的字段直接取值并返回
         return field.val();
     }
 
     /**
-     * 获取input控件的值
+     * 获取input字段的值
      * @param {Object} fm 表单实例
-     * @param {Array} field 控件数组
-     * @return {Any} 控件的值
+     * @param {Array} field 字段数组
+     * @return {Any} 字段的值
      */
     function getInputValue(fm, field) {
-        // 声明一个存放控件值的变量，默认值为空字符串
-        var value = '';
         // 取radio的值
         if (field.is(':radio')) {
             // 取选中的radio的值就行了

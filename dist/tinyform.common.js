@@ -1,5 +1,5 @@
 /**
- * TinyForm 0.7.4 common 2017-03-22
+ * TinyForm 0.7.4 common 2017-03-23
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -9,7 +9,7 @@
  * @QQ群: 187786345 (Javascript爱好者)
  */
 /**
- * TinyForm 核心组件，提供form实例化以及表单控件获取功能
+ * TinyForm 核心组件，提供form实例化以及表单字段获取功能
  */
 (function ($, win) {
     /**
@@ -47,7 +47,7 @@
     var instanceSet = {};
 
     /**
-     * 表单实例的控件集合
+     * 表单实例的字段集合
      */
     var fieldSet = {};
 
@@ -114,7 +114,7 @@
             // 表单的DOM上下文
             me.context = formContainer;
 
-            // 获取所有控件
+            // 获取所有字段
             getAllFields(me);
 
             // 调用插件的初始化方法  这个调用要放到最后，
@@ -128,17 +128,17 @@
             return me;
         },
         /**
-         * 根据name属性获取控件 返回数组，因为可能存在同name情况
-         * @param {String} fieldName 要获取的控件的name值，如果不指定这个属性，那么返回所有控件
-         * @returns {Array}  范围内所有name为指定值的控件数组或获取到的所有域对象
+         * 根据name属性获取字段 返回数组，因为可能存在同name情况
+         * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
+         * @returns {Array}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
-            // 获取到所有控件，然后创建一个副本，以避免控件集合被修改
+            // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
             var all = $.extend(true, {}, fieldSet[this.id]);
 
-            // 不传参数表示获取所有的控件
+            // 不传参数表示获取所有的字段
             if (arguments.length === 0) {
-                // 返回所的控件集合的副本
+                // 返回所的字段集合的副本
                 return all;
             }
 
@@ -147,27 +147,27 @@
                 // 参数错误，此时返回空
                 return;
             }
-            // 尝试获取控件对象（这里得到的是jQuery对象）
+            // 尝试获取字段对象（这里得到的是jQuery对象）
             var field = all[fieldName];
-            // 判断是否存在这个名字的控件
+            // 判断是否存在这个名字的字段
             if (!all.hasOwnProperty(fieldName) || field.length === 0) {
                 // 如不存在，返回空
                 return;
             }
 
-            // 返回控件的jQuery对象
+            // 返回字段的jQuery对象
             return field;
         },
 
         /**
-         * 重新获取表单的控件，此操作将更新缓存
+         * 重新获取表单的字段，此操作将更新缓存
          * @returns {Object} 表单实例
          */
         refresh: function () {
             // 因为要在下面的回调里面使用表单实例，所以弄个变量把实例保存一下
             var me = this;
 
-            // 在这个核心组件中，刷新仅仅是重新获取所有控件
+            // 在这个核心组件中，刷新仅仅是重新获取所有字段
             getAllFields(me);
 
             // 调用插件的刷新方法
@@ -236,13 +236,13 @@
     // 扩展通过  TinyForm.defaults.xxx 来设置默认参数
     TinyForm.defaults = {
         /**
-         * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
+         * 字段选择器，选择带有name属性的input select和textarea，排除input按钮
          */
         selector: 'input[name]:not(:button,:submit,:reset,[data-ignore]), select[name]:not([data-ignore]), textarea[name]:not([data-ignore])',
-        // 在表单内查找控件时，要忽略的控件或控件集合
+        // 在表单内查找字段时，要忽略的字段或字段集合
         // 值可以为false、字符串或数组：
         // boolean: 仅设置false有效，表示没有需要忽略的
-        // array: 要忽略的控件的name组成的数组
+        // array: 要忽略的字段的name组成的数组
         // 要注意的是：这里的优先级应该比标签上设置的优先级更低
         // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
         ignore: false
@@ -257,7 +257,7 @@
     win.TinyForm = TinyForm;
 
     /**
-     * 获取所有的控件
+     * 获取所有的字段
      * @param {Object} fm 表单实例
      */
     function getAllFields(fm) {
@@ -265,10 +265,10 @@
         var fields = fieldSet[fm.id] = {};
 
         // 取出在实例化时传入的需要ignore的参数，然后始终搞成数组
-        // 后面会用这个数组去判断某个控件是否需要加载
+        // 后面会用这个数组去判断某个字段是否需要加载
         var ignoreFields = $.makeArray(fm.option.ignore);
 
-        // 根据配置的选择器来查找控件
+        // 根据配置的选择器来查找字段
         fm.context.find(fm.option.selector).each(function () {
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
@@ -284,31 +284,31 @@
                 return;
             }
 
-            // 控件缓存集合中还不存在这个name的控件
+            // 字段缓存集合中还不存在这个name的字段
             // 不存在，可能是还没有这个name的属性或者长度为0，感觉这个判断有点冗余，先不管了
             if (typeof fields[name] === 'undefined' || fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
-                // 这里搞数组，就是为了将相同name的控件集中起来
+                // 这里搞数组，就是为了将相同name的字段集中起来
                 fields[name] = $(this);
-                // 可以取下一个控件了
+                // 可以取下一个字段了
                 return;
             }
 
             // 存在name，如果是radio的话就追加到jQuery数组后头
             if ($(this).is(':radio')) {
-                // 将DOM控件对象（非jQuery对象）添加到jQuery数组后头
-                // 这里可以肯定只有一个控件，所以直接使用  this
+                // 将DOM字段对象（非jQuery对象）添加到jQuery数组后头
+                // 这里可以肯定只有一个字段，所以直接使用  this
                 fields[name].push(this);
-                // 添加进去后，就可以取下一个控件了
+                // 添加进去后，就可以取下一个字段了
                 return;
             }
 
             //如果不是radio，那整相同的name就有毛病
-            console.error('控件的name属性"' + name + '"出现多次，这不对吧');
+            console.error('字段的name属性"' + name + '"出现多次，这不对吧');
         });
     }
 })(jQuery, window);/**
- * TinyForm 数据读写组件，负责从表单控件读取值以及向其写入值
+ * TinyForm 数据读写组件，负责从表单字段读取值以及向其写入值
  */
 (function($, TinyForm) {
     /**
@@ -342,30 +342,30 @@
             originalData[this.id] = this.getData();
         },
         /**
-         * 获取所有控件的值，返回对象
-         * @param {String} fieldName 控件的name名称，如果指定了此参数，则只获取name=此值的控件的值
-         * @returns {Object} 控件的name和值对象
+         * 获取所有字段的值，返回对象
+         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
+         * @returns {Object} 字段的name和值对象
          */
         getData: function(fieldName) {
-            // 没有参数，要获取所有控件的数据
+            // 没有参数，要获取所有字段的数据
             if (arguments.length === 0) {
-                // 返回所有控件的数据
+                // 返回所有字段的数据
                 return getAllData(this);
             }
-            // 参数需要控件的name字符串，类型不对
+            // 参数需要字段的name字符串，类型不对
             if (typeof fieldName !== 'string') {
                 // 返回空
                 return;
             }
 
-            // 返回指定控件的值
+            // 返回指定字段的值
             return getFieldData(this, fieldName);
         },
 
         /**
-         * 设置控件的值
+         * 设置字段的值
          * @param {String|Object} data 要设置的值
-         * @param {String} fieldName 控件的name名称，如果指定了此参数，则只设置name=此值的控件的值
+         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
          * @returns {Object}  表单实例
          */
         setData: function(data, fieldName) {
@@ -380,7 +380,7 @@
                 return me;
             }
 
-            // 如果传的参数>=2个，就是要设置指定name的控件的值，后面多余的参数直接忽略
+            // 如果传的参数>=2个，就是要设置指定name的字段的值，后面多余的参数直接忽略
             if (arguments.length >= 2) {
                 //  第二个参数还是要个字符串，格式不对没法玩
                 if (typeof fieldName !== 'string') {
@@ -388,7 +388,7 @@
                     return me;
                 }
 
-                // 设置指定name控件的值
+                // 设置指定name字段的值
                 setFieldData(me, data, me.getField(fieldName));
                 // 始终返回实例对象
                 return me;
@@ -404,7 +404,7 @@
                     val = '';
                 }
 
-                // 设置控件的值
+                // 设置字段的值
                 setFieldData(me, val, field);
             });
 
@@ -469,40 +469,40 @@
     });
 
     /**
-     * 设置某个控件的值
+     * 设置某个字段的值
      * @param {Object} fm 表单实例
      * @param {String|Object} data 要设置的值
-     * @param {Array} field 控件对象数组
+     * @param {Array} field 字段对象数组
      */
     function setFieldData(fm, data, field) {
-        // 如果控件不存在（长度为0），那么啥都不做
+        // 如果字段不存在（长度为0），那么啥都不做
         if (!field || field.length === 0) {
             // 返回吧
             return;
         }
 
-        // 控件是radio，那么可能有多个
+        // 字段是radio，那么可能有多个
         if (field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false)
-                // 找出value与数据相等的控件设置选中
+                // 找出value与数据相等的字段设置选中
                 .filter('[value=' + data + ']:first').prop('checked', true);
             // 可以返回了
             return;
         }
 
-        // 如果是checkbox，那么直接控件选中
+        // 如果是checkbox，那么直接字段选中
         if (field.is(':checkbox')) {
-            // 强制数据转换成字符串来比较，以控制控件的选中状态
+            // 强制数据转换成字符串来比较，以控制字段的选中状态
             field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
             // 可以返回了
             return;
         }
 
-        // 其它类型的input和非input控件，直接设置值
+        // 其它类型的input和非input字段，直接设置值
         field.val(data);
 
-        // 如果是select控件，那就触发一下change事件
+        // 如果是select字段，那就触发一下change事件
         if (field.is('select')) {
             field.change();
         }
@@ -515,9 +515,9 @@
     function getAllData(fm) {
         // 创建一个对象来存放数据
         var data = {};
-        // 遍历控件取值
+        // 遍历字段取值
         $.each(fm.getField(), function(name) {
-            // 获取某个name的控件的值(在radio时可能是多个)
+            // 获取某个name的字段的值(在radio时可能是多个)
             data[name] = getFieldData(fm, name);
         });
         // 返回所有数据
@@ -525,34 +525,38 @@
     }
 
     /**
-     * 设置某个控件的值
+     * 设置某个字段的值
      * @param {Object} fm 表单实例
-     * @param {String} fieldName 控件的name名称
-     * @return {Any} 控件的值
+     * @param {String} fieldName 字段的name名称
+     * @return {Any} 字段的值
      */
     function getFieldData(fm, fieldName) {
-        // 根据控件的name找到控件
+        // 根据字段的name找到字段
         var field = fm.getField(fieldName);
 
-        // 如果控件是input标签的元素，使用独特的取值技巧
+        // field 不存在，即此时在请求不存在 
+        if (!field) {
+            console.error('cannot found field "' + fieldName + '"');
+            return;
+        }
+
+        // 如果字段是input标签的元素，使用独特的取值技巧
         if (field.is('input')) {
             // 返回获取到的值
             return getInputValue(fm, field);
         }
 
-        // 其它的控件直接取值并返回
+        // 其它的字段直接取值并返回
         return field.val();
     }
 
     /**
-     * 获取input控件的值
+     * 获取input字段的值
      * @param {Object} fm 表单实例
-     * @param {Array} field 控件数组
-     * @return {Any} 控件的值
+     * @param {Array} field 字段数组
+     * @return {Any} 字段的值
      */
     function getInputValue(fm, field) {
-        // 声明一个存放控件值的变量，默认值为空字符串
-        var value = '';
         // 取radio的值
         if (field.is(':radio')) {
             // 取选中的radio的值就行了
@@ -576,7 +580,7 @@
      */
     'use strict';
     /**
-     * 验证规则定义，这些规则可以直接应用到表单控件的属性上面
+     * 验证规则定义，这些规则可以直接应用到表单字段的属性上面
      * 如果需要更多的规则，请直接添加到这里
      * @example
      * <input type="text" data-rule="email" data-msg="请输入电子邮箱地址" />
@@ -654,7 +658,7 @@
     };
 
     /**
-     * 表单控件的验证规则集合
+     * 表单字段的验证规则集合
      */
     var ruleSet = {};
 
@@ -662,11 +666,11 @@
      * 默认配置
      */
     TinyForm.defaults.validate = {
-        // 是否在输入控件失去焦点时自动验证，默认为false
+        // 是否在输入字段失去焦点时自动验证，默认为false
         auto: false,
         // 是否在第一次验证失败时停止验证，默认为true
         stop: false,
-        // 每个控件验证后的回调函数
+        // 每个字段验证后的回调函数
         callback: function() {},
         // 提供规则可编辑的接口
         rules: RULES
@@ -689,9 +693,9 @@
             refresh(this);
         },
         /**
-         * 获取表单指定控件的验证规则或所有规则
-         * @param {String} fieldName 控件的name名称，不指定此值时获取所有规则
-         * @returns {Object|Boolean}  此控件未定义规则时，返回false；否则返回规则对象 {rule: /正则表达式/, msg: '消息'}
+         * 获取表单指定字段的验证规则或所有规则
+         * @param {String} fieldName 字段的name名称，不指定此值时获取所有规则
+         * @returns {Object|Boolean}  此字段未定义规则时，返回false；否则返回规则对象 {rule: /正则表达式/, msg: '消息'}
          */
         getRule: function(fieldName) {
             // 搞一个验证规则的副本，以防止意外改变验证规则
@@ -703,25 +707,25 @@
                 return all;
             }
 
-            // 控件不存在
+            // 字段不存在
             if (this.getField(fieldName).length === 0) {
                 // 返回空对象
                 return {};
             }
 
-            // 返回指定控件的验证规则
+            // 返回指定字段的验证规则
             return all[fieldName];
         },
         /**
          * 验证表单
-         * @param {String} fieldName 指定要验证控件的name名称，不指定时验证所有控件
+         * @param {String} fieldName 指定要验证字段的name名称，不指定时验证所有字段
          * @returns {Object|Boolean} 验证通过时返回true，失败时返回失败的详细信息对象{pass: Boolean, value: String, field: Array, msg: String}
          */
         validate: function(fieldName) {
             // 后头到处要用，搞个变量保存起来，能减小压缩后的体积
             var me = this;
 
-            // 指定了参数，说明只验证指定name的控件，这里只取第一个参数
+            // 指定了参数，说明只验证指定name的字段，这里只取第一个参数
             if (arguments.length > 0) {
                 // 参数需要字符串，类型不对
                 if (typeof fieldName !== 'string') {
@@ -741,9 +745,9 @@
                 detail: {}
             };
 
-            // 取到所有的控件准备验证
+            // 取到所有的字段准备验证
             var fields = me.getField();
-            // 开始遍历控件验证
+            // 开始遍历字段验证
             for (var name in fields) {
                 // 这个name无效
                 if (!fields.hasOwnProperty(name)) {
@@ -751,7 +755,7 @@
                     continue;
                 }
 
-                // 控件的验证结果
+                // 字段的验证结果
                 // 结果长这样：
                 //{
                 //  pass: Boolean,
@@ -794,7 +798,7 @@
             // 不自动验证 就直接返回好了
             return;
         }
-        // 遍历控件，绑定失去焦点时验证的事件
+        // 遍历字段，绑定失去焦点时验证的事件
         $.each(fm.getField(), function(name) {
             // 绑定失去焦点事件
             this.blur(function() {
@@ -805,7 +809,7 @@
     }
 
     /**
-     * 获取表单所有控件的验证规则
+     * 获取表单所有字段的验证规则
      * @param {Object} fm 表单实例
      * @returns {Object} 验证规则对象
      */
@@ -815,7 +819,7 @@
         // 所有可用的规则
         var validRules = fm.option.validate.rules;
 
-        // 遍历控件，获取验证规则
+        // 遍历字段，获取验证规则
         $.each(fm.getField(), function(name, field) {
             // 从标签属性上获取规则描述  当然  还是要trim一下的
             var rule = $.trim(field.attr(ATTRS.rule));
@@ -826,7 +830,7 @@
             if (rule === '') {
                 // 设置 false ，表示没有验证规则
                 rules[name] = false;
-                // 没有规则就不用再去取提示消息了，直接返回去取下一个控件
+                // 没有规则就不用再去取提示消息了，直接返回去取下一个字段
                 return;
             }
 
@@ -896,7 +900,7 @@
     }
 
     /**
-     * 解析控件的规则验证
+     * 解析字段的规则验证
      * @param {Object} rule data-rule的值
      * @param {Object} msg 消息
      * @return {Object|Boolean} 需要验证时返回对象，否则返回false
@@ -996,25 +1000,25 @@
     }
 
     /**
-     * 验证某个控件
+     * 验证某个字段
      * @param {Object} fm 表单实例
-     * @param {String} fieldName 控件的name名称
+     * @param {String} fieldName 字段的name名称
      * @return {Object|Boolean}验证成功时返回true, 否则返回失败的详细信息
      */
     function validateField(fm, fieldName) {
-        //根据name取到控件
+        //根据name取到字段
         var field = fm.getField(fieldName);
-        // 控件不存在
+        // 字段不存在
         if (!field || field.length === 0) {
             // 返回false表示验证失败
             // 为啥呢？
-            // 开发专门来验证，却出现了控件不存在的情况，
+            // 开发专门来验证，却出现了字段不存在的情况，
             // 这是来玩的么？
             return false;
         }
 
         var pass = true;
-        // 获取控件的验证规则
+        // 获取字段的验证规则
         var rules = fm.getRule(fieldName);
 
         // 没有验证规则时，直接返回  true
@@ -1022,7 +1026,7 @@
             return pass;
         }
 
-        // 获取控件的值
+        // 获取字段的值
         var value = fm.getData(fieldName);
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
@@ -1079,13 +1083,13 @@
             var custompass = cb.call(fm, {
                 // 验证是否通过
                 pass: pass,
-                // 验证的控件对象
+                // 验证的字段对象
                 field: field,
                 // 验证规则的名称
                 rule: rule.name,
-                // 控件的name名称
+                // 字段的name名称
                 name: fieldName,
-                // 控件的值
+                // 字段的值
                 value: value,
                 // 提示消息
                 msg: rule.msg
@@ -1093,7 +1097,7 @@
 
             // 判断回调的返回值是不是 undefined，如果是那么就是用户并没有返回值
             if (typeof custompass !== 'undefined') {
-                // 用户返回了值，强制搞成boolean然后作为这个控件的验证结果
+                // 用户返回了值，强制搞成boolean然后作为这个字段的验证结果
                 pass = !!custompass;
             }
 

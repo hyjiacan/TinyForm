@@ -1,5 +1,5 @@
 /**
- * TinyForm 核心组件，提供form实例化以及表单控件获取功能
+ * TinyForm 核心组件，提供form实例化以及表单字段获取功能
  */
 (function ($, win) {
     /**
@@ -37,7 +37,7 @@
     var instanceSet = {};
 
     /**
-     * 表单实例的控件集合
+     * 表单实例的字段集合
      */
     var fieldSet = {};
 
@@ -104,7 +104,7 @@
             // 表单的DOM上下文
             me.context = formContainer;
 
-            // 获取所有控件
+            // 获取所有字段
             getAllFields(me);
 
             // 调用插件的初始化方法  这个调用要放到最后，
@@ -118,17 +118,17 @@
             return me;
         },
         /**
-         * 根据name属性获取控件 返回数组，因为可能存在同name情况
-         * @param {String} fieldName 要获取的控件的name值，如果不指定这个属性，那么返回所有控件
-         * @returns {Array}  范围内所有name为指定值的控件数组或获取到的所有域对象
+         * 根据name属性获取字段 返回数组，因为可能存在同name情况
+         * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
+         * @returns {Array}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
-            // 获取到所有控件，然后创建一个副本，以避免控件集合被修改
+            // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
             var all = $.extend(true, {}, fieldSet[this.id]);
 
-            // 不传参数表示获取所有的控件
+            // 不传参数表示获取所有的字段
             if (arguments.length === 0) {
-                // 返回所的控件集合的副本
+                // 返回所的字段集合的副本
                 return all;
             }
 
@@ -137,27 +137,27 @@
                 // 参数错误，此时返回空
                 return;
             }
-            // 尝试获取控件对象（这里得到的是jQuery对象）
+            // 尝试获取字段对象（这里得到的是jQuery对象）
             var field = all[fieldName];
-            // 判断是否存在这个名字的控件
+            // 判断是否存在这个名字的字段
             if (!all.hasOwnProperty(fieldName) || field.length === 0) {
                 // 如不存在，返回空
                 return;
             }
 
-            // 返回控件的jQuery对象
+            // 返回字段的jQuery对象
             return field;
         },
 
         /**
-         * 重新获取表单的控件，此操作将更新缓存
+         * 重新获取表单的字段，此操作将更新缓存
          * @returns {Object} 表单实例
          */
         refresh: function () {
             // 因为要在下面的回调里面使用表单实例，所以弄个变量把实例保存一下
             var me = this;
 
-            // 在这个核心组件中，刷新仅仅是重新获取所有控件
+            // 在这个核心组件中，刷新仅仅是重新获取所有字段
             getAllFields(me);
 
             // 调用插件的刷新方法
@@ -226,13 +226,13 @@
     // 扩展通过  TinyForm.defaults.xxx 来设置默认参数
     TinyForm.defaults = {
         /**
-         * 控件选择器，选择带有name属性的input select和textarea，排除input按钮
+         * 字段选择器，选择带有name属性的input select和textarea，排除input按钮
          */
         selector: 'input[name]:not(:button,:submit,:reset,[data-ignore]), select[name]:not([data-ignore]), textarea[name]:not([data-ignore])',
-        // 在表单内查找控件时，要忽略的控件或控件集合
+        // 在表单内查找字段时，要忽略的字段或字段集合
         // 值可以为false、字符串或数组：
         // boolean: 仅设置false有效，表示没有需要忽略的
-        // array: 要忽略的控件的name组成的数组
+        // array: 要忽略的字段的name组成的数组
         // 要注意的是：这里的优先级应该比标签上设置的优先级更低
         // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
         ignore: false
@@ -247,7 +247,7 @@
     win.TinyForm = TinyForm;
 
     /**
-     * 获取所有的控件
+     * 获取所有的字段
      * @param {Object} fm 表单实例
      */
     function getAllFields(fm) {
@@ -255,10 +255,10 @@
         var fields = fieldSet[fm.id] = {};
 
         // 取出在实例化时传入的需要ignore的参数，然后始终搞成数组
-        // 后面会用这个数组去判断某个控件是否需要加载
+        // 后面会用这个数组去判断某个字段是否需要加载
         var ignoreFields = $.makeArray(fm.option.ignore);
 
-        // 根据配置的选择器来查找控件
+        // 根据配置的选择器来查找字段
         fm.context.find(fm.option.selector).each(function () {
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
             var name = $.trim($(this).attr('name'));
@@ -274,27 +274,27 @@
                 return;
             }
 
-            // 控件缓存集合中还不存在这个name的控件
+            // 字段缓存集合中还不存在这个name的字段
             // 不存在，可能是还没有这个name的属性或者长度为0，感觉这个判断有点冗余，先不管了
             if (typeof fields[name] === 'undefined' || fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
-                // 这里搞数组，就是为了将相同name的控件集中起来
+                // 这里搞数组，就是为了将相同name的字段集中起来
                 fields[name] = $(this);
-                // 可以取下一个控件了
+                // 可以取下一个字段了
                 return;
             }
 
             // 存在name，如果是radio的话就追加到jQuery数组后头
             if ($(this).is(':radio')) {
-                // 将DOM控件对象（非jQuery对象）添加到jQuery数组后头
-                // 这里可以肯定只有一个控件，所以直接使用  this
+                // 将DOM字段对象（非jQuery对象）添加到jQuery数组后头
+                // 这里可以肯定只有一个字段，所以直接使用  this
                 fields[name].push(this);
-                // 添加进去后，就可以取下一个控件了
+                // 添加进去后，就可以取下一个字段了
                 return;
             }
 
             //如果不是radio，那整相同的name就有毛病
-            console.error('控件的name属性"' + name + '"出现多次，这不对吧');
+            console.error('字段的name属性"' + name + '"出现多次，这不对吧');
         });
     }
 })(jQuery, window);

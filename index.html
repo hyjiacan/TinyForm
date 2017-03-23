@@ -102,7 +102,7 @@
                 </div>
                 <div>
                     <label for="">邮编</label>
-                    <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="请输入正确的6位数字" placeholder="只能输入6位数字" />
+                    <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="$ref请输入正确的6位数字" placeholder="只能输入6位数字" />
                 </div>
                 <div>
                     <label for="">网址</label>
@@ -117,11 +117,11 @@
                     <textarea name="remark" rows="5" cols="40" data-rule="length: 20, 32" placeholder="字符数量需要在20-32之间"></textarea>
                 </div>
                 <div>
-                    <label for="">标签忽略的控件</label>
+                    <label for="">标签忽略的字段</label>
                     <input type="text" name="ignore-field-1" data-ignore />
                 </div>
                 <div>
-                    <label for="">配置忽略的控件</label>
+                    <label for="">配置忽略的字段</label>
                     <input type="text" name="ignore-field-2" />
                 </div>
             </div>
@@ -138,7 +138,7 @@
                 <input type="reset" value="只是为了展示它们不会被TinyForm获取" />
                 <input type="button" name="name4button" value="即使设置了name属性" />
 
-                <input type="button" onclick="console.log(f2.getField());" value="通过调用 f2.getField() 获取这个表单的所有控件" />
+                <input type="button" onclick="console.log(f2.getField());" value="通过调用 f2.getField() 获取这个表单的所有字段" />
             </form>
         </div>
         <div class="right">
@@ -154,9 +154,9 @@
             <h3>功能</h3>
             <ul class="features">
                 <li>实例化任何标签成form</li>
-                <li>获取表单控件对象</li>
-                <li>获取/设置表单控件的数据</li>
-                <li>验证表单控件的数据有有效性</li>
+                <li>获取表单字段对象</li>
+                <li>获取/设置表单字段的数据</li>
+                <li>验证表单字段的数据有有效性</li>
                 <li>异步提交表单</li>
                 <li>使用Storage存储表单数据，定时自动保存数据</li>
             </ul>
@@ -165,32 +165,32 @@
 
             <div class="buttons">
                 <select name="" id="fields"></select>
-                <button id="b1">获取某个控件的值</button>
+                <button id="b1">获取某个字段的值</button>
 
                 <textarea class="code">var name = form.getData('username');</textarea>
 
-                <button id="b2">获取所有控件的值</button>
+                <button id="b2">获取所有字段的值</button>
                 <textarea class="code">var formdata = form.getData();</textarea>
 
-                <button id="b3">获取"用户名"控件对象</button>
+                <button id="b3">获取"用户名"字段对象</button>
                 <textarea class="code">var field = form.getField('username');</textarea>
 
-                <button id="b4">获取"性别"控件对象</button>
+                <button id="b4">获取"性别"字段对象</button>
                 <textarea class="code">var field = form.getField('gender');</textarea>
 
-                <button id="b5">获取所有控件对象</button>
+                <button id="b5">获取所有字段对象</button>
                 <textarea class="code">var fields = form.getField();</textarea>
 
-                <button id="b6">设置"用户名"控件的值</button>
+                <button id="b6">设置"用户名"字段的值</button>
                 <textarea class="code">form.setData('hyjiacan', 'username');</textarea>
 
-                <button id="b7">设置"性别"控件的值</button>
+                <button id="b7">设置"性别"字段的值</button>
                 <textarea class="code">form.setData(0, 'gender');</textarea>
 
                 <button id="b14">设置"爱好"的值</button>
                 <textarea class="code">var hobby = form.setData(['girl', 'coding'], 'hobby');</textarea>
 
-                <button id="b8">设置所有控件的值</button>
+                <button id="b8">设置所有字段的值</button>
                 <textarea class="code">form.setData({
     username: 'hyjiacan',
     gender: 0,
@@ -214,7 +214,7 @@
                 <button id="b13">验证备注长度</button>
                 <textarea class="code">form.validate('remark');</textarea>
 
-                <button id="b11">验证所有验证的控件</button>
+                <button id="b11">验证所有验证的字段</button>
                 <textarea class="code">form.validate();</textarea>
 
                 <button id="b12">提交表单，通过事件*beforeSubmit*修改请求参数</button>
@@ -248,7 +248,7 @@ form.store();</textarea>
         checkbox: [1, 0],
         ignore: 'ignore-field-2',
         validate: {
-            auto: true, // 是否在输入控件失去焦点时自动验证
+            auto: true, // 是否在输入字段失去焦点时自动验证
             stop: true, // 是否在第一次验证失败时停止验证
             callback: function(e) {
                 console.log('字段:' + e.name);

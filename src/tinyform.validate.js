@@ -7,7 +7,7 @@
      */
     'use strict';
     /**
-     * 验证规则定义，这些规则可以直接应用到表单控件的属性上面
+     * 验证规则定义，这些规则可以直接应用到表单字段的属性上面
      * 如果需要更多的规则，请直接添加到这里
      * @example
      * <input type="text" data-rule="email" data-msg="请输入电子邮箱地址" />
@@ -85,7 +85,7 @@
     };
 
     /**
-     * 表单控件的验证规则集合
+     * 表单字段的验证规则集合
      */
     var ruleSet = {};
 
@@ -93,14 +93,18 @@
      * 默认配置
      */
     TinyForm.defaults.validate = {
-        // 是否在输入控件失去焦点时自动验证，默认为false
+        // 是否在输入字段失去焦点时自动验证，默认为false
         auto: false,
         // 是否在第一次验证失败时停止验证，默认为true
         stop: false,
-        // 每个控件验证后的回调函数
+        // 每个字段验证后的回调函数
         callback: function() {},
         // 提供规则可编辑的接口
-        rules: RULES
+        rules: RULES,
+        // 验证失败的提示引用消息，可以取值：
+        // $label 使用对应 label[for=name]标签的文字 (默认值)
+        // $placeholder 使用字段的placeholder属性值
+        refmsg: '$label'
     };
 
     /**
@@ -120,9 +124,9 @@
             refresh(this);
         },
         /**
-         * 获取表单指定控件的验证规则或所有规则
-         * @param {String} fieldName 控件的name名称，不指定此值时获取所有规则
-         * @returns {Object|Boolean}  此控件未定义规则时，返回false；否则返回规则对象 {rule: /正则表达式/, msg: '消息'}
+         * 获取表单指定字段的验证规则或所有规则
+         * @param {String} fieldName 字段的name名称，不指定此值时获取所有规则
+         * @returns {Object|Boolean}  此字段未定义规则时，返回false；否则返回规则对象 {rule: /正则表达式/, msg: '消息'}
          */
         getRule: function(fieldName) {
             // 搞一个验证规则的副本，以防止意外改变验证规则
@@ -134,25 +138,25 @@
                 return all;
             }
 
-            // 控件不存在
+            // 字段不存在
             if (this.getField(fieldName).length === 0) {
                 // 返回空对象
                 return {};
             }
 
-            // 返回指定控件的验证规则
+            // 返回指定字段的验证规则
             return all[fieldName];
         },
         /**
          * 验证表单
-         * @param {String} fieldName 指定要验证控件的name名称，不指定时验证所有控件
+         * @param {String} fieldName 指定要验证字段的name名称，不指定时验证所有字段
          * @returns {Object|Boolean} 验证通过时返回true，失败时返回失败的详细信息对象{pass: Boolean, value: String, field: Array, msg: String}
          */
         validate: function(fieldName) {
             // 后头到处要用，搞个变量保存起来，能减小压缩后的体积
             var me = this;
 
-            // 指定了参数，说明只验证指定name的控件，这里只取第一个参数
+            // 指定了参数，说明只验证指定name的字段，这里只取第一个参数
             if (arguments.length > 0) {
                 // 参数需要字符串，类型不对
                 if (typeof fieldName !== 'string') {
@@ -172,9 +176,9 @@
                 detail: {}
             };
 
-            // 取到所有的控件准备验证
+            // 取到所有的字段准备验证
             var fields = me.getField();
-            // 开始遍历控件验证
+            // 开始遍历字段验证
             for (var name in fields) {
                 // 这个name无效
                 if (!fields.hasOwnProperty(name)) {
@@ -182,7 +186,7 @@
                     continue;
                 }
 
-                // 控件的验证结果
+                // 字段的验证结果
                 // 结果长这样：
                 //{
                 //  pass: Boolean,
@@ -225,7 +229,7 @@
             // 不自动验证 就直接返回好了
             return;
         }
-        // 遍历控件，绑定失去焦点时验证的事件
+        // 遍历字段，绑定失去焦点时验证的事件
         $.each(fm.getField(), function(name) {
             // 绑定失去焦点事件
             this.blur(function() {
@@ -236,7 +240,31 @@
     }
 
     /**
-     * 获取表单所有控件的验证规则
+     * 获取引用消息
+     * @param {Object} fm 表单实例
+     * @param {string} fieldName 字段名称
+     * @param {Object} field 字段对象
+     * @returns fm.validate.refmsg=>false: 返回空串， $label: label的文本 $placeholder: placeholde属性的值
+     */
+    function getRefMsg(fm, fieldName, field) {
+        var refmsg = fm.validate.refmsg;
+
+        // 对应label的文本
+        if (refmsg === '$label') {
+            return $('label[for=' + fieldName + ']:first', fm.context).text();
+        }
+
+        // placeholder属性值
+        if (refmsg === '$placeholder') {
+            return field.attr('placeholder');
+        }
+
+        // 其它情况，返回空串
+        return '';
+    }
+
+    /**
+     * 获取表单所有字段的验证规则
      * @param {Object} fm 表单实例
      * @returns {Object} 验证规则对象
      */
@@ -246,35 +274,40 @@
         // 所有可用的规则
         var validRules = fm.option.validate.rules;
 
-        // 遍历控件，获取验证规则
-        $.each(fm.getField(), function(name, field) {
+        // 遍历字段，获取验证规则
+        $.each(fm.getField(), function(fieldName, field) {
             // 从标签属性上获取规则描述  当然  还是要trim一下的
             var rule = $.trim(field.attr(ATTRS.rule));
-            // 从标签属性上获取提示消息
-            var msg = field.attr(ATTRS.msg);
 
             // 规则为空，返回一个false
             if (rule === '') {
                 // 设置 false ，表示没有验证规则
-                rules[name] = false;
-                // 没有规则就不用再去取提示消息了，直接返回去取下一个控件
+                rules[fieldName] = false;
+                // 没有规则就不用再去取提示消息了，直接返回去取下一个字段
                 return;
             }
 
+            // 从标签属性上获取提示消息
+            var msg = field.attr(ATTRS.msg);
+
+            if (msg) {
+                // 填充引用消息
+                // 如果提示消息中包含串 $ref 的情况
+                // 那么就写作 $$ref，此时的 $ref 不会被认为是引用消息
+                msg = msg.replace(/[^\$]\$[^\$]ref/g,
+                    // 防止引用消息包含 | 符号，所以先用||替换一下，后面会搞回来的
+                    getRefMsg(fm, fieldName, field).replace(/\|/g, '||'));
+            }
             // 不包含 : 冒号，表示是普通规则
             // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
             if (rule.indexOf(':') === -1) {
                 // 字段的所有验证规则
+                // 通过 | 符号分隔
                 var fieldRules = rule.split('|');
-                // 这是|符号的占位符。
-                // 占位方法：将 || 替换成这个串，然后再map中替换成 |
-                var placeholder = '@tiny_form_msg_splitter@';
-                // 多个提示消息的分隔符
-                var splitter = '|';
                 // 多个消息使用 | 符号分隔，如果要在消息中显示 | 符号，那么就使用 ||
                 var msgs = typeof msg === 'undefined' ? false :
-                    $.map(msg.replace(/\|\|/g, placeholder).split(splitter), function(msgItem) {
-                        return msgItem.replace(new RegExp(placeholder), splitter);
+                    $.map(msg.split(/[^\|]\|[^\|]/), function(item) {
+                        return item.replace(/\|\|/g, '|');
                     });
 
                 if (msgs) {
@@ -289,7 +322,7 @@
                     }
                 }
 
-                rules[name] = [];
+                rules[fieldName] = [];
 
                 $.each(fieldRules, function(index, ruleName) {
                     if (!validRules.hasOwnProperty(ruleName)) {
@@ -310,24 +343,24 @@
                         }
                     }
                     // 添加规则
-                    rules[name].push(thisRule);
+                    rules[fieldName].push(thisRule);
                 });
 
                 // 如果所有验证规则都不存在，那么就认为不需要验证
-                if (!rules[name].length) {
-                    rules[name] = false;
+                if (!rules[fieldName].length) {
+                    rules[fieldName] = false;
                 }
                 // 可以返回了
                 return;
             }
 
             // 解析在validRules中没有定义的规则，然后返回
-            rules[name] = [resolveValidateRule(rule, msg)];
+            rules[fieldName] = [resolveValidateRule(rule, msg)];
         });
     }
 
     /**
-     * 解析控件的规则验证
+     * 解析字段的规则验证
      * @param {Object} rule data-rule的值
      * @param {Object} msg 消息
      * @return {Object|Boolean} 需要验证时返回对象，否则返回false
@@ -427,25 +460,25 @@
     }
 
     /**
-     * 验证某个控件
+     * 验证某个字段
      * @param {Object} fm 表单实例
-     * @param {String} fieldName 控件的name名称
+     * @param {String} fieldName 字段的name名称
      * @return {Object|Boolean}验证成功时返回true, 否则返回失败的详细信息
      */
     function validateField(fm, fieldName) {
-        //根据name取到控件
+        //根据name取到字段
         var field = fm.getField(fieldName);
-        // 控件不存在
+        // 字段不存在
         if (!field || field.length === 0) {
             // 返回false表示验证失败
             // 为啥呢？
-            // 开发专门来验证，却出现了控件不存在的情况，
+            // 开发专门来验证，却出现了字段不存在的情况，
             // 这是来玩的么？
             return false;
         }
 
         var pass = true;
-        // 获取控件的验证规则
+        // 获取字段的验证规则
         var rules = fm.getRule(fieldName);
 
         // 没有验证规则时，直接返回  true
@@ -453,7 +486,7 @@
             return pass;
         }
 
-        // 获取控件的值
+        // 获取字段的值
         var value = fm.getData(fieldName);
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
@@ -510,13 +543,13 @@
             var custompass = cb.call(fm, {
                 // 验证是否通过
                 pass: pass,
-                // 验证的控件对象
+                // 验证的字段对象
                 field: field,
                 // 验证规则的名称
                 rule: rule.name,
-                // 控件的name名称
+                // 字段的name名称
                 name: fieldName,
-                // 控件的值
+                // 字段的值
                 value: value,
                 // 提示消息
                 msg: rule.msg
@@ -524,7 +557,7 @@
 
             // 判断回调的返回值是不是 undefined，如果是那么就是用户并没有返回值
             if (typeof custompass !== 'undefined') {
-                // 用户返回了值，强制搞成boolean然后作为这个控件的验证结果
+                // 用户返回了值，强制搞成boolean然后作为这个字段的验证结果
                 pass = !!custompass;
             }
 
