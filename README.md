@@ -121,7 +121,7 @@ $ bower install tinyform
 
 ```javascript
 var form = TinyForm('#f1', {
-    // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 [true, false]
+    // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 ['on', 'off']
     checkbox: [1, 0],
     // 在表单内查找字段时，要忽略的字段或字段集合
     // 值可以为false、字符串或数组：
@@ -219,11 +219,11 @@ var form = TinyForm('#f1', {
 
 **checkbox** Array
 
-> 自定义**checkbox**的选中与未选中状态的值，默认为 `[true, false]`，
+> 自定义**checkbox**的选中与未选中状态的值，默认为 `['on', 'off']`，
 > 这个选项在调用`getData`和`setData`时都会生效，
 > 要注意的是，这里的类型只支持基础值类型： Number, String, Boolean
 > 在设置数据时，会将设置的数据转换成字符串(调用 `toString`，这个选项的值也会转换)再比较，
-> 为`true`则选中，否则不选中
+> 为`on`则选中，否则不选中
 
 **validate** Object
 

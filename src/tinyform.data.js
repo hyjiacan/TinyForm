@@ -15,8 +15,8 @@
     // 默认配置
     // 因为 data 是核心组件，所以配置项就不单独放到一个对象中
     $.extend(true, TinyForm.defaults, {
-        // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 [true, false]
-        checkbox: [true, false],
+        // 自定义 checkbox 选中(第0个元素)和未选中(第1个元素)状态的值，默认为 ['on', 'off']
+        checkbox: ['on', 'off'],
         // 调用ajax前的数据处理
         beforeSubmit: false
     });
