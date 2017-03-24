@@ -364,11 +364,18 @@
 		// 字段的所有验证规则
 		// 通过 | 符号分隔
 		return rule.split('|').filter(function(ruleName) {
-			return validRules.hasOwnProperty(ruleName);
+			return validRules.hasOwnProperty(ruleName) || ruleName[0] === '&';
 		}).map(function(ruleName) {
 			var thisRule = $.extend(true, {
 				name: ruleName
 			}, validRules[ruleName]);
+
+			// 如果验证规则是以 & 符号开头，那就表示这个字段要与其它某个字段的值相同
+			// 其它某个字段： & 符号后的字符串即为其名称
+			if(ruleName[0] === '&') {
+				thisRule.rule = ruleName;
+			}
+
 			if(msgs && msgs.length) {
 				// 如果有配置data-msg，就使用data-msg作为默认的消息
 				if(typeof msgs === 'string') {
@@ -392,7 +399,9 @@
 	 */
 	function resolveValidateRule(rule, msg) {
 		// 创建一个存放验证规则和提示消息的对象
-		var validation = {};
+		var validation = {
+			name: rule
+		};
 		// 参数传入的rule为空
 		if(!rule) {
 			// 不需要验证，返回一个false
@@ -428,7 +437,9 @@
 	 */
 	function resolveLengthRule(rule, msg) {
 		// 创建一个存放验证规则和提示消息的对象
-		var validation = {};
+		var validation = {
+			name: rule
+		};
 
 		// 长度定义格式: length: start [, end]
 		// 所以通过分隔逗号(,)来搞成数组
@@ -545,9 +556,15 @@
 					// 返回值作为验证结果
 					pass = !!ret;
 				}
+			} else if(rule.rule[0] === '&') {
+				// 验证与其它某个字段的值相等
+				pass = fm.getData(rule.rule.substring(1)) === value;
 			} else {
 				// 不是函数，那就认为是下则表达式了
-				// 因为只支持这两种写法
+				// 因为只支持这三种写法
+
+				// 同一个正则多次验证，每次验证都需要将 lastIndex 设置为0，否则多次验证会失败
+				rule.rule.lastIndex = 0;
 				pass = rule.rule.test(value);
 			}
 

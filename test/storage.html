@@ -1,92 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <title>Unit test for tinyform.storage.js</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="../src/tinyform.core.js"></script>
-    <script src="../src/tinyform.data.js"></script>
-    <script src="../src/tinyform.storage.js"></script>
-    <link href="../node_modules/qunitjs/qunit/qunit.css" rel="stylesheet">
-</head>
+	<head>
+		<title>Unit test for tinyform.storage.js</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="../src/tinyform.core.js"></script>
+		<script src="../src/tinyform.data.js"></script>
+		<script src="../src/tinyform.storage.js"></script>
+		<link href="../node_modules/qunitjs/qunit/qunit.css" rel="stylesheet">
+	</head>
 
-<body>
-    <div id="qunit"></div>
-    <div id="qunit-fixture"></div>
-    <div class="container">
-        <form id="form">
-            <ol>
-                <li>
-                    <label for="">文本框</label>
-                    <input type="text" name="text" value="textboxvalue">
-                </li>
-                <li>
-                    <label for="">单选按钮</label>
-                    <input type="radio" name="radio" value="radio1"> radio1
+	<body>
+		<div id="qunit"></div>
+		<div id="qunit-fixture"></div>
+		<div class="container">
+			<form id="form">
+				<ol>
+					<li>
+						<label for="">文本框</label>
+						<input type="text" name="text" value="textboxvalue">
+					</li>
+					<li>
+						<label for="">单选按钮</label>
+						<input type="radio" name="radio" value="radio1"> radio1
 
-                    <input type="radio" name="radio" value="radio2" checked="checked"> radio2
-                </li>
-                <li>
-                    <label for="">复选框</label>
-                    <input type="checkbox" name="checkbox" checked="checked">
-                </li>
-                <li>
-                    <label for="">下拉框(单选)</label>
-                    <select name="select1" id="">
-                        <option value="1">第1项</option>
-                        <option value="2" selected="selected">第2项</option>
-                        <option value="3">第3项</option>
-                    </select>
-                </li>
-                <li>
-                    <label for="">下拉框(多选)</label>
-                    <select name="select2" id="" multiple="multiple">
-                        <option value="1" selected="selected">第1项</option>
-                        <option value="2">第2项</option>
-                        <option value="3" selected="selected">第3项</option>
-                    </select>
-                </li>
-                <li>
-                    <label for="">多行文本框</label>
-                    <textarea rows="" cols="" name="textarea">textareatext</textarea>
-                </li>
-            </ol>
-        </form>
-    </div>
-    <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
-    <script>
-        var form = TinyForm('#form', {
-            checkbox: ['On', 'Off'],
-            storage: {
-                name: 'testform'
-            }
-        });
+						<input type="radio" name="radio" value="radio2" checked="checked"> radio2
+					</li>
+					<li>
+						<label for="">复选框</label>
+						<input type="checkbox" name="checkbox" checked="checked">
+					</li>
+					<li>
+						<label for="">下拉框(单选)</label>
+						<select name="select1" id="">
+							<option value="1">第1项</option>
+							<option value="2" selected="selected">第2项</option>
+							<option value="3">第3项</option>
+						</select>
+					</li>
+					<li>
+						<label for="">下拉框(多选)</label>
+						<select name="select2" id="" multiple="multiple">
+							<option value="1" selected="selected">第1项</option>
+							<option value="2">第2项</option>
+							<option value="3" selected="selected">第3项</option>
+						</select>
+					</li>
+					<li>
+						<label for="">多行文本框</label>
+						<textarea rows="" cols="" name="textarea">textareatext</textarea>
+					</li>
+				</ol>
+			</form>
+		</div>
+		<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+		<script>
+			var form = TinyForm('#form', {
+				checkbox: ['On', 'Off'],
+				storage: {
+					name: 'testform'
+				}
+			});
+			if(window && window.localStorage) {
+				QUnit.test("保存/加载数据<=>存储", function(assert) {
+					var expected = form.getData();
+					console.log(JSON.stringify(expected))
+					form.store();
 
-        QUnit.test("保存/加载数据<=>存储", function(assert) {
-            var expected = form.getData();
-            form.store();
+					var actual = window.localStorage.getItem(form.option.storage.name);
 
-            var actual = localStorage.getItem(form.option.storage.name);
+					assert.ok(actual, '保存后 localStorage 中存在项 testform');
 
-            assert.ok(actual, '保存后 localStorage 中存在项 testform');
+					assert.deepEqual(JSON.parse(actual), expected, '直接从 localStorage 读取出的数据与getData的数据一致');
 
-            assert.deepEqual(expected, JSON.parse(actual), '直接从 localStorage 读取出的数据与getData的数据一致');
+					assert.deepEqual(form.load(), expected, '通过form.load从 localStorage 读取出的数据与getData的数据一致');
+				});
 
-            assert.deepEqual(expected, form.load(), '通过form.load从 localStorage 读取出的数据与getData的数据一致');
-        });
+				QUnit.test('清除保存的数据', function(assert) {
+					form.abandon();
 
-        QUnit.test('清除保存的数据', function(assert) {
-            form.abandon();
+					var actual = window.localStorage.getItem(form.option.storage.name);
+					assert.ok(!actual, '清除后 localStorage 中不存在项 testform (为 null)');
 
-            var actual = localStorage.getItem(form.option.storage.name);
-            assert.ok(actual === null, '清除后 localStorage 中不存在项 testform (为 null)');
-
-            assert.ok(form.load() === null, '通过form.load从 localStorage 读取出的数据=null');
-        });
-    </script>
-</body>
+					assert.ok(!form.load(), '通过form.load从 localStorage 读取出的数据=null');
+				});
+			} else {
+				QUnit.test('不是浏览器环境或不支持 localStorage，无法执行此测试', function(assert) {
+					assert.expect(0);
+				});
+			}
+		</script>
+	</body>
 
 </html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>Unit test for tinyform.validate.js</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="../src/tinyform.core.js"></script>
+		<script src="../src/tinyform.data.js"></script>
+		<script src="../src/tinyform.validate.js"></script>
+		<link href="../node_modules/qunitjs/qunit/qunit.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<div id="qunit"></div>
+		<div id="qunit-fixture"></div>
+		<div class="container">
+			<form id="form">
+				<ol>
+					<li>
+						<label for="username">用户名</label>
+						<input type="text" name="username" data-rule="required|alpha" data-msg="&p|&l只能是字母" placeholder="用户名不能为空">
+					</li>
+					<li>
+						<label for="">密码</label>
+						<input type="password" name="password" data-rule="required|pswd" data-msg="请填写密码|密码复杂度不符合要求">
+					</li>
+
+					<li>
+						<label for="">确认密码</label>
+						<input type="password" name="passwordconfirm" data-rule="required|&password" data-msg="请填写密码|两次密码输入不一致">
+					</li>
+					<li>
+						<label for="">性别</label>
+						<input type="radio" name="gender" value="男" data-rule="required" data-msg="请选择&l"> 男
+
+						<input type="radio" name="gender" value="女"> 女
+					</li>
+					<li>
+						<label for="">多选下拉框</label>
+						<select name="select" id="" multiple="multiple" data-rule="select2atleast">
+							<option value="1">第1项</option>
+							<option value="2">第2项</option>
+							<option value="3">第3项</option>
+						</select>
+					</li>
+					<li>
+						<label for="">多行文本框</label>
+						<textarea rows="" cols="" name="textarea" data-rule="length: 20, 56"></textarea>
+					</li>
+				</ol>
+			</form>
+		</div>
+		<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+		<script>
+			var form = TinyForm('#form', {
+				validate: {
+					auto: false,
+					rules: {
+						lower: {
+							rule: /^[a-z]+$/,
+							msg: '请输入小写字母'
+						},
+						select2atleast: {
+							rule: function(value) {
+								return value.length >= 2;
+							},
+							msg: '请至少选择两项'
+						},
+						pswd: {
+							rule: function(value) {
+								if(!value) {
+									return;
+								}
+
+								if(!/[a-z]/.test(value)) {
+									return '密码应包含小写字母';
+								}
+
+								if(!/[A-Z]/.test(value)) {
+									return '密码应包含大写字母';
+								}
+
+								if(!/[0-9]/.test(value)) {
+									return '密码应包含数字';
+								}
+
+								if(!/[!@#\$%\^&\*\(\)\-_\+=\|\\\[\]\{\};:'"<,>\.\/\?~`]/.test(value)) {
+									return '密码应包含特殊字符';
+								}
+							}
+						}
+					}
+				}
+			});
+
+			var allfield = form.getField();
+			var allrule = form.getRule();
+
+			QUnit.test('用户名', function(assert) {
+				var rules = allrule.username;
+				assert.ok(rules, '需要验证');
+
+				assert.equal(rules.length, 2, '有两个验证规则');
+
+				var rule1 = rules[0];
+				assert.equal(rule1.name, 'required', '第一个规则');
+				assert.equal(rule1.msg, '用户名不能为空', '第一个验证消息');
+
+				var rule2 = rules[1];
+				assert.equal(rule2.name, 'alpha', '第二个规则');
+				assert.equal(rule2.msg, '用户名只能是字母', '第二个验证消息');
+
+				var field = allfield.username;
+
+				// 填入数字
+				field.val(3211);
+				assert.equal(form.validate('username'), false, '填入数字验证不通过');
+
+				// 填入汉字
+				field.val('汉字');
+				assert.equal(form.validate('username'), false, '填入汉字验证不通过');
+
+				// 填入大写字母
+				field.val('UPPERCASE');
+				assert.equal(form.validate('username'), true, '填入大写字母验证通过');
+
+				// 填入大写字母
+				field.val('lowercase');
+				assert.equal(form.validate('username'), true, '填入大写字母验证通过');
+
+				// 混合填入大写字母和小写字母
+				field.val('lowercaseaNdUPPERCASE');
+				assert.equal(form.validate('username'), true, '混合填入大写字母和小写字母验证通过');
+
+				// 包含空格
+				field.val('ln asdfb');
+				assert.equal(form.validate('username'), false, '填入空格验证不通过');
+
+				// 其它字符
+				field.val('asduiobasd^');
+				assert.equal(form.validate('username'), false, '填入其它字符验证不通过');
+
+				// 为空
+				field.val('');
+				assert.equal(form.validate('username'), false, '为空验证不通过');
+			});
+
+			QUnit.test('密码输入框', function(assert) {
+				var rules = allrule.password;
+				assert.ok(rules, '需要验证');
+
+				assert.equal(rules.length, 2, '有两个验证规则');
+
+				var rule1 = rules[0];
+				assert.equal(rule1.name, 'required', '第一个规则');
+				assert.equal(rule1.msg, '请填写密码', '第一个验证消息');
+
+				var rule2 = rules[1];
+				assert.equal(rule2.name, 'pswd', '第二个规则');
+				assert.equal(rule2.msg, '密码复杂度不符合要求', '第二个验证消息');
+
+				// 密码需要大小写字母 数字和特殊字符
+
+				// 为空 
+				assert.equal(form.validate('password'), false, '输入为空时验证不通过');
+
+				// 只填写数字
+				form.setData(111, 'password');
+				assert.equal(form.validate('password'), false, '只输入数字时验证不通过');
+
+				// 只填写小写字母
+				form.setData('aaa', 'password');
+				assert.equal(form.validate('password'), false, '只输入小写字母时验证不通过');
+
+				// 只填写大写字母
+				form.setData('AAA', 'password');
+				assert.equal(form.validate('password'), false, '只输入大写字母时验证不通过');
+
+				// 只填写特殊字符
+				form.setData('%^&({', 'password');
+				assert.equal(form.validate('password'), false, '只输入特殊字符时验证不通过');
+
+				// 只填写数字与小写字母
+				form.setData('111aaa', 'password');
+				assert.equal(form.validate('password'), false, '只输入数字与小写字母时验证不通过');
+
+				// 只填写数字与大写字母
+				form.setData('111AAA', 'password');
+				assert.equal(form.validate('password'), false, '只输入数字与大写字母时验证不通过');
+
+				// 只填写数字与特殊字符
+				form.setData('111%^&({', 'password');
+				assert.equal(form.validate('password'), false, '只输入数字与特殊字符时验证不通过');
+
+				// 填写数字  大小写字母  特殊字符
+				form.setData('111aaaAAA^&&*:', 'password');
+				assert.equal(form.validate('password'), true, '输入数字  大小写字母  特殊字符时验证通过');
+			});
+
+			QUnit.test('确认密码输入框', function(assert) {
+				var rules = allrule.passwordconfirm;
+				assert.ok(rules, '需要验证');
+
+				assert.equal(rules.length, 2, '有两个验证规则');
+
+				var rule1 = rules[0];
+				assert.equal(rule1.name, 'required', '第一个规则');
+				assert.equal(rule1.msg, '请填写密码', '第一个验证消息');
+
+				var rule2 = rules[1];
+				assert.equal(rule2.name, '&password', '第二个规则');
+				assert.equal(rule2.msg, '两次密码输入不一致', '第二个验证消息');
+
+				// 为空
+				assert.equal(form.validate('passwordconfirm'), false, '输入为空时验证不通过');
+
+				// 不一致的输入
+				form.setData('asdvyas[donanimationstart978', 'passwordconfirm');
+				assert.equal(form.validate('passwordconfirm'), false, '不一致的输入验证不通过');
+
+				// 一致的输入
+				form.setData('111aaaAAA^&&*:', 'passwordconfirm');
+				assert.equal(form.validate('passwordconfirm'), true, '一致的输入验证通过');
+			});
+
+			QUnit.test('性别', function(assert) {
+				var rules = allrule.gender;
+
+				assert.ok(rules, '需要验证');
+
+				assert.equal(rules.length, 1, '有一个验证规则');
+
+				var rule = rules[0];
+				assert.equal(rule.name, 'required', '规则名称');
+				assert.equal(rule.msg, '请选择', '因为没有label的for属性为gender，所以验证消息为"请选择"');
+
+				assert.equal(form.validate('gender'), false, '不选择性别验证不通过');
+
+				form.setData('男', 'gender');
+				assert.equal(form.validate('gender'), true, '选择性别"男"验证通过');
+
+				form.setData('女', 'gender');
+				assert.equal(form.validate('gender'), true, '选择性别"女"验证通过');
+			});
+
+			QUnit.test('多选下拉框', function(assert) {
+				var rules = allrule.select;
+
+				assert.ok(rules, '需要验证');
+
+				assert.equal(rules.length, 1, '有一个验证规则');
+
+				var rule = rules[0];
+				assert.equal(rule.name, 'select2atleast', '规则名称');
+				assert.equal(rule.msg, '请至少选择两项', '验证消息');
+
+				assert.equal(form.validate('select'), true, '不选择验证通过，因为没有required规则');
+
+				form.setData(1, 'select');
+				assert.equal(form.validate('select'), false, '选择一项验证不通过');
+
+				form.setData([1, 3], 'select');
+				assert.equal(form.validate('select'), true, '选择性两项验证通过');
+
+				form.setData([1, 2, 3], 'select');
+				assert.equal(form.validate('select'), true, '选择性三项验证通过');
+			});
+
+			QUnit.test('多行文本框', function(assert) {
+				var rules = allrule.textarea;
+
+				assert.ok(rules, '需要验证');
+
+				assert.equal(rules.length, 1, '有一个验证规则');
+
+				var rule = rules[0];
+				assert.equal(rule.name, 'length: 20, 56', '规则名称为undefined');
+				assert.equal(rule.msg, '长度应该在20到56个字之间', '验证消息');
+
+				// 为空
+				assert.equal(form.validate('textarea'), true, '为空时验证通过，因为没有required规则');
+
+				// 输入不到20个字符(18个)
+				form.setData('123456789123456789', 'textarea');
+				assert.equal(form.validate('textarea'), false, '输入不到20个字符(18个)验证不通过');
+
+				// 输入刚好20个字符
+				form.setData('12345678912345678900', 'textarea');
+				assert.equal(form.validate('textarea'), true, '输入刚好20个字符验证通过');
+
+				// 输入在20个-56个字符之间
+				form.setData('12345678912345678912345678912345678912345', 'textarea');
+				assert.equal(form.validate('textarea'), true, '输入在20个-56个字符之间验证通过');
+
+				// 输入刚好56个字符
+				form.setData('12345678912345678912345678912345678912345678912345678900', 'textarea');
+				assert.equal(form.validate('textarea'), true, '输入刚好56个字符验证通过');
+
+				// 输入超过56个字符
+				form.setData('123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789', 'textarea');
+				assert.equal(form.validate('textarea'), false, '输入超过56个字符验证不通过');
+			});
+		</script>
+	</body>
+
+</html>

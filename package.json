@@ -1,6 +1,6 @@
 {
   "name": "tinyform",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "一个简单的WEB表单工具",
   "keywords": [
     "form"
@@ -21,7 +21,6 @@
     "jquery": "^1.11.0"
   },
   "devDependencies": {
-    "bootstrap": "^3.3.7",
     "grunt": "^1.0.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",

@@ -258,7 +258,7 @@ TinyForm.defaults.validate.rules.xxx = {
 
 **data-rule**
 
-> 此输入字段的验证规则，支持以下值：
+此输入字段的验证规则，支持以下值(**这些写法均要区分大小写**)：
 
 - **required** 必填
 - **number** 数字
@@ -282,6 +282,15 @@ TinyForm.defaults.validate.rules.xxx = {
 ```
 是错误的写法。
 
+另外，如果想验证输入与其它某个字段的值相同(比如常见的密码确认功能)，可以这样写规则：
+
+```html
+<input type="password" name="pswd" rule="required|password" />
+<input type="password" name="pswdconfirm" rule="required|&pswd" />
+```
+
+，看到了吧，这里写成引用的方式来告诉程序，希望字段`pswdconfirm`的值与`pswd`的值相同，这样，字段`pswdconfirm`验证时，就会自动判断了。
+
 **data-msg**
 
 > 此字段验证失败时的提示消息，若不指定则使用默认消息，
@@ -304,6 +313,18 @@ var form = $('#form', {
     }
 })
 ```
+
+另外，`data-msg`属性新增了引用功能，可以通过 `&l`和`&p`分别引用对应`label`标签和`placeholder`属性的值，如：
+
+```html
+<label for="username">用户名</label>
+<input name="username" data-rule="required|format" data-msg="&p|输入的&l格式不正确" placeholder="请输入用户名" />
+```
+
+这样，当未填写时，就会提示消息*请输入用户名*，而当输入的格式不正确时(`format`规则)，就会提示*输入的用户名格式不正确*。
+
+`&l`和`&p`可以多次出现，如果要在消息中显示 `&l`和`&p`，则写作`&&l`和`&&p`。
+
 
 ## 实例属性/Property
 
