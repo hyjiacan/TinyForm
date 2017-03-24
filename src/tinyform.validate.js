@@ -100,11 +100,7 @@
         // 每个字段验证后的回调函数
         callback: function() {},
         // 提供规则可编辑的接口
-        rules: RULES,
-        // 验证失败的提示引用消息，可以取值：
-        // $label 使用对应 label[for=name]标签的文字 (默认值)
-        // $placeholder 使用字段的placeholder属性值
-        refmsg: '$label'
+        rules: RULES
     };
 
     /**
@@ -240,30 +236,6 @@
     }
 
     /**
-     * 获取引用消息
-     * @param {Object} fm 表单实例
-     * @param {string} fieldName 字段名称
-     * @param {Object} field 字段对象
-     * @returns fm.validate.refmsg=>false: 返回空串， $label: label的文本 $placeholder: placeholde属性的值
-     */
-    function getRefMsg(fm, fieldName, field) {
-        var refmsg = fm.validate.refmsg;
-
-        // 对应label的文本
-        if (refmsg === '$label') {
-            return $('label[for=' + fieldName + ']:first', fm.context).text();
-        }
-
-        // placeholder属性值
-        if (refmsg === '$placeholder') {
-            return field.attr('placeholder');
-        }
-
-        // 其它情况，返回空串
-        return '';
-    }
-
-    /**
      * 获取表单所有字段的验证规则
      * @param {Object} fm 表单实例
      * @returns {Object} 验证规则对象
@@ -287,82 +259,135 @@
                 return;
             }
 
-            // 从标签属性上获取提示消息
-            var msg = field.attr(ATTRS.msg);
+            var msg = replaceRegMsg(fm, field, fieldName, field.attr(ATTRS.msg));
 
-            if (msg) {
-                // 填充引用消息
-                // 如果提示消息中包含串 $ref 的情况
-                // 那么就写作 $$ref，此时的 $ref 不会被认为是引用消息
-                msg = msg.replace(/[^\$]\$[^\$]ref/g,
-                    // 防止引用消息包含 | 符号，所以先用||替换一下，后面会搞回来的
-                    getRefMsg(fm, fieldName, field).replace(/\|/g, '||'));
-            }
+            // 从标签属性上获取提示消息
+            var msgs = msg ? handlePlaceholder(msg, '|') : false;
+
             // 不包含 : 冒号，表示是普通规则
             // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
-            if (rule.indexOf(':') === -1) {
-                // 字段的所有验证规则
-                // 通过 | 符号分隔
-                var fieldRules = rule.split('|');
-                // 多个消息使用 | 符号分隔，如果要在消息中显示 | 符号，那么就使用 ||
-                var msgs = typeof msg === 'undefined' ? false :
-                    $.map(msg.split(/[^\|]\|[^\|]/), function(item) {
-                        return item.replace(/\|\|/g, '|');
-                    });
+            rules[fieldName] = rule.indexOf(':') === -1 ?
+                resolvePreDefinedRule(validRules, rule, msgs) :
+                // 规则是特殊语法
+                [resolveValidateRule(rule, msgs[0])];
 
-                if (msgs) {
-                    // 让规则和消息长度一致
-                    if (msgs.length > fieldRules.length) {
-                        msgs.length = fieldRules.length;
-                    }
-
-                    // 如果只有一个消息，就搞成字符串
-                    if (msgs.length === 1) {
-                        msgs = msgs[0];
-                    }
-                }
-
-                rules[fieldName] = [];
-
-                $.each(fieldRules, function(index, ruleName) {
-                    if (!validRules.hasOwnProperty(ruleName)) {
-                        return;
-                    }
-                    var thisRule = $.extend(true, {
-                        name: ruleName
-                    }, validRules[ruleName]);
-
-                    if (msgs && msgs.length) {
-                        // 如果有配置data-msg，就使用data-msg作为默认的消息
-                        if (typeof msgs === 'string') {
-                            // 使用标签上配置的的提示消息(也就是在data-msg上配置的消息)
-                            thisRule.msg = msgs;
-                        } else {
-                            // 取第一个消息
-                            thisRule.msg = msgs.shift();
-                        }
-                    }
-                    // 添加规则
-                    rules[fieldName].push(thisRule);
-                });
-
-                // 如果所有验证规则都不存在，那么就认为不需要验证
-                if (!rules[fieldName].length) {
-                    rules[fieldName] = false;
-                }
-                // 可以返回了
-                return;
+            // 如果所有验证规则都不存在，那么就认为不需要验证
+            if (!rules[fieldName].length) {
+                rules[fieldName] = false;
             }
-
-            // 解析在validRules中没有定义的规则，然后返回
-            rules[fieldName] = [resolveValidateRule(rule, msg)];
         });
     }
 
     /**
-     * 解析字段的规则验证
+     * 将字符串str通过 seek 分隔成数组，然后将两个连续的seek替换成 place
+     * 
+     * @param {String} str 原始串
+     * @param {String} seek 用来分隔多项的串
+     * @param {String} place 用来替换两个连续的seek的串，当不指定时，表示与 seek 相同
+     * @returns 分割后的数组
+     */
+    function handlePlaceholder(str, seek, place) {
+        if (!str) {
+            return [];
+        }
+        seek = seek.toString();
+
+        if (str.indexOf(seek) === -1) {
+            return [str];
+        }
+
+        // 搞个新的占位串，这个占位串用来替代两个 placeholder 连续存在的位置
+        var token;
+        do {
+            // 因为要构建正则，所以这里干掉.符号
+            token = '#' + Math.random().toString().replace('.', '') + '#';
+        } while (str.indexOf(token) !== -1);
+
+        var tokenReg = new RegExp(token, 'g');
+        place = typeof place === 'undefined' ? seek : place;
+
+        // 把 | 符号转义，正则里面才能使用
+        seek = seek.replace(/\|/g, '\\|');
+
+        // 例： str = 'xxx||aaa'
+        // 会得到 xxx#1232121#aaa
+        return str.replace(new RegExp(seek + seek, 'g'), token)
+            // 将多个内容分开
+            .split(new RegExp(seek, 'g')).map(function(item) {
+                return item.replace(tokenReg, place);
+            });
+    }
+
+    /**
+     * 替换消息中的引用消息
+     * @param {Object} fm 表单实例
+     * @param {Object} field 字段对象
+     * @param {string} fieldName 字段名称
+     * @param {String} msg 原始消息串
+     * @returns 替换后的提示消息
+     */
+    function replaceRegMsg(fm, field, fieldName, msg) {
+        if (!msg) {
+            return '';
+        }
+        var refmsg;
+        if (msg.indexOf('&l') !== -1) {
+            refmsg = $('label[for=' + fieldName + ']:first', fm.context)
+                .text().replace(/\|/g, '||'); // 防止要引用消息中含有|符号
+
+            // 填充引用消息 &l => label
+            msg = handlePlaceholder(msg, '&l')
+                .join(refmsg);
+        }
+
+        if (msg.indexOf('&p') !== -1) {
+            refmsg = field.attr('placeholder') || ''
+                .replace(/\|/g, '||'); // 防止要引用消息中含有|符号
+
+            // 填充引用消息 &p => placeholder
+            msg = handlePlaceholder(msg, '&p')
+                .join(refmsg);
+        }
+
+        return msg;
+    }
+
+    /**
+     * 解析字段的预定义规则验证
+     * @param {Object} 所有可用的验证规则
      * @param {Object} rule data-rule的值
-     * @param {Object} msg 消息
+     * @param {Array} msgs 消息数组
+     * @return {Array} 这个字段需要验证的规则数组，如果没有就返回空数组
+     */
+    function resolvePreDefinedRule(validRules, rule, msgs) {
+        // 规则名称
+        // 字段的所有验证规则
+        // 通过 | 符号分隔
+        return rule.split('|').filter(function(ruleName) {
+            return validRules.hasOwnProperty(ruleName);
+        }).map(function(ruleName) {
+            var thisRule = $.extend(true, {
+                name: ruleName
+            }, validRules[ruleName]);
+            if (msgs && msgs.length) {
+                // 如果有配置data-msg，就使用data-msg作为默认的消息
+                if (typeof msgs === 'string') {
+                    // 使用标签上配置的的提示消息(也就是在data-msg上配置的消息)
+                    thisRule.msg = msgs;
+                } else {
+                    // 取第一个消息
+                    thisRule.msg = msgs.shift();
+                }
+            }
+            // 添加规则
+            return thisRule;
+        });
+    }
+
+    /**
+     * 解析字段的特殊规则验证
+     * @param {Object} rule data-rule的值
+     * @param {String} msg 消息
      * @return {Object|Boolean} 需要验证时返回对象，否则返回false
      */
     function resolveValidateRule(rule, msg) {
@@ -399,7 +424,6 @@
     /**
      * 解析验证规则为长度的表达式
      * @param {String} rule 规则表达式
-     * @param {String} msg 验证失败时的自定义消息
      * @returns {Object|Boolean} 需要验证时返回对象，否则返回false
      */
     function resolveLengthRule(rule, msg) {

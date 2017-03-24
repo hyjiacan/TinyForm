@@ -19,7 +19,7 @@ module.exports = function(grunt) {
                     jQuery: true,
                     console: true,
                     window: true,
-                    'TinyForm': true,
+                    TinyForm: true,
                 },
                 // 写完一行必须加个分号
                 asi: false,

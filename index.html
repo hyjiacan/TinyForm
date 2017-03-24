@@ -90,7 +90,7 @@
                 </div>
                 <div>
                     <label for="">电话号码</label>
-                    <input type="text" name="phone" value="" data-rule="number" placeholder="只能是数字" />
+                    <input type="text" name="phone" value="" data-rule="number" placeholder="只能是数字" data-msg="&p" />
                 </div>
                 <div>
                     <label for="">英文名字</label>
@@ -101,8 +101,8 @@
                     <input type="text" name="email" value="" data-rule="email" placeholder="只能输入邮箱" />
                 </div>
                 <div>
-                    <label for="">邮编</label>
-                    <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="$ref请输入正确的6位数字" placeholder="只能输入6位数字" />
+                    <label for="postcode">邮编</label>
+                    <input type="text" name="postcode" value="" data-rule="regex:^[0-9]{6}$" data-msg="&l:请输入正确的6位数字" placeholder="只能输入6位数字" />
                 </div>
                 <div>
                     <label for="">网址</label>
@@ -251,6 +251,7 @@ form.store();</textarea>
             auto: true, // 是否在输入字段失去焦点时自动验证
             stop: true, // 是否在第一次验证失败时停止验证
             callback: function(e) {
+                console.log(e)
                 console.log('字段:' + e.name);
                 console.log('值:' + e.value);
                 console.log('规则:' + e.rule);
