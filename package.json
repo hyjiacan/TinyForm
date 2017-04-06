@@ -1,36 +1,40 @@
 {
-  "name": "tinyform",
-  "version": "0.7.5",
-  "description": "一个简单的WEB表单工具",
-  "keywords": [
-    "form"
-  ],
-  "homepage": "http://git.oschina.net/hyjiacan/TinyForm",
-  "example": "http://hyjiacan.oschina.io/tinyform",
-  "bugs": {
-    "url": "http://git.oschina.net/hyjiacan/TinyForm/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://git.oschina.net/hyjiacan/TinyForm.git"
-  },
-  "license": "MIT",
-  "author": "hyjiacan <dev@hyjiacan.com> (http://www.hyjiacan.com)",
-  "main": "dist/tinyform.all.js",
-  "dependencies": {
-    "jquery": "^1.11.0"
-  },
-  "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-concat": "^1.0.1",
-    "grunt-contrib-jshint": "^1.1.0",
-    "grunt-contrib-less": "^1.4.0",
-    "grunt-contrib-qunit": "^1.3.0",
-    "grunt-contrib-uglify": "^2.0.0",
-    "grunt-contrib-watch": "^1.0.0",
-    "qunitjs": "^1.23.1"
-  },
-  "scripts": {
-    "test": "grunt qunit"
-  }
+    "name": "tinyform",
+    "version": "0.7.5",
+    "description": "一个简单的WEB表单工具",
+    "keywords": [
+        "form"
+    ],
+    "homepage": "http://git.oschina.net/hyjiacan/TinyForm",
+    "example": "http://hyjiacan.oschina.io/tinyform",
+    "bugs": {
+        "url": "http://git.oschina.net/hyjiacan/TinyForm/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://git.oschina.net/hyjiacan/TinyForm.git"
+    },
+    "license": "MIT",
+    "author": "hyjiacan <dev@hyjiacan.com> (http://www.hyjiacan.com)",
+    "files": [
+        "dist/tinyform.core.js",
+        "dist/tinyform.common.js",
+        "dist/tinyform.all.js"
+    ],
+    "dependencies": {
+        "jquery": "^1.11.0"
+    },
+    "devDependencies": {
+        "grunt": "^1.0.1",
+        "grunt-contrib-concat": "^1.0.1",
+        "grunt-contrib-jshint": "^1.1.0",
+        "grunt-contrib-less": "^1.4.0",
+        "grunt-contrib-qunit": "^1.3.0",
+        "grunt-contrib-uglify": "^2.0.0",
+        "grunt-contrib-watch": "^1.0.0",
+        "qunitjs": "^1.23.1"
+    },
+    "scripts": {
+        "test": "grunt qunit"
+    }
 }
