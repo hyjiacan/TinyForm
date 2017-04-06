@@ -1,6 +1,6 @@
 [MENU]
 
-# Instruction
+# 简介
 
 **TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单字段。
 >默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，配置参数这`TinyForm.defaults.selector`，也就是说，也可以通过实例化表单的参数*selector*来自定义。
@@ -36,7 +36,7 @@
 [tinyform.all.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.all.js)(开发版)
 [tinyform.all.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.all.min.js)(生产版)
 
-## 源码/SourceCode
+## 源码
 
 git
 ```shell
@@ -54,7 +54,7 @@ Bower
 $ bower install tinyform
 ```
 
-## 用法/Usage
+## 用法
 
 **html**
 
@@ -188,6 +188,7 @@ var form = TinyForm('#f1', {
         // // 自动保存表单数据到存储的间隔(毫秒)，不设置或设置0表示不自动保存
         time: 0,
         // 自动保存数据后的回调函数
+        // this 是表单实例
         onstore: function(data) {
             console.log('表单数据已经自动保存');
         }
@@ -211,7 +212,15 @@ var form = TinyForm('#f1', {
 
 ### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/tinyform/)** 吧
 
-## 选项/Option
+## 选项
+
+选项`option`是在创建表单实例的时候仇主入的一个参数对象：
+
+```javascript
+var form = TinyForm('formselector', option);
+```
+
+下面是选项的概述：
 
 **selector** String
 
@@ -254,7 +263,7 @@ TinyForm.defaults.validate.rules.xxx = {
 
 这样的方式来修改，在执行这句后的所有`TinyForm`都会自动在失去焦点后验证
 
-## 标签属性/Tag Attribute
+## 标签属性
 
 **data-rule**
 
@@ -326,7 +335,7 @@ var form = $('#form', {
 `&l`和`&p`可以多次出现，如果要在消息中显示 `&l`和`&p`，则写作`&&l`和`&&p`。
 
 
-## 实例属性/Property
+## 实例属性
 
 **context**
 
@@ -359,7 +368,7 @@ form.option.storage.container = window.sessionStorage;
     - stop 可以改变：是否在第一次验证失败后停止验证
     - callback 改变字段验证的回调函数
 
-## 方法/Method
+## 实例方法
 
 > 说明：除了获取数据类(包括验证)的函数，其它都会返回表单的实例对象。
 
@@ -468,7 +477,7 @@ form.option.storage.container = window.sessionStorage;
 **store(fn: Function)**: Object
 
 > 存储表单数据
-> **fn** 存储前的回调函数，用于在存储前处理数据，这个函数有一个参数*data*，是表单的数据，修改后的数据通过`return`返回
+> **fn** 存储前的数据处理函数，用于在存储前处理数据，这个函数有一个参数*data*，是表单的数据，修改后的数据通过`return`返回
 > **return** 表单实例
 
 **load(fill: Boolean, fn: Function)**: Object
@@ -483,9 +492,23 @@ form.option.storage.container = window.sessionStorage;
 > 读取存储的表单数据，然后清除存储的数据
 > **return** 从存储读取的数据
 
-## 扩展/Extend
+## 静态函数
 
-> TinyForm支持添加自定义功能扩展。
+TinyForm 也提供了一些的功能函数。
+
+### 获取实例
+
+在任意位置获取表单实例的接口。即可以不记住表单实例，只需要通过表单的id就可以获取到指定的表单。
+
+`TinyForm.get(id)` 
+参数`id`是表单的实例id，这个id可以在实例对象的id属性上找到，也可以在创建表单标签的data-tinyform属性上找到。
+当指定`id`的实例不存在时，返回 `undefined`，当不传参数`id`时，返回页面上的所有实例
+
+### 实例功能扩展
+
+TinyForm 支持通过调用函数`TinyForm.extend`添加自定义实例功能扩展。
+
+一般的扩展用法如下：
 
 ```javascript
 (function($, TinyForm){
