@@ -6,6 +6,9 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script>
+            var win = window;
+        </script>
 		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
 		<script src="../src/tinyform.core.js"></script>
 		<script src="../src/tinyform.data.js"></script>
@@ -64,34 +67,29 @@
 					name: 'testform'
 				}
 			});
-			if(window && window.localStorage) {
-				QUnit.test("保存/加载数据<=>存储", function(assert) {
-					var expected = form.getData();
-					console.log(JSON.stringify(expected))
-					form.store();
 
-					var actual = window.localStorage.getItem(form.option.storage.name);
+			QUnit.test("保存/加载数据<=>存储", function(assert) {
+				var expected = form.getData();
+				console.log(JSON.stringify(expected))
+				form.store();
 
-					assert.ok(actual, '保存后 localStorage 中存在项 testform');
+				var actual = window.localStorage.getItem(form.option.storage.name);
 
-					assert.deepEqual(JSON.parse(actual), expected, '直接从 localStorage 读取出的数据与getData的数据一致');
+				assert.ok(actual, '保存后 localStorage 中存在项 testform');
 
-					assert.deepEqual(form.load(), expected, '通过form.load从 localStorage 读取出的数据与getData的数据一致');
-				});
+				assert.deepEqual(JSON.parse(actual), expected, '直接从 localStorage 读取出的数据与getData的数据一致');
 
-				QUnit.test('清除保存的数据', function(assert) {
-					form.abandon();
+				assert.deepEqual(form.load(), expected, '通过form.load从 localStorage 读取出的数据与getData的数据一致');
+			});
 
-					var actual = window.localStorage.getItem(form.option.storage.name);
-					assert.ok(!actual, '清除后 localStorage 中不存在项 testform (为 null)');
+			QUnit.test('清除保存的数据', function(assert) {
+				form.abandon();
 
-					assert.ok(!form.load(), '通过form.load从 localStorage 读取出的数据=null');
-				});
-			} else {
-				QUnit.test('不是浏览器环境或不支持 localStorage，无法执行此测试', function(assert) {
-					assert.expect(0);
-				});
-			}
+				var actual = window.localStorage.getItem(form.option.storage.name);
+				assert.ok(!actual, '清除后 localStorage 中不存在项 testform (为 null)');
+
+				assert.ok(!form.load(), '通过form.load从 localStorage 读取出的数据=null');
+			});
 		</script>
 	</body>
 

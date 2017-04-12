@@ -185,27 +185,19 @@ Object.defineProperty(TinyForm, 'extend', {
      * 然后就可以通过  form.xxxx() 来调用
      */
     value: function(extension) {
-        // 搞一个参数的副本，以防止改变原有的对象，
-        // 或者是原有的对象改变后影响已经绑定的功能
-        var temp = $.extend(true, {}, extension);
-        // 判断插件是否有初始化方法
-        if(temp.hasOwnProperty('setup')) {
-            // 有初始化方法，将其添加到扩展方法数组中
-            extfn.setup.push(temp.setup);
-            // 删掉插件参数上面的setup方法，以阻止其污染核心组件的setup
-            delete temp.setup;
-        }
-        if(temp.hasOwnProperty('refresh')) {
-            // 有刷新方法，将其添加到扩展方法数组中
-            extfn.refresh.push(temp.refresh);
-            // 删掉插件参数上面的refresh方法，以阻止其污染核心组件的refresh
-            delete temp.refresh;
-        }
+        var me = this;
+        
+        // 添加扩展
+        $.each(extension, function(name, fn) {
+            // 插件方法
+            if(extfn.hasOwnProperty(name)) {
+                extfn[name].push(fn);
+                return;
+            }
 
-        // 添加插件方法到实例上
-        $.each(temp, function(name, fn) {
+            // 扩展方法
             // 检查方法是否存在
-            if(this.hasOwnProperty(name)) {
+            if(me.hasOwnProperty(name)) {
                 // 方法存在，插件不能添加这个方法
                 console.error(METHOD_EXISTS);
                 // 既然不能添加，那就直接返回吧
