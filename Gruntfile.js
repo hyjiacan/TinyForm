@@ -1,5 +1,6 @@
-module.exports = function(grunt) {
-    var headerinfo = '/**' +
+module.exports = function (grunt) {
+
+    var header = '/**' +
         '\n * TinyForm-{edition}@<%= pkg.version %>  <%= grunt.template.today("yyyy-mm-dd") %>' +
         '\n * @作者: hyjiacan' +
         '\n * @源码: <%= pkg.repository.url %>' +
@@ -8,9 +9,9 @@ module.exports = function(grunt) {
         '\n * @依赖: jQuery 1.8.0及更高版本' +
         '\n * @浏览器支持: 不支持IE7及更低版本' +
         '\n * @QQ群: 187786345 (Javascript爱好者)' +
-        '\n */' +
-        '\n\n(function(win, $){' +
-        '\n"use strict";\n';
+        '\n */';
+
+    var wapper = '\n\n(function(win, $){\n"use strict";\n';
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -21,7 +22,7 @@ module.exports = function(grunt) {
                     $: true,
                     console: true,
                     win: true,
-                    TinyForm: true,
+                    TinyForm: true
                 },
                 // 写完一行必须加个分号
                 asi: false,
@@ -59,7 +60,7 @@ module.exports = function(grunt) {
             },
             core: {
                 options: {
-                    banner: headerinfo.replace('{edition}', 'core')
+                    banner: header.replace('{edition}', 'core') + wapper
                 },
                 // 将要被合并的文件
                 src: ['src/tinyform.core.js', 'src/tinyform.data.js'],
@@ -68,7 +69,7 @@ module.exports = function(grunt) {
             },
             common: {
                 options: {
-                    banner: headerinfo.replace('{edition}', 'common')
+                    banner: header.replace('{edition}', 'common') + wapper
                 },
                 // 将要被合并的文件
                 src: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js'],
@@ -77,7 +78,7 @@ module.exports = function(grunt) {
             },
             all: {
                 options: {
-                    banner: headerinfo.replace('{edition}', 'all')
+                    banner: header.replace('{edition}', 'all') + wapper
                 },
                 // 将要被合并的文件
                 src: ['src/*.js'],
@@ -99,7 +100,7 @@ module.exports = function(grunt) {
         uglify: {
             core: {
                 options: {
-                    banner: headerinfo.replace('{edition}', 'core')
+                    banner: header.replace('{edition}', 'core')
                 },
                 files: {
                     'dist/<%= pkg.name %>.core.min.js': ['<%= concat.core.dest %>']
@@ -107,7 +108,7 @@ module.exports = function(grunt) {
             },
             common: {
                 options: {
-                    banner: headerinfo.replace('{edition}', 'common')
+                    banner: header.replace('{edition}', 'common')
                 },
                 files: {
                     'dist/<%= pkg.name %>.common.min.js': ['<%= concat.common.dest %>']
@@ -115,7 +116,7 @@ module.exports = function(grunt) {
             },
             all: {
                 options: {
-                    banner: headerinfo.replace('{edition}', 'all')
+                    banner: header.replace('{edition}', 'all')
                 },
                 files: {
                     'dist/<%= pkg.name %>.all.min.js': ['<%= concat.all.dest %>']
