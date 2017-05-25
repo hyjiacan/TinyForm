@@ -1,5 +1,5 @@
 /**
- * TinyForm-common@0.7.6  2017-05-25
+ * TinyForm-common@0.7.7  2017-05-25
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -126,7 +126,7 @@
         /**
          * 根据name属性获取字段 返回数组，因为可能存在同name情况
          * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
-         * @returns {Array}  范围内所有name为指定值的字段数组或获取到的所有域对象
+         * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
             // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
@@ -345,8 +345,8 @@
         },
         /**
          * 获取所有字段的值，返回对象
-         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
-         * @returns {Object} 字段的name和值对象
+         * @param {String} [fieldName] 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
+         * @returns {Object|void} 字段的name和值对象
          */
         getData: function (fieldName) {
             // 没有参数，要获取所有字段的数据
@@ -367,7 +367,7 @@
         /**
          * 设置字段的值
          * @param {String|Object} data 要设置的值
-         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
+         * @param {String} [fieldName] 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
          * @returns {Object}  表单实例
          */
         setData: function (data, fieldName) {
@@ -416,7 +416,7 @@
         /**
          * 使用jQuery提交表单（默认异步: async=true）
          * @param {Object} option Ajax参数项
-         * @returns {Object}  表单实例
+         * @returns {Object|void}  表单实例
          */
         submit: function (option) {
             // 到处都要写this，加个变量保存起来，在压缩的时候说不定能小好几十个字节
@@ -543,7 +543,7 @@
      * 设置某个字段的值
      * @param {Object} fm 表单实例
      * @param {String} fieldName 字段的name名称
-     * @return {Any} 字段的值
+     * @return {Object|void} 字段的值
      */
     function getFieldData(fm, fieldName) {
         // 根据字段的name找到字段
@@ -576,7 +576,7 @@
      * 获取input字段的值
      * @param {Object} fm 表单实例
      * @param {Array} field 字段数组
-     * @return {Any} 字段的值
+     * @return {String|Boolean|Number} 字段的值
      */
     function getInputValue(fm, field) {
         // 取radio的值
@@ -876,8 +876,8 @@
      *
      * @param {String} str 原始串
      * @param {String} seek 用来分隔多项的串
-     * @param {String} place 用来替换两个连续的seek的串，当不指定时，表示与 seek 相同
-     * @returns 分割后的数组
+     * @param {String} [place] 用来替换两个连续的seek的串，当不指定时，表示与 seek 相同
+     * @returns {Array} 分割后的数组
      */
     function handlePlaceholder(str, seek, place) {
         if (!str) {
@@ -917,7 +917,7 @@
      * @param {Object} field 字段对象
      * @param {string} fieldName 字段名称
      * @param {String} msg 原始消息串
-     * @returns 替换后的提示消息
+     * @returns {String} 替换后的提示消息
      */
     function replaceRegMsg(fm, field, fieldName, msg) {
         if (!msg) {
@@ -987,8 +987,8 @@
 
     /**
      * 解析字段的特殊规则验证
-     * @param {Object} rule data-rule的值
-     * @param {String} msg 消息
+     * @param {String} rule data-rule的值
+     * @param {String} [msg] 消息
      * @return {Object|Boolean} 需要验证时返回对象，否则返回false
      */
     function resolveValidateRule(rule, msg) {
@@ -1005,7 +1005,7 @@
         if (rule.indexOf('regex:') === 0) {
             // 本来这里有 try catch 的，但是考虑到，
             // 要是有异常，这就是开发的问题了，这种错误还是保留比较好
-            // 替换掉原串的 regox: 字符，后面的就应该是验证用的正则
+            // 替换掉原串的 regex: 字符，后面的就应该是验证用的正则
             validation.rule = new RegExp(rule.replace('regex:', ''));
             // 设置默认的提示消息
             validation.msg = msg || '格式不正确';
@@ -1027,6 +1027,7 @@
     /**
      * 解析验证规则为长度的表达式
      * @param {String} rule 规则表达式
+     * @param {String} msg 自定义的提示消息
      * @returns {Object|Boolean} 需要验证时返回对象，否则返回false
      */
     function resolveLengthRule(rule, msg) {
@@ -1051,9 +1052,9 @@
             }
 
             // 根据配置创建正则对象
-            validation.rule = new RegExp(RULE_LEN.least.rule.replace('{0}', len), 'g');
+            validation.rule = new RegExp(RULE_LEN.least.rule.replace('{0}', len.toString()), 'g');
             // 根据配置创建提示消息
-            validation.msg = msg || RULE_LEN.least.msg.replace('{0}', len);
+            validation.msg = msg || RULE_LEN.least.msg.replace('{0}', len.toString());
 
             // 返回规则验证对象
             return validation;
@@ -1073,9 +1074,9 @@
             }
 
             //根据配置创建正则对象
-            validation.rule = new RegExp(RULE_LEN.between.rule.replace('{0}', len1).replace('{1}', len2), 'g');
+            validation.rule = new RegExp(RULE_LEN.between.rule.replace('{0}', len1.toString()).replace('{1}', len2.toString()), 'g');
             // 根据配置创建提示消息
-            validation.msg = msg || RULE_LEN.between.msg.replace('{0}', len1).replace('{1}', len2);
+            validation.msg = msg || RULE_LEN.between.msg.replace('{0}', len1.toString()).replace('{1}', len2.toString());
 
             // 返回规则验证对象
             return validation;
@@ -1205,4 +1206,4 @@
         return pass;
     }
 })(window, jQuery);
-TinyForm.version = "0.7.6"
+TinyForm.version = "0.7.7"

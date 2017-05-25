@@ -1,5 +1,5 @@
 /**
- * TinyForm-core@0.7.6  2017-05-25
+ * TinyForm-core@0.7.7  2017-05-25
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -126,7 +126,7 @@
         /**
          * 根据name属性获取字段 返回数组，因为可能存在同name情况
          * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
-         * @returns {Array}  范围内所有name为指定值的字段数组或获取到的所有域对象
+         * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
             // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
@@ -345,8 +345,8 @@
         },
         /**
          * 获取所有字段的值，返回对象
-         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
-         * @returns {Object} 字段的name和值对象
+         * @param {String} [fieldName] 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
+         * @returns {Object|void} 字段的name和值对象
          */
         getData: function (fieldName) {
             // 没有参数，要获取所有字段的数据
@@ -367,7 +367,7 @@
         /**
          * 设置字段的值
          * @param {String|Object} data 要设置的值
-         * @param {String} fieldName 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
+         * @param {String} [fieldName] 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
          * @returns {Object}  表单实例
          */
         setData: function (data, fieldName) {
@@ -416,7 +416,7 @@
         /**
          * 使用jQuery提交表单（默认异步: async=true）
          * @param {Object} option Ajax参数项
-         * @returns {Object}  表单实例
+         * @returns {Object|void}  表单实例
          */
         submit: function (option) {
             // 到处都要写this，加个变量保存起来，在压缩的时候说不定能小好几十个字节
@@ -543,7 +543,7 @@
      * 设置某个字段的值
      * @param {Object} fm 表单实例
      * @param {String} fieldName 字段的name名称
-     * @return {Any} 字段的值
+     * @return {Object|void} 字段的值
      */
     function getFieldData(fm, fieldName) {
         // 根据字段的name找到字段
@@ -576,7 +576,7 @@
      * 获取input字段的值
      * @param {Object} fm 表单实例
      * @param {Array} field 字段数组
-     * @return {Any} 字段的值
+     * @return {String|Boolean|Number} 字段的值
      */
     function getInputValue(fm, field) {
         // 取radio的值
@@ -594,4 +594,4 @@
         return field.val();
     }
 })(window, jQuery);
-TinyForm.version = "0.7.6"
+TinyForm.version = "0.7.7"

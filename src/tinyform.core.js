@@ -116,7 +116,7 @@
         /**
          * 根据name属性获取字段 返回数组，因为可能存在同name情况
          * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
-         * @returns {Array}  范围内所有name为指定值的字段数组或获取到的所有域对象
+         * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
             // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
