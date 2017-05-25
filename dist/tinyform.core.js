@@ -5,7 +5,7 @@
  * @示例: http://hyjiacan.oschina.io/tinyform
  * @许可协议: MIT
  * @依赖: jQuery 1.8.0及更高版本
- * @浏览器支持: 不支持IE7及更低版本
+ * @浏览器支持: 不支持IE8及更低版本
  * @QQ群: 187786345 (Javascript爱好者)
  */
 /**
@@ -188,7 +188,7 @@
          * @param {Object} extension 扩展，这是一个对象，如：
          * TinyForm.extend({
      *     xxxx: function(){
-     *     
+     *
      *     }
      * });
          * 这样就给TinyForm的实例添加了一个方法  xxxx，
@@ -278,7 +278,7 @@
         /**
          * 字段选择器，选择带有name属性的input select和textarea，排除input按钮
          */
-        selector: 'input[name]:not(:button,:submit,:reset,[data-ignore],[type=file]), select[name]:not([data-ignore]), textarea[name]:not([data-ignore])',
+        selector: 'input[name]:not(:button,:submit,:reset,[data-ignore]' + (!!window.FormData ? '' : ',[type=file]') + '), select[name]:not([data-ignore]), textarea[name]:not([data-ignore])',
         // 在表单内查找字段时，要忽略的字段或字段集合
         // 值可以为false、字符串或数组：
         // boolean: 仅设置false有效，表示没有需要忽略的
