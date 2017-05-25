@@ -9,7 +9,9 @@
         <script>
             var win = window;
         </script>
-		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+		<!--<script src="../node_modules/jquery/dist/jquery.min.js"></script>-->
+		<!--<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>-->
+		<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 		<script src="../src/tinyform.core.js"></script>
 		<script src="../src/tinyform.data.js"></script>
 		<script src="../src/tinyform.validate.js"></script>
@@ -59,6 +61,7 @@
 		<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
 		<script>
 			var form = TinyForm('#form', {
+                jquery3: true,
 				validate: {
 					auto: false,
 					rules: {

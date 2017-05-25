@@ -9,9 +9,7 @@ module.exports = function (grunt) {
         '\n * @依赖: jQuery 1.8.0及更高版本' +
         '\n * @浏览器支持: 不支持IE7及更低版本' +
         '\n * @QQ群: 187786345 (Javascript爱好者)' +
-        '\n */';
-
-    var wapper = '\n\n(function(win, $){\n"use strict";\n';
+        '\n */\n';
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -19,9 +17,9 @@ module.exports = function (grunt) {
             files: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js', 'src/tinyform.storage.js'],
             options: {
                 globals: {
-                    $: true,
+                    jQuery: true,
                     console: true,
-                    win: true,
+                    window: true,
                     TinyForm: true
                 },
                 // 写完一行必须加个分号
@@ -56,11 +54,11 @@ module.exports = function (grunt) {
             options: {
                 // 定义一个用于插入合并输出文件之间的字符
                 separator: '\n',
-                footer: '})(window, jQuery);'
+                footer: '\nTinyForm.version = "<%= pkg.version %>"'
             },
             core: {
                 options: {
-                    banner: header.replace('{edition}', 'core') + wapper
+                    banner: header.replace('{edition}', 'core')
                 },
                 // 将要被合并的文件
                 src: ['src/tinyform.core.js', 'src/tinyform.data.js'],
@@ -69,7 +67,7 @@ module.exports = function (grunt) {
             },
             common: {
                 options: {
-                    banner: header.replace('{edition}', 'common') + wapper
+                    banner: header.replace('{edition}', 'common')
                 },
                 // 将要被合并的文件
                 src: ['src/tinyform.core.js', 'src/tinyform.data.js', 'src/tinyform.validate.js'],
@@ -78,7 +76,7 @@ module.exports = function (grunt) {
             },
             all: {
                 options: {
-                    banner: header.replace('{edition}', 'all') + wapper
+                    banner: header.replace('{edition}', 'all')
                 },
                 // 将要被合并的文件
                 src: ['src/*.js'],

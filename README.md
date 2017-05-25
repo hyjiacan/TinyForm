@@ -130,6 +130,10 @@ var form = TinyForm('#f1', {
     // 要注意的是：这里的优先级比标签上设置的优先级更低
     // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
     ignore: 'ignore-field-2',
+    // 是否要支持 jQuery3
+    // 在使用 jQuery3时，请将这项设置为 true
+    // 因为在 jQuery3的一此行为发生了不兼容的变化
+    jquery3: false,
     validate: {
         // 是否在输入字段失去焦点时自动验证，默认为false
         auto: true,

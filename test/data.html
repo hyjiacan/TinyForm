@@ -9,7 +9,9 @@
     <script>
         var win = window;
     </script>
-    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <!--<script src="../node_modules/jquery/dist/jquery.min.js"></script>-->
+    <!--<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>-->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <script src="../src/tinyform.core.js"></script>
     <script src="../src/tinyform.data.js"></script>
     <link href="../node_modules/qunitjs/qunit/qunit.css" rel="stylesheet">
@@ -61,7 +63,8 @@
     <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
     <script>
         var form = TinyForm('#form', {
-            checkbox: ['选中', '未选中']
+            checkbox: ['选中', '未选中'],
+			jquery3: true
         });
 
         QUnit.test("设置文本框的值", function(assert) {
