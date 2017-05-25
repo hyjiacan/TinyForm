@@ -327,7 +327,7 @@ var form = $('#form', {
 })
 ```
 
-另外，`data-msg`属性新增了引用功能，可以通过 `&l`和`&p`分别引用对应`label`标签和`placeholder`属性的值，如：
+另外，`data-msg`属性新增了引用功能，可以通过 `&l`, `&p`, `&v`分别引用对应`label`标签和`placeholder`属性的值，如：
 
 ```html
 <label for="username">用户名</label>

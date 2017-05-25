@@ -829,6 +829,15 @@
     }
 
     /**
+     * 将字符串str通过 seek 分隔成数组，然后将两个连续的seek替换成 place
+     *
+     * @param {String} str 原始串
+     * @param {String} seek 用来分隔多项的串
+     * @param {String} [place] 用来替换两个连续的seek的串，当不指定时，表示与 seek 相同
+     * @returns {Array} 分割后的数组
+     */
+
+    /**
      * 获取表单所有字段的验证规则
      * @param {Object} fm 表单实例
      * @returns {Object} 验证规则对象
@@ -871,14 +880,6 @@
         });
     }
 
-    /**
-     * 将字符串str通过 seek 分隔成数组，然后将两个连续的seek替换成 place
-     *
-     * @param {String} str 原始串
-     * @param {String} seek 用来分隔多项的串
-     * @param {String} [place] 用来替换两个连续的seek的串，当不指定时，表示与 seek 相同
-     * @returns {Array} 分割后的数组
-     */
     function handlePlaceholder(str, seek, place) {
         if (!str) {
             return [];
@@ -924,6 +925,7 @@
             return '';
         }
         var refmsg;
+        // 对 label文本 的引用支持
         if (msg.indexOf('&l') !== -1) {
             refmsg = $('label[for=' + fieldName + ']:first', fm.context)
                 .text().replace(/\|/g, '||'); // 防止要引用消息中含有|符号
@@ -932,16 +934,14 @@
             msg = handlePlaceholder(msg, '&l')
                 .join(refmsg);
         }
-
+        // 对 placeholder 的引用支持
         if (msg.indexOf('&p') !== -1) {
-            refmsg = field.attr('placeholder') || ''
-                    .replace(/\|/g, '||'); // 防止要引用消息中含有|符号
+            refmsg = (field.attr('placeholder') || '').replace(/\|/g, '||'); // 防止要引用消息中含有|符号
 
             // 填充引用消息 &p => placeholder
             msg = handlePlaceholder(msg, '&p')
                 .join(refmsg);
         }
-
         return msg;
     }
 
@@ -1188,7 +1188,10 @@
                 // 字段的值
                 value: value,
                 // 提示消息
-                msg: rule.msg
+                // 对输入值的引用支持
+                // 仅支持 input输入框(即 checkbox和radio无效 )
+                msg: rule.msg.indexOf('&v') === -1 || !field.is('input:not(:checkbox,:radio)') ?
+                    rule.msg : rule.msg.replace(/&v/g, value || '')
             });
 
             // 判断回调的返回值是不是 undefined，如果是那么就是用户并没有返回值
