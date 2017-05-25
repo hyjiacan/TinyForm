@@ -53,6 +53,9 @@
     };
 
     TinyForm.extend({
+        /**
+         *
+         */
         init: function () {
             var me = this;
             var option = me.option.upload;
