@@ -220,7 +220,7 @@ var form = TinyForm('#f1', {
 
 ## 选项
 
-选项`option`是在创建表单实例的时候仇主入的一个参数对象：
+选项`option`是在创建表单实例的时候传入的一个参数对象：
 
 ```javascript
 var form = TinyForm('formselector', option);
