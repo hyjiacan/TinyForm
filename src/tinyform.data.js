@@ -1,6 +1,16 @@
 /**
  * TinyForm 数据读写组件，负责从表单字段读取值以及向其写入值
  */(function (win, $) {
+     
+    /**
+     * 定义一个空的 jQuery.Deferred 对象，
+     * 以在 beforeSubmit 返回 false 的时候，
+     * 将这个空的 Deferred 返回，这样才能确保
+     * form.submit().then() 调用始终有效。
+     * 在这里创建一个全局的 Deferred ，
+     * 以减少多次调用 $.Deferred() 产生的开销。
+     */
+    var emptyDeffered = $.Deferred();
 
     /**
      * 存放表单初始数据的集合
@@ -125,7 +135,7 @@
                 // 设置了提交前的回调函数，就调用一下
                 // 回调函数的上下文this是表单实例对象，有个参数option，可以直接进行改动
                 if (me.option.beforeSubmit.call(me, option) === false) {
-                    return;
+                    return emptyDeffered;
                 }
             }
 
