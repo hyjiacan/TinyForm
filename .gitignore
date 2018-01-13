@@ -2,3 +2,4 @@
 /bower_components
 /npm-debug.log
 /.idea
+/nginx-1.11.9/logs

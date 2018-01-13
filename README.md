@@ -58,6 +58,11 @@ $ bower install tinyform
 
 ## 用法
 
+用于构建`TinyForm`不是非要`form`元素，其它类型也是可以的。
+即使写的不是`form`，`TinyForm`也会读取其属性`method`与`action`。
+
+> 这样设计是为了防止在`form`中写`button`按钮意外地触发表单的提交事件。
+
 **html**
 
 ```html
@@ -250,9 +255,13 @@ var form = TinyForm('formselector', option);
 > **ajaxOption** 异步请求的数据对象，参数与jQuery的ajax参数一致。修改这个对象会直接影响ajax请求的参数。
 > **return** 此函数返回 false 会阻止表单的提交(仅阻止通过`form.submit()`发起的提交)。
 
-  **exclude** boolean
+**exclude** boolean
   
 > 要被排除的范围，在这个范围内的字段不会被加载
+
+**onprogress** Function() 
+  
+> 表单中有文件字段时的文件上传进度回调函数。
 
 这些选项的默认值可以通过：
 

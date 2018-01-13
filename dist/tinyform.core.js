@@ -59,9 +59,9 @@
 
     /**
      * 表单构造函数
-     * @param {String|Object} selector 表单选择器
+     * @param {String|jQuery|HTMLElement} selector 表单选择器
      * @param {Object} [option] 参数，可选
-     * @returns {Object} 表单实例
+     * @returns {TinyForm} 实例
      */
     function TinyForm(selector, option) {
         // 只将第一个元素实例化成TinyForm
@@ -85,7 +85,7 @@
     }
 
     /**
-     * 表单实例
+     * 实例
      */
     TinyForm.prototype = {
         /**
@@ -94,10 +94,10 @@
         constructor: TinyForm,
         /**
          * 初始化表单实例
-         * @param {Object} formContainer 表单容器的JQ对象
+         * @param {jQuery} formContainer 表单容器的JQ对象
          * @param {Object} option 参数，可选
          * @param {String} id TinyForm实例id
-         * @returns {Object}  表单实例
+         * @returns {Object}  实例
          */
         setup: function (formContainer, option, id) {
             // 保存实例对象到变量里面
@@ -160,7 +160,7 @@
 
         /**
          * 重新获取表单的字段，此操作将更新缓存
-         * @returns {Object} 表单实例
+         * @returns {TinyForm} 实例
          */
         refresh: function () {
             // 因为要在下面的回调里面使用表单实例，所以弄个变量把实例保存一下
@@ -245,28 +245,28 @@
         exclude = $(me.context).find('[data-exclude]');
         if (exclude.length) {
             option.exclude = exclude ?
-                option.exclude.concat(exclude) : exclude;
+                option.exclude.add(exclude) : exclude;
         }
     }
 
     /**
      * 获取所有的字段
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      */
-    function getAllFields(fm) {
+    function getAllFields(me) {
         // 清空原有的数据
-        var fields = fieldSet[fm.id] = {};
+        var fields = fieldSet[me.id] = {};
 
         // 取出在实例化时传入的需要ignore的参数，然后始终搞成数组
         // 后面会用这个数组去判断某个字段是否需要加载
-        var ignoreFields = $.makeArray(fm.option.ignore);
+        var ignoreFields = $.makeArray(me.option.ignore);
 
         // 根据配置的选择器来查找字段
-        fm.context.find(TinyForm.defaults.selector).each(function () {
+        me.context.find(TinyForm.defaults.selector).each(function () {
             // 字段对象
             var field = $(this);
             // 不是选择器指定的字段
-            if (fm.option.selector && !field.is(fm.option.selector)) {
+            if (me.option.selector && !field.is(me.option.selector)) {
                 return;
             }
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
@@ -284,7 +284,7 @@
             }
 
             // 看看这个字段是不是处于被 exclude 的范围内
-            if (fm.option.exclude && fm.option.exclude.find(field).length > 0) {
+            if (me.option.exclude && me.option.exclude.find(field).length > 0) {
                 return;
             }
 
@@ -302,7 +302,7 @@
             if (field.is(':radio')) {
                 // 将DOM字段对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个字段，所以直接使用  this
-                fields[name].push(this);
+                fields[name] = fields[name].add(this);
                 // 添加进去后，就可以取下一个字段了
                 return;
             }
@@ -430,7 +430,7 @@
          *      如果指定了此参数，
          *      当是字符串时，则只设置name=此值的字段的值
          *      当是布尔值时，也会设置所有字段的值，但是会否跳过data中没有的字段(不设置值)
-         * @returns {Object}  表单实例
+         * @returns {Object}  实例
          */
         setData: function (data, fieldName) {
             // 后头要在回调函数里面用这个实例对象，所以先弄个变量存起来
@@ -487,7 +487,7 @@
         /**
          * 将当前表单内的数据作为默认数据，默认数据将作为 getChanges 的基础
          * @param {object} [data] 要作为默认值的数据，如果不传，则使用当前表单内的数据
-         * @returns {Object|void}  表单实例
+         * @returns {Object|void}  实例
          */
         asDefault: function (data) {
             var me = this;
@@ -527,25 +527,13 @@
         /**
          * 使用jQuery提交表单（默认异步: async=true）
          * @param {Object} option Ajax参数项
-         * @returns {Object|void}  表单实例
+         * @returns {Object|void}  实例
          */
         submit: function (option) {
             // 到处都要写this，加个变量保存起来，在压缩的时候说不定能小好几十个字节
             var me = this;
 
-            // 合并提交数据的参数，这些参数都是给ajax用的
-            option = $.extend({
-                // 提交的url，默认读取dom元素的action属性
-                url: me.context.attr('action'),
-                // 提交的类型（post/get），默认读取dom元素的method属性
-                type: me.context.attr('method') || 'post',
-                // 默认异步提交
-                async: true,
-                // 数据则使用表单的所有数据
-                data: me.getData(),
-                // 默认不使用数据缓存
-                cache: false
-            }, option);
+            option = parseOption(me, option);
 
             // option 构建完了，这里看看有没有设置提交前的回调函数
             if ($.isFunction(me.option.beforeSubmit)) {
@@ -562,7 +550,7 @@
 
         /**
          * 重置表单所有项
-         * @returns {Object} 表单实例
+         * @returns {TinyForm} 实例
          */
         reset: function () {
             // 看一下表单dom元素对象上有没有一个叫做reset的方法
@@ -583,11 +571,11 @@
 
     /**
      * 设置某个字段的值
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {String|Number|Boolean|Array} data 要设置的值，可以是任意类型，除了select其它类型都会自动搞成string
      * @param {Array} field 字段对象数组
      */
-    function setFieldData(fm, data, field) {
+    function setFieldData(me, data, field) {
         // 如果字段不存在（长度为0），那么啥都不做
         if (!field || field.length === 0) {
             // 返回吧
@@ -624,7 +612,7 @@
         if (field.is(':checkbox')) {
             // 比较字符串的值，以控制字段的选中状态 
             // 不区分大小写
-            field.prop('checked', data.toLowerCase() === fm.option.checkbox[0].toString().toLowerCase());
+            field.prop('checked', data.toLowerCase() === me.option.checkbox[0].toString().toLowerCase());
             // 可以返回了
             return;
         }
@@ -641,15 +629,15 @@
 
     /**
      * 获取表单的所有数据
-     * @param {Object} fm
+     * @param {TinyForm} me
      */
-    function getAllData(fm) {
+    function getAllData(me) {
         // 创建一个对象来存放数据
         var data = {};
         // 遍历字段取值
-        $.each(fm.getField(), function (name) {
+        $.each(me.getField(), function (name) {
             // 获取某个name的字段的值(在radio时可能是多个)
-            data[name] = getFieldData(fm, name);
+            data[name] = getFieldData(me, name);
         });
         // 返回所有数据
         return data;
@@ -657,13 +645,13 @@
 
     /**
      * 设置某个字段的值
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {String} fieldName 字段的name名称
      * @return {*} 字段的值
      */
-    function getFieldData(fm, fieldName) {
+    function getFieldData(me, fieldName) {
         // 根据字段的name找到字段
-        var field = fm.getField(fieldName);
+        var field = me.getField(fieldName);
 
         // field 不存在，即此时在请求不存在
         if (!field) {
@@ -674,7 +662,7 @@
         // 如果字段是input标签的元素，使用独特的取值技巧
         if (field.is('input')) {
             // 返回获取到的值
-            return getInputValue(fm, field);
+            return getInputValue(me, field);
         }
         var val = field.val();
 
@@ -693,11 +681,11 @@
 
     /**
      * 获取input字段的值
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {Array} field 字段数组
      * @return {String|Boolean|Number} 字段的值
      */
-    function getInputValue(fm, field) {
+    function getInputValue(me, field) {
         // 取radio的值
         if (field.is(':radio')) {
             // 取选中的radio的值就行了
@@ -706,7 +694,7 @@
 
         // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
         if (field.is(':checkbox')) {
-            return field.is(':checked') ? fm.option.checkbox[0] : fm.option.checkbox[1];
+            return field.is(':checked') ? me.option.checkbox[0] : me.option.checkbox[1];
         }
 
         // 其它的直接返回值
@@ -723,6 +711,81 @@
         return typeof  val === 'undefined' || val === null ?
             arguments.length > 1 ? def : ''
             : val;
+    }
+
+    /**
+     * 处理$.ajax异步上传的选项
+     * @param {TinyForm} me 实例
+     * @param {object} [option] 调用 submit 方法时传入的参数
+     * @return {object} 处理后的选项对象
+     */
+    function parseOption(me, option) {
+        var data = me.getData();
+
+        var defaultOption = {
+            // 提交的url，默认读取dom元素的action属性
+            url: me.context.attr('action'),
+            // 提交的类型（post/get），默认读取dom元素的method属性
+            type: me.context.attr('method') || 'post',
+            // 默认异步提交
+            async: true,
+            // 默认不使用数据缓存
+            cache: false
+        };
+
+        // 看看是否有文件字段
+        var hasFileField = false;
+        $.each(me.getField(), function (fieldName, field) {
+            if (field.is(':file')) {
+                // 发现了文件字段
+                hasFileField = true;
+                return false;
+            }
+        });
+
+        // 有文件字段  那么发送的数据就不一样了
+        if (hasFileField) {
+            if (!win.FormData) {
+                throw new Error('[TinyForm] 浏览器不支持 FormData，无法上传文件，请前往 http://caniuse.com/#search=formdata 查看浏览器兼容性');
+            }
+            // 构造 FormData
+            var formData = new win.FormData();
+            $.each(me.getField(), function (fieldName, field) {
+                if (field.is(':file')) {
+                    // 发现了文件字段
+                    // 将文件对象搞进去
+                    formData.append(fieldName, field.get(0).files[0]);
+                } else {
+                    // 非文件字段
+                    formData.append(fieldName, data[fieldName]);
+                }
+            });
+            defaultOption.data = formData;
+            // 还要设置一些其它的属性才行
+            // https://segmentfault.com/a/1190000007207128
+            defaultOption.contentType = false;
+            // https://zhidao.baidu.com/question/1926250710050869147.html
+            defaultOption.processData = false;
+
+            if (me.option.onprogress) {
+                // 添加文件上传进度的支持
+                defaultOption.xhr = function () {
+                    //获取ajaxSettings中的xhr对象，为它的upload属性绑定progress事件的处理函数
+                    var xhr = $.ajaxSettings.xhr();
+                    if (xhr.upload) { //检查upload属性是否存在
+                        //绑定progress事件的回调函数
+                        xhr.upload.addEventListener('progress', me.option.onprogress, false);
+                    }
+                    return xhr;
+                };
+            }
+        } else {
+            // 没有文件字段则使用表单的所有数据
+            defaultOption.data = data;
+        }
+
+        // 合并提交数据的参数，这些参数都是给ajax用的
+        return $.extend(true, defaultOption, option);
     }
 })(window, jQuery);
 TinyForm.version = "0.7.8"

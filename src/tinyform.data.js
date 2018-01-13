@@ -176,19 +176,7 @@
             // 到处都要写this，加个变量保存起来，在压缩的时候说不定能小好几十个字节
             var me = this;
 
-            // 合并提交数据的参数，这些参数都是给ajax用的
-            option = $.extend({
-                // 提交的url，默认读取dom元素的action属性
-                url: me.context.attr('action'),
-                // 提交的类型（post/get），默认读取dom元素的method属性
-                type: me.context.attr('method') || 'post',
-                // 默认异步提交
-                async: true,
-                // 数据则使用表单的所有数据
-                data: me.getData(),
-                // 默认不使用数据缓存
-                cache: false
-            }, option);
+            option = parseOption(me, option);
 
             // option 构建完了，这里看看有没有设置提交前的回调函数
             if ($.isFunction(me.option.beforeSubmit)) {
@@ -366,5 +354,80 @@
         return typeof  val === 'undefined' || val === null ?
             arguments.length > 1 ? def : ''
             : val;
+    }
+
+    /**
+     * 处理$.ajax异步上传的选项
+     * @param {TinyForm} me 实例
+     * @param {object} [option] 调用 submit 方法时传入的参数
+     * @return {object} 处理后的选项对象
+     */
+    function parseOption(me, option) {
+        var data = me.getData();
+
+        var defaultOption = {
+            // 提交的url，默认读取dom元素的action属性
+            url: me.context.attr('action'),
+            // 提交的类型（post/get），默认读取dom元素的method属性
+            type: me.context.attr('method') || 'post',
+            // 默认异步提交
+            async: true,
+            // 默认不使用数据缓存
+            cache: false
+        };
+
+        // 看看是否有文件字段
+        var hasFileField = false;
+        $.each(me.getField(), function (fieldName, field) {
+            if (field.is(':file')) {
+                // 发现了文件字段
+                hasFileField = true;
+                return false;
+            }
+        });
+
+        // 有文件字段  那么发送的数据就不一样了
+        if (hasFileField) {
+            if (!win.FormData) {
+                throw new Error('[TinyForm] 浏览器不支持 FormData，无法上传文件，请前往 http://caniuse.com/#search=formdata 查看浏览器兼容性');
+            }
+            // 构造 FormData
+            var formData = new win.FormData();
+            $.each(me.getField(), function (fieldName, field) {
+                if (field.is(':file')) {
+                    // 发现了文件字段
+                    // 将文件对象搞进去
+                    formData.append(fieldName, field.get(0).files[0]);
+                } else {
+                    // 非文件字段
+                    formData.append(fieldName, data[fieldName]);
+                }
+            });
+            defaultOption.data = formData;
+            // 还要设置一些其它的属性才行
+            // https://segmentfault.com/a/1190000007207128
+            defaultOption.contentType = false;
+            // https://zhidao.baidu.com/question/1926250710050869147.html
+            defaultOption.processData = false;
+
+            if (me.option.onprogress) {
+                // 添加文件上传进度的支持
+                defaultOption.xhr = function () {
+                    //获取ajaxSettings中的xhr对象，为它的upload属性绑定progress事件的处理函数
+                    var xhr = $.ajaxSettings.xhr();
+                    if (xhr.upload) { //检查upload属性是否存在
+                        //绑定progress事件的回调函数
+                        xhr.upload.addEventListener('progress', me.option.onprogress, false);
+                    }
+                    return xhr;
+                };
+            }
+        } else {
+            // 没有文件字段则使用表单的所有数据
+            defaultOption.data = data;
+        }
+
+        // 合并提交数据的参数，这些参数都是给ajax用的
+        return $.extend(true, defaultOption, option);
     }
 })(window, jQuery);

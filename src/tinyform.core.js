@@ -101,7 +101,7 @@
             // 合并选项参数
             me.option = $.extend(true, {}, TinyForm.defaults, option);
 
-            parseOption(me);
+            parseExcludeOption(me);
 
             // 获取所有字段
             getAllFields(me);
@@ -155,6 +155,9 @@
         refresh: function () {
             // 因为要在下面的回调里面使用表单实例，所以弄个变量把实例保存一下
             var me = this;
+
+            // 先更新一下排除范围
+            parseExcludeOption(me);
 
             // 在这个核心组件中，刷新仅仅是重新获取所有字段
             getAllFields(me);
@@ -214,12 +217,16 @@
     });
 
     /**
-     * 对选项进行预处理
+     * 对exclude选项进行预处理
      * @param {TinyForm} me 实例
      */
-    function parseOption(me) {
+    function parseExcludeOption(me) {
         var option = me.option;
         var exclude = option.exclude;
+
+        // 重置排除范围
+        option.exclude = false;
+
         // 配置中 exclude 如果传的是字符串，表示是选择器
         // 或者是 html 对象
         // 在这里将其搞成jQuery对象
@@ -234,8 +241,8 @@
         // 如果有标签写了属性 data-exclude 也要被排除掉
         exclude = $(me.context).find('[data-exclude]');
         if (exclude.length) {
-            option.exclude = exclude ?
-                option.exclude.concat(exclude) : exclude;
+            option.exclude = option.exclude ?
+                option.exclude.add(exclude) : exclude;
         }
     }
 
@@ -292,7 +299,7 @@
             if (field.is(':radio')) {
                 // 将DOM字段对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个字段，所以直接使用  this
-                fields[name].push(this);
+                fields[name] = fields[name].add(this);
                 // 添加进去后，就可以取下一个字段了
                 return;
             }
