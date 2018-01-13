@@ -61,7 +61,6 @@
 		<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
 		<script>
 			var form = TinyForm('#form', {
-                jquery3: true,
 				validate: {
 					auto: false,
 					rules: {
@@ -133,9 +132,9 @@
 				field.val('UPPERCASE');
 				assert.equal(form.validate('username'), true, '填入大写字母验证通过');
 
-				// 填入大写字母
+				// 填入小写字母
 				field.val('lowercase');
-				assert.equal(form.validate('username'), true, '填入大写字母验证通过');
+				assert.equal(form.validate('username'), true, '填入小写字母验证通过');
 
 				// 混合填入大写字母和小写字母
 				field.val('lowercaseaNdUPPERCASE');

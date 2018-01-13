@@ -11,7 +11,10 @@
     var RULES = {
         // 必填
         required: {
-            rule: /^.+$/,
+            rule: function (value) {
+                value = $.trim(value);
+                return !!value && value.length;
+            },
             msg: '不能为空'
         },
         // 数字
@@ -233,6 +236,35 @@
     }
 
     /**
+     * 从一个jQuery对象的字段中获取验证的规则
+     * @param {TinyForm} fm 表单实例
+     * @param {Object} field 字段jQuery对象
+     * @returns {Array}
+     */
+    function getFieldRule(fm, field) {
+        // 从标签属性上获取规则描述  当然  还是要trim一下的
+        var rule = $.trim(field.attr(ATTRS.rule));
+
+        // 规则为空，返回一个false
+        if (rule === '') {
+            // 返回[] ，表示没有验证规则
+            return [];
+        }
+
+        var msg = replaceRegMsg(fm.context, field, field.attr('name'), field.attr(ATTRS.msg));
+
+        // 从标签属性上获取提示消息
+        var msgs = msg ? handlePlaceholder(msg, '|') : false;
+
+        // 不包含 : 冒号，表示是普通规则
+        // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
+        return rule.indexOf(':') === -1 ?
+            resolvePreDefinedRule(fm.option.validate.rules, rule, msgs) :
+            // 规则是特殊语法
+            [resolveValidateRule(rule, msgs[0])];
+    }
+
+    /**
      * 将字符串str通过 seek 分隔成数组，然后将两个连续的seek替换成 place
      *
      * @param {String} str 原始串
@@ -249,33 +281,10 @@
     function getAllRules(fm) {
         // 清空原有的数据
         var rules = ruleSet[fm.id] = {};
-        // 所有可用的规则
-        var validRules = fm.option.validate.rules;
 
         // 遍历字段，获取验证规则
         $.each(fm.getField(), function (fieldName, field) {
-            // 从标签属性上获取规则描述  当然  还是要trim一下的
-            var rule = $.trim(field.attr(ATTRS.rule));
-
-            // 规则为空，返回一个false
-            if (rule === '') {
-                // 设置 false ，表示没有验证规则
-                rules[fieldName] = false;
-                // 没有规则就不用再去取提示消息了，直接返回去取下一个字段
-                return;
-            }
-
-            var msg = replaceRegMsg(fm, field, fieldName, field.attr(ATTRS.msg));
-
-            // 从标签属性上获取提示消息
-            var msgs = msg ? handlePlaceholder(msg, '|') : false;
-
-            // 不包含 : 冒号，表示是普通规则
-            // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
-            rules[fieldName] = rule.indexOf(':') === -1 ?
-                resolvePreDefinedRule(validRules, rule, msgs) :
-                // 规则是特殊语法
-                [resolveValidateRule(rule, msgs[0])];
+            rules[fieldName] = getFieldRule(fm, field);
 
             // 如果所有验证规则都不存在，那么就认为不需要验证
             if (!rules[fieldName].length) {
@@ -318,20 +327,20 @@
 
     /**
      * 替换消息中的引用消息
-     * @param {Object} fm 表单实例
+     * @param {Object} context 元素的上下文环境
      * @param {Object} field 字段对象
      * @param {string} fieldName 字段名称
      * @param {String} msg 原始消息串
      * @returns {String} 替换后的提示消息
      */
-    function replaceRegMsg(fm, field, fieldName, msg) {
+    function replaceRegMsg(context, field, fieldName, msg) {
         if (!msg) {
             return '';
         }
         var refmsg;
-        // 对 label文本 的引用支持
-        if (msg.indexOf('&l') !== -1) {
-            refmsg = $('label[for=' + fieldName + ']:first', fm.context)
+        // 在具有name属性时，对 label文本 的引用支持
+        if (fieldName && msg.indexOf('&l') !== -1) {
+            refmsg = $('label[for=' + fieldName + ']:first', context)
                 .text().replace(/\|/g, '||'); // 防止要引用消息中含有|符号
 
             // 填充引用消息 &l => label
@@ -353,7 +362,7 @@
      * 解析字段的预定义规则验证
      * @param {Object} validRules 所有可用的验证规则
      * @param {Object} rule data-rule的值
-     * @param {Array} msgs 消息数组
+     * @param {Array|Boolean} msgs 消息数组
      * @return {Array} 这个字段需要验证的规则数组，如果没有就返回空数组
      */
     function resolvePreDefinedRule(validRules, rule, msgs) {
@@ -510,22 +519,34 @@
             // 这是来玩的么？
             return false;
         }
-
-        var pass = true;
         // 获取字段的验证规则
         var rules = fm.getRule(fieldName);
 
         // 没有验证规则时，直接返回  true
         if (rules === false) {
-            return pass;
+            return true;
         }
 
-        // 获取字段的值
-        var value = fm.getData(fieldName) || '';
+        var value = fm.getData(fieldName);
+
+        return validateFieldRules(fm, field, value, rules);
+    }
+
+    /**
+     * 执行验证规则的真正逻辑
+     * @param {TinyForm} fm 实例
+     * @param {jQuery} field 字段的jQuery对象
+     * @param {string} value 字段的值
+     * @param rules
+     * @return {boolean}
+     */
+    function validateFieldRules(fm, field, value, rules) {
+        var pass = true;
+        var fieldName = field.attr('name');
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
         // 此时不需要验证，所以就不调用回调函数了
-        if (rules === false || (value === '' && rules.every(function (rule) {
+        if (rules === false || ((value === '' || value.length === 0) && rules.every(function (rule) {
                 return rule.name !== 'required';
             }))) {
             return pass;

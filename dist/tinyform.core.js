@@ -1,5 +1,5 @@
 /**
- * TinyForm-core@0.7.7  2017-05-25
+ * TinyForm-core@0.7.8  2018-01-13
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -60,7 +60,7 @@
     /**
      * 表单构造函数
      * @param {String|Object} selector 表单选择器
-     * @param {Object} option 参数，可选
+     * @param {Object} [option] 参数，可选
      * @returns {Object} 表单实例
      */
     function TinyForm(selector, option) {
@@ -125,7 +125,7 @@
         },
         /**
          * 根据name属性获取字段 返回数组，因为可能存在同name情况
-         * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
+         * @param {String} [fieldName] 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
          * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
@@ -285,11 +285,7 @@
         // array: 要忽略的字段的name组成的数组
         // 要注意的是：这里的优先级应该比标签上设置的优先级更低
         // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
-        ignore: false,
-        // 是否要支持 jQuery3
-        // 在使用 jQuery3时，请将这项设置为 true
-        // 因为在 jQuery3的一此行为发生了不兼容的变化
-        jquery3: false
+        ignore: false
     };
 
     // 搞懂，因为真正创建实例是通过 setup ，
@@ -319,9 +315,24 @@
  */(function (win, $) {
 
     /**
+     * 定义一个空的 jQuery.Deferred 对象，
+     * 以在 beforeSubmit 返回 false 的时候，
+     * 将这个空的 Deferred 返回，这样才能确保
+     * form.submit().then() 调用始终有效。
+     * 在这里创建一个全局的 Deferred ，
+     * 以减少多次调用 $.Deferred() 产生的开销。
+     */
+    var emptyDeffered = $.Deferred();
+
+    /**
      * 存放表单初始数据的集合
      */
     var originalData = {};
+
+    /**
+     * 存放表单默认数据的集合，这里面的数据是 getChanges 的基础
+     */
+    var defaultData = {};
 
     // 默认配置
     // 因为 data 是核心组件，所以配置项就不单独放到一个对象中
@@ -342,11 +353,13 @@
         setup: function () {
             // 保存初始数据，用于重置
             originalData[this.id] = this.getData();
+            // 保存默认值，用于 getChanges
+            defaultData[this.id] = this.getData();
         },
         /**
          * 获取所有字段的值，返回对象
          * @param {String} [fieldName] 字段的name名称，如果指定了此参数，则只获取name=此值的字段的值
-         * @returns {Object|void} 字段的name和值对象
+         * @returns {*} 字段的name和值对象
          */
         getData: function (fieldName) {
             // 没有参数，要获取所有字段的数据
@@ -357,7 +370,7 @@
             // 参数需要字段的name字符串，类型不对
             if (typeof fieldName !== 'string') {
                 // 返回空
-                return;
+                return '';
             }
 
             // 返回指定字段的值
@@ -367,7 +380,11 @@
         /**
          * 设置字段的值
          * @param {String|Object} data 要设置的值
-         * @param {String} [fieldName] 字段的name名称，如果指定了此参数，则只设置name=此值的字段的值
+         * @param {String|boolean} [fieldName] 字段的name名称或是否跳转data中没有的字段，
+         *      如果未指定此参数，则**data**应该是一个对象，此时设置表单所有字段的值
+         *      如果指定了此参数，
+         *      当是字符串时，则只设置name=此值的字段的值
+         *      当是布尔值时，也会设置所有字段的值，但是会否跳过data中没有的字段(不设置值)
          * @returns {Object}  表单实例
          */
         setData: function (data, fieldName) {
@@ -376,7 +393,7 @@
 
             // 这个函数需要至少一个参数，你一个都不传，这是想造反么？
             if (arguments.length === 0) {
-                // 这属性开发错误，我要在控制台给你报个错
+                // 这属于开发错误，我要在控制台给你报个错
                 console.error('setData 需要至少1个参数');
                 // 还是返回个实例给你
                 return me;
@@ -384,27 +401,36 @@
 
             // 如果传的参数>=2个，就是要设置指定name的字段的值，后面多余的参数直接忽略
             if (arguments.length >= 2) {
-                //  第二个参数还是要个字符串，格式不对没法玩
-                if (typeof fieldName !== 'string') {
+                //  第二个参数还是要个字符串，
+                if (typeof fieldName === 'string') {
+                    // 设置指定name字段的值
+                    setFieldData(me, data, me.getField(fieldName));
                     // 返回给你个实例对象
                     return me;
                 }
+            }
 
-                // 设置指定name字段的值
-                setFieldData(me, data, me.getField(fieldName));
-                // 始终返回实例对象
+            // 看看第二个是不是布尔类型
+            var secondArgIsBoolean = typeof fieldName === 'boolean';
+
+            // 如果第二个参数也不是boolean  就表示跳过
+            if (arguments.length >= 2 && !secondArgIsBoolean) {
+                // 始终记得返回给你个实例对象
                 return me;
             }
 
             // 未指定name参数，设置表单所有项
             $.each(me.getField(), function (name, field) {
-                // 从传入数据对象里面取出这个name的值
-                var val = data[name];
-                // 如果数据对象里面没有指定这个name，或值为null
-                if (typeof val === 'undefined' || val === null) {
-                    // 那就把值设置成空字符串
-                    val = '';
+                // 在第二个参数为boolean时
+                // 并且数据不包含其值时
+                // 不设置（保留原值）
+                if (secondArgIsBoolean && !data.hasOwnProperty(name)) {
+                    return;
                 }
+                // 从传入数据对象里面取出这个name的值
+                // 如果数据对象里面没有指定这个name，或值为null
+                // 那就把值设置成空字符串
+                var val = ifUndefOrNull(data[name]);
 
                 // 设置字段的值
                 setFieldData(me, val, field);
@@ -412,6 +438,46 @@
 
             // 继续返回实例对象
             return me;
+        },
+        /**
+         * 将当前表单内的数据作为默认数据，默认数据将作为 getChanges 的基础
+         * @param {object} [data] 要作为默认值的数据，如果不传，则使用当前表单内的数据
+         * @returns {Object|void}  表单实例
+         */
+        asDefault: function (data) {
+            var me = this;
+            defaultData[me.id] = arguments.length ? data : me.getData();
+            return me;
+        },
+        /**
+         * 获取值的改变的字段
+         * @param {boolean} [returnFields=false] 是否返回字段，默认为 false
+         * 传入true的时候，返回的是改变的字段集合
+         * 传入false的时候，返回的是改变的值集合
+         * @return {{}}
+         */
+        getChanges: function (returnFields) {
+            var me = this;
+            // 默认值
+            var defaultValue = defaultData[me.id] || {};
+            // 改变的集合
+            // 放的可能是字段或者值
+            var changes = {};
+            // 所有字段的集合
+            var fields = me.getField();
+            // 遍历当前数据
+            // 将找出有改变的字段来
+            $.each(me.getData(), function (field, value) {
+                // 默认值中包含这个字段
+                // 并且默认值与当前值一致
+                // 则认为此字段没有改变
+                if (defaultValue.hasOwnProperty(field) && defaultValue[field] === value) {
+                    return;
+                }
+                changes[field] = returnFields ? fields[field] : value;
+            });
+
+            return changes;
         },
         /**
          * 使用jQuery提交表单（默认异步: async=true）
@@ -441,7 +507,7 @@
                 // 设置了提交前的回调函数，就调用一下
                 // 回调函数的上下文this是表单实例对象，有个参数option，可以直接进行改动
                 if (me.option.beforeSubmit.call(me, option) === false) {
-                    return;
+                    return emptyDeffered;
                 }
             }
 
@@ -487,16 +553,20 @@
         // 就会变成  [value="null"]:first 或者 [value="undefined"]:first
         // 这明显是不对的哇
         // 所以给搞成空字符串，这样就可以得到正确的选择器 [value=""]:first，查找值为空的元素
-        if (data === null || typeof data === 'undefined') {
-            data = '';
-        }
+        data = ifUndefOrNull(data);
+
+        // 把值强制弄成字符串
+        data = $.isArray(data) ? $.map(data, function (item) {
+            return item.toString();
+        }) : data.toString();
 
         // 字段是radio，那么可能有多个
         if (field.is(':radio')) {
             // 所有radio先置为未选中的状态，这样来避免设置了不存在的值时，还有radio是选中的状态
             field.prop('checked', false).each(function () {
                 // 找出value与数据相等的字段设置选中
-                if ($(this).val() === data) {
+                // 不区分大小写
+                if ($(this).val().toLowerCase() === data.toLowerCase()) {
                     $(this).prop('checked', true);
                     return false;
                 }
@@ -507,8 +577,9 @@
 
         // 如果是checkbox，那么直接字段选中
         if (field.is(':checkbox')) {
-            // 强制数据转换成字符串来比较，以控制字段的选中状态
-            field.prop('checked', data.toString() === fm.option.checkbox[0].toString());
+            // 比较字符串的值，以控制字段的选中状态 
+            // 不区分大小写
+            field.prop('checked', data.toLowerCase() === fm.option.checkbox[0].toString().toLowerCase());
             // 可以返回了
             return;
         }
@@ -519,7 +590,7 @@
             field.change();
         } else {
             // 其它类型的input和非input字段，直接设置值
-            field.val(data.toString());
+            field.val(data);
         }
     }
 
@@ -543,7 +614,7 @@
      * 设置某个字段的值
      * @param {Object} fm 表单实例
      * @param {String} fieldName 字段的name名称
-     * @return {Object|void} 字段的值
+     * @return {*} 字段的值
      */
     function getFieldData(fm, fieldName) {
         // 根据字段的name找到字段
@@ -552,7 +623,7 @@
         // field 不存在，即此时在请求不存在
         if (!field) {
             console.error('cannot found field "' + fieldName + '"');
-            return;
+            return '';
         }
 
         // 如果字段是input标签的元素，使用独特的取值技巧
@@ -560,16 +631,19 @@
             // 返回获取到的值
             return getInputValue(fm, field);
         }
+        var val = field.val();
 
-        // 如果是select的多选，在 jQuery3下，没有选中项时，获取到的是空数组
-        // 这里让行为保持一致，若是空数组，也返回一个 null (null 是jquery3以前的版本得到的值)
-        if (fm.option.jquery3 && field.is('select[multiple]')) {
-            var data = field.val();
-			return data.length === 0 ? null : data;
+        // 如果是select的多选，在 jQuery3版本中，没有选中项时，获取到的是空数组
+        // 而在jquery3之前的版本 没有选中时返回的是 null
+        // 这里让行为保持一致，若是jquery3之前的版本，则也返回空数组
+        if (field.is('select[multiple]')) {
+            return val === null ? [] : val;
         }
 
         // 其它的字段直接取值并返回
-        return field.val();
+        // 如果取到的是 undefined 那么返回空字符串或空数组
+        return typeof val === 'undefined' ?
+            (field.is('select[multiple]') ? [] : '') : val;
     }
 
     /**
@@ -582,7 +656,7 @@
         // 取radio的值
         if (field.is(':radio')) {
             // 取选中的radio的值就行了
-            return field.filter(':checked').val();
+            return ifUndefOrNull(field.filter(':checked').val());
         }
 
         // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
@@ -591,7 +665,19 @@
         }
 
         // 其它的直接返回值
-        return field.val();
+        return ifUndefOrNull(field.val());
+    }
+
+    /**
+     * 若果值是 undefined，返回一个默认值
+     * @param {string} [val] 用于判断的值
+     * @param {string} [def=''] 默认值
+     * @return {string}
+     */
+    function ifUndefOrNull(val, def) {
+        return typeof  val === 'undefined' || val === null ?
+            arguments.length > 1 ? def : ''
+            : val;
     }
 })(window, jQuery);
-TinyForm.version = "0.7.7"
+TinyForm.version = "0.7.8"

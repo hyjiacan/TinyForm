@@ -50,7 +50,7 @@
     /**
      * 表单构造函数
      * @param {String|Object} selector 表单选择器
-     * @param {Object} option 参数，可选
+     * @param {Object} [option] 参数，可选
      * @returns {Object} 表单实例
      */
     function TinyForm(selector, option) {
@@ -115,7 +115,7 @@
         },
         /**
          * 根据name属性获取字段 返回数组，因为可能存在同name情况
-         * @param {String} fieldName 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
+         * @param {String} [fieldName] 要获取的字段的name值，如果不指定这个属性，那么返回所有字段
          * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
@@ -275,11 +275,7 @@
         // array: 要忽略的字段的name组成的数组
         // 要注意的是：这里的优先级应该比标签上设置的优先级更低
         // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
-        ignore: false,
-        // 是否要支持 jQuery3
-        // 在使用 jQuery3时，请将这项设置为 true
-        // 因为在 jQuery3的一此行为发生了不兼容的变化
-        jquery3: false
+        ignore: false
     };
 
     // 搞懂，因为真正创建实例是通过 setup ，

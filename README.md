@@ -1,8 +1,8 @@
-[MENU]
-
 # 简介
 
-**TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单字段。
+**TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。
+使用这个工具，不会改变原有的DOM结构和样式，也不会新增或移除元素。
+他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单字段。
 >默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，配置参数这`TinyForm.defaults.selector`，也就是说，也可以通过实例化表单的参数*selector*来自定义。
 
 <del>IE8及更低版本IE浏览器</del>
@@ -132,10 +132,6 @@ var form = TinyForm('#f1', {
     // 要注意的是：这里的优先级比标签上设置的优先级更低
     // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
     ignore: 'ignore-field-2',
-    // 是否要支持 jQuery3
-    // 在使用 jQuery3时，请将这项设置为 true
-    // 因为在 jQuery3的一此行为发生了不兼容的变化
-    jquery3: false,
     validate: {
         // 是否在输入字段失去焦点时自动验证，默认为false
         auto: true,
@@ -404,14 +400,32 @@ form.option.storage.container = window.sessionStorage;
 }
 ```
 
-> 注意：带有*multiple="multiple"*属性的*select*，获取到的值为数组。
+> 注意：没有值时返回空字符串，
+> 带有*multiple*属性的*select*，获取到的值为数组，没有选择项时返回空数组。
 
-**setData(data: Any|Object, fieldName: String): Instance**
+**setData(data: Any|Object, fieldName: String|boolean): Instance**
 
 > 设置字段的值
 > **data** 表单数据，*field*不指定时结构与`getData`返回结构一致，缺少的项使用空值；指定时可以设置任何合适的类型
-> **fieldName** 字段的*name*名称，如果指定了此参数，则只设置*name=此值*的字段的值
+> **fieldName** 字段的name名称或是否跳转data中没有的字段，
+        如果未指定此参数，则**data**应该是一个对象，此时设置表单所有字段的值
+        如果指定了此参数，
+        当是字符串时，则只设置name=此值的字段的值
+        当是布尔值时，也会设置所有字段的值，但是会否跳过data中没有的字段(不设置值)
 > **return** 表单实例
+
+**asDefault(data: object): Instance**
+
+> 将当前表单内的数据作为默认数据，默认数据将作为 getChanges 的基础
+> **data** 要作为默认值的数据，如果不传，则使用当前表单内的数据
+> **return** 表单实例
+
+**getChanges(returnField: boolean): object**
+
+> 获取值的改变的字段
+> **returnField** 是否返回字段，默认为 false
+        传入true的时候，返回的是改变的字段集合
+        传入false的时候，返回的是改变的值集合
 
 **reset(): Instance**
 
