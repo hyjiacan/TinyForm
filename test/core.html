@@ -1,215 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 
-	<head>
-		<title>Unit test for tinyform.core.js</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">		
-		<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-		<script>
-            var win = window;
-        </script>
-		<!--<script src="../node_modules/jquery/dist/jquery.min.js"></script>-->
-		<!--<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>-->
-		<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-		<script src="../src/tinyform.core.js"></script>
-		<link href="../node_modules/qunitjs/qunit/qunit.css" rel="stylesheet">
-	</head>
+<head>
+    <title>Unit test for tinyform.core.js</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        var win = window;
+    </script>
+    <!--<script src="../node_modules/jquery/dist/jquery.min.js"></script>-->
+    <!--<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>-->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="../src/tinyform.core.js"></script>
+    <link href="../node_modules/qunitjs/qunit/qunit.css" rel="stylesheet">
+</head>
 
-	<body>
-		<div id="qunit"></div>
-		<div id="qunit-fixture"></div>
-		<div class="container">
-			<h2>通过 form 标签构建的表单</h2>
-			<hr>
-			<form id="form1" action="#">
-				<ol>
-					<li>
-						<label for="">文本框</label>
-						<input type="text" name="text">
-					</li>
-					<li>
-						<label for="">单选按钮</label>
-						<input type="radio" name="radio">
-						<input type="radio" name="radio">
-					</li>
-					<li>
-						<label for="">复选框</label>
-						<input type="checkbox" name="checkbox">
-					</li>
-					<li>
-						<label for="">下拉框(单选)</label>
-						<select name="select1" id="">
-							<option value="">第1项</option>
-							<option value="">第2项</option>
-							<option value="">第3项</option>
-						</select>
-					</li>
-					<li>
-						<label for="">下拉框(多选)</label>
-						<select name="select2" id="" multiple="multiple">
-							<option value="">第1项</option>
-							<option value="">第2项</option>
-							<option value="">第3项</option>
-						</select>
-					</li>
-					<li>
-						<label for="">多行文本框</label>
-						<textarea rows="" cols="" name="textarea"></textarea>
-					</li>下面这些控件会被表单忽略
-					<li>
-						<label for="">标签属性忽略</label>
-						<input type="text" name="ignoretext" data-ignore>
-					</li>
-					<li>
-						<label for="">配置忽略</label>
-						<select name="ignoreselect" id="">
-							<option value="">第1项</option>
-							<option value="">第2项</option>
-							<option value="">第3项</option>
-						</select>
-					</li>
-					<li>
-						<label for="">按钮不会加载</label>
-						<input type="button" name="button" value="button">
-					</li>
-				</ol>
-			</form>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<div class="container">
+    <h2>通过 form 标签构建的表单</h2>
+    <hr>
+    <form id="form1" action="#">
+        <ol>
+            <li>
+                <label for="">文本框</label>
+                <input type="text" name="text">
+            </li>
+            <li>
+                <label for="">单选按钮</label>
+                <input type="radio" name="radio">
+                <input type="radio" name="radio">
+            </li>
+            <li>
+                <label for="">复选框</label>
+                <input type="checkbox" name="checkbox">
+            </li>
+            <li>
+                <label for="">下拉框(单选)</label>
+                <select name="select1" id="">
+                    <option value="">第1项</option>
+                    <option value="">第2项</option>
+                    <option value="">第3项</option>
+                </select>
+            </li>
+            <li>
+                <label for="">下拉框(多选)</label>
+                <select name="select2" id="" multiple="multiple">
+                    <option value="">第1项</option>
+                    <option value="">第2项</option>
+                    <option value="">第3项</option>
+                </select>
+            </li>
+            <li>
+                <label for="">多行文本框</label>
+                <textarea rows="" cols="" name="textarea"></textarea>
+            </li>
+            下面这些字段会被表单忽略
+            <li>
+                <label for="">标签属性忽略</label>
+                <input type="text" name="ignoretext" data-ignore>
+            </li>
+            <li>
+                <label for="">配置忽略</label>
+                <select name="ignoreselect" id="">
+                    <option value="">第1项</option>
+                    <option value="">第2项</option>
+                    <option value="">第3项</option>
+                </select>
+            </li>
+            <li>
+                <label for="">按钮不会加载</label>
+                <input type="button" name="button" value="button">
+            </li>
+        </ol>
+    </form>
 
-			<h2>通过 div 标签构建的表单</h2>
-			<hr>
-			<div id="form2" action="#">
-				<ol>
-					<li>
-						<label for="">文本框</label>
-						<input type="text" name="text">
-					</li>
-					<li>
-						<label for="">单选按钮</label>
-						<input type="radio" name="radio"> radio1
+    <h2>通过 div 标签构建的表单</h2>
+    <hr>
+    <div id="form2" action="#">
+        <ol>
+            <li>
+                <label for="">文本框</label>
+                <input type="text" name="text">
+            </li>
+            <li>
+                <label for="">单选按钮</label>
+                <input type="radio" name="radio"> radio1
 
-						<input type="radio" name="radio"> radio2
-					</li>
-					<li>
-						<label for="">复选框</label>
-						<input type="checkbox" name="checkbox">
-					</li>
-					<li>
-						<label for="">下拉框(单选)</label>
-						<select name="select1" id="">
-							<option value="">第1项</option>
-							<option value="">第2项</option>
-							<option value="">第3项</option>
-						</select>
-					</li>
-					<li>
-						<label for="">下拉框(多选)</label>
-						<select name="select2" id="" multiple="multiple">
-							<option value="">第1项</option>
-							<option value="">第2项</option>
-							<option value="">第3项</option>
-						</select>
-					</li>
-					<li>
-						<label for="">多行文本框</label>
-						<textarea rows="" cols="" name="textarea"></textarea>
-					</li>下面这些控件会被表单忽略
-					<li>
-						<label for="">标签属性忽略</label>
-						<input type="text" name="ignoretext" data-ignore>
-					</li>
-					<li>
-						<label for="">配置忽略</label>
-						<select name="ignoreselect" id="">
-							<option value="">第1项</option>
-							<option value="">第2项</option>
-							<option value="">第3项</option>
-						</select>
-					</li>
-					<li>
-						<label for="">按钮不会加载</label>
-						<input type="button" name="button" value="button">
-					</li>
-				</ol>
-			</div>
-		</div>
-		<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
-		<script>
-			var form1 = TinyForm('#form1', {
-				ignore: 'ignoreselect'
-			});
-			var form2 = TinyForm('#form1', {
-				ignore: 'ignoreselect'
-			});
+                <input type="radio" name="radio"> radio2
+            </li>
+            <li>
+                <label for="">复选框</label>
+                <input type="checkbox" name="checkbox">
+            </li>
+            <li>
+                <label for="">下拉框(单选)</label>
+                <select name="select1" id="">
+                    <option value="">第1项</option>
+                    <option value="">第2项</option>
+                    <option value="">第3项</option>
+                </select>
+            </li>
+            <li>
+                <label for="">下拉框(多选)</label>
+                <select name="select2" id="" multiple="multiple">
+                    <option value="">第1项</option>
+                    <option value="">第2项</option>
+                    <option value="">第3项</option>
+                </select>
+            </li>
+            <li>
+                <label for="">多行文本框</label>
+                <textarea rows="" cols="" name="textarea"></textarea>
+            </li>
+            下面两个字段会被表单忽略
+            <li>
+                <label for="">标签属性忽略</label>
+                <input type="text" name="ignoretext" data-ignore>
+            </li>
+            <li>
+                <label for="">配置忽略</label>
+                <select name="ignoreselect" id="">
+                    <option value="">第1项</option>
+                    <option value="">第2项</option>
+                    <option value="">第3项</option>
+                </select>
+            </li>
+            下面两个字段会被表单排除
+            <li class="exclude">
+                <label for="">配置排除</label>
+                <input type="text" name="field-exclude-by-config"/>
+            </li>
+            <li data-exclude>
+                <label for="">属性排除</label>
+                <input type="text" name="field-exclude-by-attr"/>
+            </li>
+            <li>
+                <label for="">按钮不会加载</label>
+                <input type="button" name="button" value="button">
+            </li>
+        </ol>
+    </div>
+</div>
+<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+<script>
+    var form1 = TinyForm('#form1', {
+        ignore: 'ignoreselect'
+    });
+    var form2 = TinyForm('#form1', {
+        ignore: 'ignoreselect'
+    });
 
-			function runTest(form) {
-				var fields = form1.getField();
+    function runTest(form) {
+        var fields = form1.getField();
 
-				QUnit.test("表单id", function(assert) {
-					assert.equal(form2.context.attr('data-tinyform'), form.id, "表单id=" + form.id);
-				});
+        QUnit.test("表单id", function (assert) {
+            assert.equal(form2.context.attr('data-tinyform'), form.id, "表单id=" + form.id);
+        });
 
-				QUnit.test("控件数量", function(assert) {
-					var count = 0;
-					for(var key in fields) {
-						if(fields.hasOwnProperty(key)) {
-							count++;
-						}
-					}
-					assert.equal(count, 6, "加载控件的数量=6");
-				});
-				var radio = form1.getField('radio');
-				QUnit.test("单选框数量", function(assert) {
-					assert.equal(radio.length, 2, "name=radio 单选框数量=2");
-				});
+        QUnit.test("字段数量", function (assert) {
+            var count = 0;
+            for (var key in fields) {
+                if (fields.hasOwnProperty(key)) {
+                    count++;
+                }
+            }
+            assert.equal(count, 6, "加载字段的数量=6");
+        });
+        var radio = form1.getField('radio');
+        QUnit.test("单选框数量", function (assert) {
+            assert.equal(radio.length, 2, "name=radio 单选框数量=2");
+        });
 
-				QUnit.test("通过标签忽略的控件", function(assert) {
-					assert.equal(fields['ignoretext'], undefined, "不加载通过标签忽略的控件 ");
-				});
+        QUnit.test("通过标签忽略的字段", function (assert) {
+            assert.equal(fields['ignoretext'], undefined, "不加载通过标签忽略的字段 ");
+        });
 
-				QUnit.test("通过配置忽略的控件", function(assert) {
-					assert.equal(fields['ignoreselect'], undefined, "不加载通过配置忽略的控件 ");
-				});
+        QUnit.test("通过配置忽略的字段", function (assert) {
+            assert.equal(fields['ignoreselect'], undefined, "不加载通过配置忽略的字段 ");
+        });
 
-				QUnit.test("按钮不会被加载", function(assert) {
-					assert.equal(fields['button'], undefined, "不加载按钮 ");
-				});
-			}
+        QUnit.test("按钮不会被加载", function (assert) {
+            assert.equal(fields['button'], undefined, "不加载按钮 ");
+        });
+    }
 
-			runTest(form1);
-			QUnit.test("两个表单的分隔线", function(assert) {
-				assert.equal(1, 1, "----------------------------");
-			});
-			runTest(form2);
+    runTest(form1);
+    QUnit.test("两个表单的分隔线", function (assert) {
+        assert.equal(1, 1, "----------------------------");
+    });
+    runTest(form2);
 
-			form2.context.append($('<li>')
-				.append('<label>动态添加的文本框</label>')
-				.append('<input type="text" name="dynamic-field">')
-			);
+    form2.context.append($('<li>')
+        .append('<label>动态添加的文本框</label>')
+        .append('<input type="text" name="dynamic-field">')
+    );
 
-			form2.refresh();
+    form2.refresh();
 
-			QUnit.test("表单form2的id", function(assert) {
-				assert.equal(form2.context.attr('data-tinyform'), form2.id, "表单id=" + form2.id);
-			});
+    QUnit.test("表单form2的id", function (assert) {
+        assert.equal(form2.context.attr('data-tinyform'), form2.id, "表单id=" + form2.id);
+    });
 
-			QUnit.test("动态添加控件后的数量", function(assert) {
-				var count = 0;
-				var fields = form2.getField();
-				for(var key in fields) {
-					if(fields.hasOwnProperty(key)) {
-						count++;
-					}
-				}
-				assert.equal(count, 7, "加载控件的数量=7");
-			});
+    QUnit.test("动态添加字段后的数量", function (assert) {
+        var count = 0;
+        var fields = form2.getField();
+        for (var key in fields) {
+            if (fields.hasOwnProperty(key)) {
+                count++;
+            }
+        }
+        assert.equal(count, 7, "加载字段的数量=7");
+    });
 
-			QUnit.test("获取动态添加的控件", function(assert) {
-				var expected = document.getElementsByName('dynamic-field')[0];
-				var dinamicfield = form2.getField('dynamic-field').get(0);
-				assert.equal(dinamicfield, expected, "获取动态添加的控件");
-			});
-		</script>
-	</body>
+    QUnit.test("获取动态添加的字段", function (assert) {
+        var expected = document.getElementsByName('dynamic-field')[0];
+        var dinamicfield = form2.getField('dynamic-field').get(0);
+        assert.equal(dinamicfield, expected, "获取动态添加的字段");
+    });
+
+    QUnit.test("被排除的字段", function (assert) {
+        assert.equal(form2.getField('field-exclude-by-config'), undefined, "找不到被配置范围内的字段 field-exclude-by-config");
+        assert.equal(form2.getField('field-exclude-by-attr'), undefined, "找不到被标签属性范围内的字段 field-exclude-by-attr");
+    });
+</script>
+</body>
 
 </html>

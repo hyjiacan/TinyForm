@@ -105,10 +105,13 @@
             // 设置实例的id
             me.id = id;
 
-            // 合并选项参数
-            me.option = $.extend(true, {}, TinyForm.defaults, option);
             // 表单的DOM上下文
             me.context = formContainer;
+
+            // 合并选项参数
+            me.option = $.extend(true, {}, TinyForm.defaults, option);
+
+            parseOption(me);
 
             // 获取所有字段
             getAllFields(me);
@@ -221,6 +224,32 @@
     });
 
     /**
+     * 对选项进行预处理
+     * @param {TinyForm} me 实例
+     */
+    function parseOption(me) {
+        var option = me.option;
+        var exclude = option.exclude;
+        // 配置中 exclude 如果传的是字符串，表示是选择器
+        // 或者是 html 对象
+        // 在这里将其搞成jQuery对象
+        if (typeof exclude === 'string' ||
+            exclude instanceof window.HTMLElement) {
+            option.exclude = $(exclude, me.context);
+        } else if (!(exclude instanceof $)) {
+            // 传入了不是字段串 jQuery 对象的
+            option.exclude = false;
+        }
+
+        // 如果有标签写了属性 data-exclude 也要被排除掉
+        exclude = $(me.context).find('[data-exclude]');
+        if (exclude.length) {
+            option.exclude = exclude ?
+                option.exclude.concat(exclude) : exclude;
+        }
+    }
+
+    /**
      * 获取所有的字段
      * @param {Object} fm 表单实例
      */
@@ -233,9 +262,15 @@
         var ignoreFields = $.makeArray(fm.option.ignore);
 
         // 根据配置的选择器来查找字段
-        fm.context.find(fm.option.selector).each(function () {
+        fm.context.find(TinyForm.defaults.selector).each(function () {
+            // 字段对象
+            var field = $(this);
+            // 不是选择器指定的字段
+            if (fm.option.selector && !field.is(fm.option.selector)) {
+                return;
+            }
             // 尝试取出name属性，顺便trim一下，要是有人喜欢搞怪，给弄点空白呢
-            var name = $.trim($(this).attr('name'));
+            var name = $.trim(field.attr('name'));
 
             // 如果name为空，则跳过
             if (name === '') {
@@ -248,18 +283,23 @@
                 return;
             }
 
+            // 看看这个字段是不是处于被 exclude 的范围内
+            if (fm.option.exclude && fm.option.exclude.find(field).length > 0) {
+                return;
+            }
+
             // 字段缓存集合中还不存在这个name的字段
             // 不存在，可能是还没有这个name的属性或者长度为0，感觉这个判断有点冗余，先不管了
             if (typeof fields[name] === 'undefined' || fields[name].length === 0) {
                 // 结果中还不存在name，搞个数组出来
                 // 这里搞数组，就是为了将相同name的字段集中起来
-                fields[name] = $(this);
+                fields[name] = field;
                 // 可以取下一个字段了
                 return;
             }
 
             // 存在name，如果是radio的话就追加到jQuery数组后头
-            if ($(this).is(':radio')) {
+            if (field.is(':radio')) {
                 // 将DOM字段对象（非jQuery对象）添加到jQuery数组后头
                 // 这里可以肯定只有一个字段，所以直接使用  this
                 fields[name].push(this);
@@ -285,7 +325,12 @@
         // array: 要忽略的字段的name组成的数组
         // 要注意的是：这里的优先级应该比标签上设置的优先级更低
         // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
-        ignore: false
+        ignore: false,
+        /**
+         * 要被排除的范围，在这个范围内的字段不会被加载
+         * @type {string|HTMLElement|jQuery}
+         */
+        exclude: false
     };
 
     // 搞懂，因为真正创建实例是通过 setup ，

@@ -250,6 +250,10 @@ var form = TinyForm('formselector', option);
 > **ajaxOption** 异步请求的数据对象，参数与jQuery的ajax参数一致。修改这个对象会直接影响ajax请求的参数。
 > **return** 此函数返回 false 会阻止表单的提交(仅阻止通过`form.submit()`发起的提交)。
 
+  **exclude** boolean
+  
+> 要被排除的范围，在这个范围内的字段不会被加载
+
 这些选项的默认值可以通过：
 
 ```javascript
@@ -267,7 +271,7 @@ TinyForm.defaults.validate.rules.xxx = {
 
 ## 标签属性
 
-**data-rule**
+### **data-rule**
 
 此输入字段的验证规则，支持以下值(**这些写法均要区分大小写**)：
 
@@ -302,7 +306,7 @@ TinyForm.defaults.validate.rules.xxx = {
 
 ，看到了吧，这里写成引用的方式来告诉程序，希望字段`pswdconfirm`的值与`pswd`的值相同，这样，字段`pswdconfirm`验证时，就会自动判断了。
 
-**data-msg**
+### **data-msg**
 
 > 此字段验证失败时的提示消息，若不指定则使用默认消息，
 > data-msg消息的优先级最高，也就是说:
@@ -336,6 +340,25 @@ var form = $('#form', {
 
 `&l`和`&p`可以多次出现，如果要在消息中显示 `&l`和`&p`，则写作`&&l`和`&&p`。
 
+### **data-ignore**
+
+被忽略的字段，有这个属性的字段不会被处理，如：
+
+```html
+<input type="text" name="ignore-field" data-ignore />
+```
+
+### **data-exclude**
+
+被排除的范围，有这个属性范围内的字段不会被处理，如：
+
+```html
+<div data-exclude>
+    <input type="text" name="ignore-field" />
+</div>
+```
+
+> 这些忽略和排除的属性，可以用于在某个表单中创建子表单。
 
 ## 实例属性
 

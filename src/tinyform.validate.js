@@ -214,54 +214,54 @@
     /**
      * 加载验证规则并根据配置绑定自动验证事件
      *
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      */
-    function refresh(fm) {
+    function refresh(me) {
         // 重新获取标签的验证规则
-        getAllRules(fm);
+        getAllRules(me);
 
         // 绑定事件 失去焦点时调用验证函数
-        if (!fm.option.validate.auto) {
+        if (!me.option.validate.auto) {
             // 不自动验证 就直接返回好了
             return;
         }
         // 遍历字段，绑定失去焦点时验证的事件
-        $.each(fm.getField(), function (name) {
+        $.each(me.getField(), function (name) {
             // 绑定失去焦点事件
             this.blur(function () {
                 // 失去焦点时触发验证规则
-                fm.validate(name);
+                me.validate(name);
             });
         });
     }
 
     /**
      * 从一个jQuery对象的字段中获取验证的规则
-     * @param {TinyForm} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {Object} field 字段jQuery对象
      * @returns {Array}
      */
-    function getFieldRule(fm, field) {
+    function getFieldRule(me, field) {
         // 从标签属性上获取规则描述  当然  还是要trim一下的
-        var rule = $.trim(field.attr(ATTRS.rule));
+        var ruleName = $.trim(field.attr(ATTRS.rule));
 
         // 规则为空，返回一个false
-        if (rule === '') {
+        if (ruleName === '') {
             // 返回[] ，表示没有验证规则
             return [];
         }
 
-        var msg = replaceRegMsg(fm.context, field, field.attr('name'), field.attr(ATTRS.msg));
+        var msg = replaceRegMsg(me.context, field, field.attr('name'), field.attr(ATTRS.msg));
 
         // 从标签属性上获取提示消息
         var msgs = msg ? handlePlaceholder(msg, '|') : false;
 
         // 不包含 : 冒号，表示是普通规则
         // 如果自定义规则 validRules 中存在这个名称的规则，那么直接取出正则
-        return rule.indexOf(':') === -1 ?
-            resolvePreDefinedRule(fm.option.validate.rules, rule, msgs) :
+        return ruleName.indexOf(':') === -1 ?
+            resolvePreDefinedRule(me.option.validate.rules, ruleName, msgs) :
             // 规则是特殊语法
-            [resolveValidateRule(rule, msgs[0])];
+            [resolveValidateRule(ruleName, msgs[0])];
     }
 
     /**
@@ -275,16 +275,16 @@
 
     /**
      * 获取表单所有字段的验证规则
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @returns {Object} 验证规则对象
      */
-    function getAllRules(fm) {
+    function getAllRules(me) {
         // 清空原有的数据
-        var rules = ruleSet[fm.id] = {};
+        var rules = ruleSet[me.id] = {};
 
         // 遍历字段，获取验证规则
-        $.each(fm.getField(), function (fieldName, field) {
-            rules[fieldName] = getFieldRule(fm, field);
+        $.each(me.getField(), function (fieldName, field) {
+            rules[fieldName] = getFieldRule(me, field);
 
             // 如果所有验证规则都不存在，那么就认为不需要验证
             if (!rules[fieldName].length) {
@@ -504,13 +504,13 @@
 
     /**
      * 验证某个字段
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {String} fieldName 字段的name名称
      * @return {Object|Boolean}验证成功时返回true, 否则返回失败的详细信息
      */
-    function validateField(fm, fieldName) {
+    function validateField(me, fieldName) {
         //根据name取到字段
-        var field = fm.getField(fieldName);
+        var field = me.getField(fieldName);
         // 字段不存在
         if (!field || field.length === 0) {
             // 返回false表示验证失败
@@ -520,27 +520,27 @@
             return false;
         }
         // 获取字段的验证规则
-        var rules = fm.getRule(fieldName);
+        var rules = me.getRule(fieldName);
 
         // 没有验证规则时，直接返回  true
         if (rules === false) {
             return true;
         }
 
-        var value = fm.getData(fieldName);
+        var value = me.getData(fieldName);
 
-        return validateFieldRules(fm, field, value, rules);
+        return validateFieldRules(me, field, value, rules);
     }
 
     /**
      * 执行验证规则的真正逻辑
-     * @param {TinyForm} fm 实例
+     * @param {TinyForm} me 实例
      * @param {jQuery} field 字段的jQuery对象
      * @param {string} value 字段的值
      * @param rules
      * @return {boolean}
      */
-    function validateFieldRules(fm, field, value, rules) {
+    function validateFieldRules(me, field, value, rules) {
         var pass = true;
         var fieldName = field.attr('name');
 
@@ -578,7 +578,7 @@
                 }
             } else if (rule.rule[0] === '&') {
                 // 验证与其它某个字段的值相等
-                pass = fm.getData(rule.rule.substring(1)) === value;
+                pass = me.getData(rule.rule.substring(1)) === value;
             } else {
                 // 不是函数，那就认为是下则表达式了
                 // 因为只支持这三种写法
@@ -589,19 +589,19 @@
             }
 
             //验证的回调函数，这个太长了，弄个短名字好写些
-            var cb = fm.option.validate.callback;
+            var cb = me.option.validate.callback;
 
             // 回调不是函数，直接返回验证的结果
             if (!$.isFunction(cb)) {
                 // 配置了stop参数么在第一次验证失败后就停止验证
-                if (fm.option.validate.stop && !pass) {
+                if (me.option.validate.stop && !pass) {
                     return false;
                 }
                 continue;
             }
 
             // 因为回调可以通过return来改变验证结果，所以这里要取得回调的返回值
-            var custompass = cb.call(fm, {
+            var custompass = cb.call(me, {
                 // 验证是否通过
                 pass: pass,
                 // 验证的字段对象
@@ -626,7 +626,7 @@
             }
 
             // 配置了stop参数么在第一次验证失败后就停止验证
-            if (fm.option.validate.stop && !pass) {
+            if (me.option.validate.stop && !pass) {
                 return false;
             }
         }

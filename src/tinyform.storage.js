@@ -55,7 +55,7 @@
         /**
          * 保存数据到缓存中，新保存的数据会覆盖上次保存的数据
          * @param {Function} fn 保存数据前的处理函数，返回值是新的数据
-         * @return {Object} 表单实例
+         * @return {TinyForm} 实例
          */
         store: function (fn) {
             // 存储数据前肯定要先获取数据
@@ -167,10 +167,10 @@
 
     /**
      * 定时存储表单数据
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {Object} storage 配置参数的storage对象
      */
-    function storeDataInterval(fm, storage) {
+    function storeDataInterval(me, storage) {
         interval = parseInt(storage.time);
 
         // 是否配置了定时存储数据
@@ -182,15 +182,15 @@
         // 定义了定时存储，搞个定时器来做这个事
         win.setTimeout(function () {
             // 存储数据
-            fm.store();
+            me.store();
             // 如果指定了存储数据的事件处理函数
             if ($.isFunction(storage.onstore)) {
                 // 调用存储数据的处理函数
-                storage.onstore.call(fm);
+                storage.onstore.call(me);
             }
 
             // 然后再次调用存储函数，准备下个周期的存储
-            storeDataInterval(fm, storage);
+            storeDataInterval(me, storage);
         }, parseInt(interval));
     }
 })(window, jQuery);

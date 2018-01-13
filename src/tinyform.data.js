@@ -73,7 +73,7 @@
          *      如果指定了此参数，
          *      当是字符串时，则只设置name=此值的字段的值
          *      当是布尔值时，也会设置所有字段的值，但是会否跳过data中没有的字段(不设置值)
-         * @returns {Object}  表单实例
+         * @returns {Object}  实例
          */
         setData: function (data, fieldName) {
             // 后头要在回调函数里面用这个实例对象，所以先弄个变量存起来
@@ -130,7 +130,7 @@
         /**
          * 将当前表单内的数据作为默认数据，默认数据将作为 getChanges 的基础
          * @param {object} [data] 要作为默认值的数据，如果不传，则使用当前表单内的数据
-         * @returns {Object|void}  表单实例
+         * @returns {Object|void}  实例
          */
         asDefault: function (data) {
             var me = this;
@@ -170,7 +170,7 @@
         /**
          * 使用jQuery提交表单（默认异步: async=true）
          * @param {Object} option Ajax参数项
-         * @returns {Object|void}  表单实例
+         * @returns {Object|void}  实例
          */
         submit: function (option) {
             // 到处都要写this，加个变量保存起来，在压缩的时候说不定能小好几十个字节
@@ -205,7 +205,7 @@
 
         /**
          * 重置表单所有项
-         * @returns {Object} 表单实例
+         * @returns {TinyForm} 实例
          */
         reset: function () {
             // 看一下表单dom元素对象上有没有一个叫做reset的方法
@@ -226,11 +226,11 @@
 
     /**
      * 设置某个字段的值
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {String|Number|Boolean|Array} data 要设置的值，可以是任意类型，除了select其它类型都会自动搞成string
      * @param {Array} field 字段对象数组
      */
-    function setFieldData(fm, data, field) {
+    function setFieldData(me, data, field) {
         // 如果字段不存在（长度为0），那么啥都不做
         if (!field || field.length === 0) {
             // 返回吧
@@ -267,7 +267,7 @@
         if (field.is(':checkbox')) {
             // 比较字符串的值，以控制字段的选中状态 
             // 不区分大小写
-            field.prop('checked', data.toLowerCase() === fm.option.checkbox[0].toString().toLowerCase());
+            field.prop('checked', data.toLowerCase() === me.option.checkbox[0].toString().toLowerCase());
             // 可以返回了
             return;
         }
@@ -284,15 +284,15 @@
 
     /**
      * 获取表单的所有数据
-     * @param {Object} fm
+     * @param {TinyForm} me
      */
-    function getAllData(fm) {
+    function getAllData(me) {
         // 创建一个对象来存放数据
         var data = {};
         // 遍历字段取值
-        $.each(fm.getField(), function (name) {
+        $.each(me.getField(), function (name) {
             // 获取某个name的字段的值(在radio时可能是多个)
-            data[name] = getFieldData(fm, name);
+            data[name] = getFieldData(me, name);
         });
         // 返回所有数据
         return data;
@@ -300,13 +300,13 @@
 
     /**
      * 设置某个字段的值
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {String} fieldName 字段的name名称
      * @return {*} 字段的值
      */
-    function getFieldData(fm, fieldName) {
+    function getFieldData(me, fieldName) {
         // 根据字段的name找到字段
-        var field = fm.getField(fieldName);
+        var field = me.getField(fieldName);
 
         // field 不存在，即此时在请求不存在
         if (!field) {
@@ -317,7 +317,7 @@
         // 如果字段是input标签的元素，使用独特的取值技巧
         if (field.is('input')) {
             // 返回获取到的值
-            return getInputValue(fm, field);
+            return getInputValue(me, field);
         }
         var val = field.val();
 
@@ -336,11 +336,11 @@
 
     /**
      * 获取input字段的值
-     * @param {Object} fm 表单实例
+     * @param {TinyForm} me 实例
      * @param {Array} field 字段数组
      * @return {String|Boolean|Number} 字段的值
      */
-    function getInputValue(fm, field) {
+    function getInputValue(me, field) {
         // 取radio的值
         if (field.is(':radio')) {
             // 取选中的radio的值就行了
@@ -349,7 +349,7 @@
 
         // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
         if (field.is(':checkbox')) {
-            return field.is(':checked') ? fm.option.checkbox[0] : fm.option.checkbox[1];
+            return field.is(':checked') ? me.option.checkbox[0] : me.option.checkbox[1];
         }
 
         // 其它的直接返回值
