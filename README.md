@@ -3,7 +3,10 @@
 **TinyForm**是一个基于 *jQuery* 的WEB表单处理工具(**仅操作表单，不是~~创建表单~~**)。
 使用这个工具，不会改变原有的DOM结构和样式，也不会新增或移除元素。
 他根据传入的*选择器*或*DOM/jQuery*对象，创建表单实例，然后在这个范围内搜索带有*name*属性的表单字段。
->默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，配置参数这`TinyForm.defaults.selector`，也就是说，也可以通过实例化表单的参数*selector*来自定义。
+>默认的选择器是*input[name]:not(:button,:submit,:reset), select[name], textarea[name]*，
+自定义的配置选项为`TinyForm.defaults.selector`，
+也就是说，也可以通过实例化表单的参数*selector*来自定义。
+需要注意的是：自定义的选择器仅作为默认选择器的附加条件，并不会改变默认的选择器。
 
 <del>IE8及更低版本IE浏览器</del>
 
