@@ -125,8 +125,7 @@
             "text": "textboxvalue",
             "textarea": "textareavalue"
         };
-        var changes = form.getChanges();
-        assert.deepEqual(changes, expected, "获取改变的字段=" + JSON.stringify(changes));
+        assert.deepEqual(form.getChanges(), expected, "获取改变的字段=" + JSON.stringify(expected));
     });
 
     QUnit.test('重置表单', function (assert) {
@@ -140,6 +139,7 @@
         };
         form.reset();
         assert.deepEqual(form.getData(), expected, "重置表单");
+        assert.deepEqual(form.getChanges(), false, "重置后获取改变的字段=false");
     });
 </script>
 </body>

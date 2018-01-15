@@ -142,7 +142,7 @@
          * @param {boolean} [returnFields=false] 是否返回字段，默认为 false
          * 传入true的时候，返回的是改变的字段集合
          * 传入false的时候，返回的是改变的值集合
-         * @return {{}}
+         * @return {object|Boolean} 有改变时，返回改变的数据，否则返回 false
          */
         getChanges: function (returnFields) {
             var me = this;
@@ -151,6 +151,8 @@
             // 改变的集合
             // 放的可能是字段或者值
             var changes = {};
+            // 标记是否有改变
+            var hasChange = false;
             // 所有字段的集合
             var fields = me.getField();
             // 遍历当前数据
@@ -159,13 +161,40 @@
                 // 默认值中包含这个字段
                 // 并且默认值与当前值一致
                 // 则认为此字段没有改变
-                if (defaultValue.hasOwnProperty(field) && defaultValue[field] === value) {
+                if (!defaultValue.hasOwnProperty(field)) {
                     return;
                 }
-                changes[field] = returnFields ? fields[field] : value;
+                if ((function (oldValue, newValue) {
+                        // 多选的select得到的是数组
+                        // 都是数组
+                        if ($.isArray(oldValue) && $.isArray(newValue)) {
+                            // 长度不相等
+                            if (oldValue.length !== newValue.length) {
+                                return true;
+                            }
+                            // 值不相等
+                            for (var i = 0; i < oldValue.length; i++) {
+                                if (oldValue[i] !== newValue[i]) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                        // 数据类型都不同了 肯定改变了
+                        if ($.isArray(oldValue) || $.isArray(newValue)) {
+                            return true;
+                        }
+
+                        // 都不是数组 就按字符串比较
+                        return oldValue !== newValue;
+                    })(defaultValue[field], value)) {
+                    hasChange = true;
+                    changes[field] = returnFields ? fields[field] : value;
+                }
             });
 
-            return changes;
+            return hasChange ? changes : false;
         },
         /**
          * 使用jQuery提交表单（默认异步: async=true）
