@@ -244,6 +244,10 @@ var form = TinyForm('formselector', option);
 > 在设置数据时，会将设置的数据转换成字符串(调用 `toString`，这个选项的值也会转换)再比较，
 > 为`on`则选中，否则不选中
 
+**refresh** Boolean
+
+> 是否在调用方法时自动调用`refresh`方法，默认为`false`
+
 **validate** Object
 
 > 验证相关的参数对象，详细参数详见上方示例

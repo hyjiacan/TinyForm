@@ -122,8 +122,13 @@
          * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
+            var me = this;
+            // 是否设置了自动刷新
+            if (me.option.refresh) {
+                me.refresh();
+            }
             // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
-            var all = $.extend(true, {}, fieldSet[this.id]);
+            var all = $.extend(true, {}, fieldSet[me.id]);
 
             // 不传参数表示获取所有的字段
             if (arguments.length === 0) {
@@ -327,7 +332,14 @@
          * 要被排除的范围，在这个范围内的字段不会被加载
          * @type {string|HTMLElement|jQuery}
          */
-        exclude: false
+        exclude: false,
+        /**
+         * 在调用方法时，是否自动执行 refresh() 方法
+         * 设置为 false 时，表示不自动刷新，设置为true时，表示自动刷新
+         * 注意：设置为true时会有额外的性能开销
+         * @type {boolean}
+         */
+        refresh: false
     };
 
     // 搞懂，因为真正创建实例是通过 setup ，

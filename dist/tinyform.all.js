@@ -1,5 +1,5 @@
 /**
- * TinyForm-all@0.7.8  2018-01-13
+ * TinyForm-all@0.7.9  2018-01-24
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -111,7 +111,7 @@
             // 合并选项参数
             me.option = $.extend(true, {}, TinyForm.defaults, option);
 
-            parseOption(me);
+            parseExcludeOption(me);
 
             // 获取所有字段
             getAllFields(me);
@@ -132,8 +132,13 @@
          * @returns {Array|Object|void}  范围内所有name为指定值的字段数组或获取到的所有域对象
          */
         getField: function (fieldName) {
+            var me = this;
+            // 是否设置了自动刷新
+            if (me.option.refresh) {
+                me.refresh();
+            }
             // 获取到所有字段，然后创建一个副本，以避免字段集合被修改
-            var all = $.extend(true, {}, fieldSet[this.id]);
+            var all = $.extend(true, {}, fieldSet[me.id]);
 
             // 不传参数表示获取所有的字段
             if (arguments.length === 0) {
@@ -165,6 +170,9 @@
         refresh: function () {
             // 因为要在下面的回调里面使用表单实例，所以弄个变量把实例保存一下
             var me = this;
+
+            // 先更新一下排除范围
+            parseExcludeOption(me);
 
             // 在这个核心组件中，刷新仅仅是重新获取所有字段
             getAllFields(me);
@@ -224,12 +232,16 @@
     });
 
     /**
-     * 对选项进行预处理
+     * 对exclude选项进行预处理
      * @param {TinyForm} me 实例
      */
-    function parseOption(me) {
+    function parseExcludeOption(me) {
         var option = me.option;
         var exclude = option.exclude;
+
+        // 重置排除范围
+        option.exclude = false;
+
         // 配置中 exclude 如果传的是字符串，表示是选择器
         // 或者是 html 对象
         // 在这里将其搞成jQuery对象
@@ -244,7 +256,7 @@
         // 如果有标签写了属性 data-exclude 也要被排除掉
         exclude = $(me.context).find('[data-exclude]');
         if (exclude.length) {
-            option.exclude = exclude ?
+            option.exclude = option.exclude ?
                 option.exclude.add(exclude) : exclude;
         }
     }
@@ -330,7 +342,14 @@
          * 要被排除的范围，在这个范围内的字段不会被加载
          * @type {string|HTMLElement|jQuery}
          */
-        exclude: false
+        exclude: false,
+        /**
+         * 在调用方法时，是否自动执行 refresh() 方法
+         * 设置为 false 时，表示不自动刷新，设置为true时，表示自动刷新
+         * 注意：设置为true时会有额外的性能开销
+         * @type {boolean}
+         */
+        refresh: false
     };
 
     // 搞懂，因为真正创建实例是通过 setup ，
@@ -1621,4 +1640,4 @@
     }
 })(window, jQuery);
 
-TinyForm.version = "0.7.8"
+TinyForm.version = "0.7.9"
