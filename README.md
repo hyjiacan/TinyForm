@@ -459,12 +459,13 @@ form.option.storage.container = window.sessionStorage;
 > **data** 要作为默认值的数据，如果不传，则使用当前表单内的数据
 > **return** 表单实例
 
-**getChanges(returnField: boolean): object**
+**getChanges(returnField: boolean): object|Boolean**
 
 > 获取值的改变的字段
 > **returnField** 是否返回字段，默认为 false
         传入true的时候，返回的是改变的字段集合
         传入false的时候，返回的是改变的值集合
+> **return** 有改变时，返回改变的数据，否则返回 false
 
 **reset(): Instance**
 
