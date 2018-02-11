@@ -87,6 +87,11 @@
                 return me;
             }
 
+            //  传入的data为空时，啥也不做
+            if (typeof data === 'undefined' || data === null) {
+                return me;
+            }
+
             // 如果传的参数>=2个，就是要设置指定name的字段的值，后面多余的参数直接忽略
             if (arguments.length >= 2) {
                 //  第二个参数还是要个字符串，

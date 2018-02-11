@@ -14,7 +14,7 @@
 
 // 默认配置
     TinyForm.defaults.storage = {
-        // 存储的唯一名称，如果不指定，会自动计算一个唯一名称
+        // 存储的唯一名称，如果不指定，会使用表单的name值或id值，否则自动计算一个唯一名称
         name: null,
         // 数据存储的容器，根据应用场景可以设置为 localStorage或sessionStorage
         container: win.localStorage,
