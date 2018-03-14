@@ -160,42 +160,25 @@
             var hasChange = false;
             // 所有字段的集合
             var fields = me.getField();
+            // 当前的数据
+            var currentData = me.getData();
             // 遍历当前数据
             // 将找出有改变的字段来
-            $.each(me.getData(), function (field, value) {
-                // 默认值中包含这个字段
+            $.each(currentData, function (field, value) {
+                // 默认值中包含这个字段（不包含表示有新增字段）
                 // 并且默认值与当前值一致
                 // 则认为此字段没有改变
-                if (!defaultValue.hasOwnProperty(field)) {
-                    return;
-                }
-                if ((function (oldValue, newValue) {
-                        // 多选的select得到的是数组
-                        // 都是数组
-                        if ($.isArray(oldValue) && $.isArray(newValue)) {
-                            // 长度不相等
-                            if (oldValue.length !== newValue.length) {
-                                return true;
-                            }
-                            // 值不相等
-                            for (var i = 0; i < oldValue.length; i++) {
-                                if (oldValue[i] !== newValue[i]) {
-                                    return true;
-                                }
-                            }
-
-                            return false;
-                        }
-                        // 数据类型都不同了 肯定改变了
-                        if ($.isArray(oldValue) || $.isArray(newValue)) {
-                            return true;
-                        }
-
-                        // 都不是数组 就按字符串比较
-                        return oldValue !== newValue;
-                    })(defaultValue[field], value)) {
+                if (!defaultValue.hasOwnProperty(field) || diff(defaultValue[field], value)) {
                     hasChange = true;
                     changes[field] = returnFields ? fields[field] : value;
+                }
+            });
+
+            // 看看原数据中有的而当前数据没有的字段（缺失字段）
+            $.each(defaultValue, function (field) {
+                if (!currentData.hasOwnProperty(field)) {
+                    hasChange = true;
+                    changes[field] = returnFields ? fields[field] : '';
                 }
             });
 
@@ -245,6 +228,46 @@
             return this;
         }
     });
+
+    /**
+     * 判断两个值是否不一致
+     * @param oldValue
+     * @param newValue
+     * @return {Boolean} 一致时返回false，否则返回true
+     */
+    function diff(oldValue, newValue) {
+        // 这里把 null undefined 以及空数组 等同于 空字符串处理
+        if (oldValue === undefined || oldValue === null || ($.isArray(oldValue) && !oldValue.length)) {
+            oldValue = '';
+        }
+        if (newValue === undefined || newValue === null || ($.isArray(newValue) && !newValue.length)) {
+            newValue = '';
+        }
+
+        // 多选的select得到的是数组
+        // 都是数组
+        if ($.isArray(oldValue) && $.isArray(newValue)) {
+            // 长度不相等
+            if (oldValue.length !== newValue.length) {
+                return true;
+            }
+            // 值不相等
+            for (var i = 0; i < oldValue.length; i++) {
+                if (oldValue[i] !== newValue[i]) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        // 数据类型都不同了 肯定改变了
+        if ($.isArray(oldValue) || $.isArray(newValue)) {
+            return true;
+        }
+
+        // 都不是数组 就按字符串比较
+        return oldValue !== newValue;
+    }
 
     /**
      * 设置某个字段的值
