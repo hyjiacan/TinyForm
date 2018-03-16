@@ -15,8 +15,8 @@
 **dist** 生成目录
 
 - tinyform.core[.min].js 基本的表单字段获取和数据读写功能、表单的重置、异步提交
-- tinyform.common[.min].js 含基本的表单字段获取、数据读写、表单的重置、异步提交和数据验证功能
-- tinyform.all[.min].js 包含所有功能
+- tinyform.common[.min].js 含以上功能和数据验证功能
+- tinyform.all[.min].js 包含所有功能(含以上功能和数据存储)
 
 **src** 源码目录
 
@@ -30,22 +30,22 @@
 > 请使用 **右键->另存为** 下载文件
 
 如果只需要表单字段的获取以及表单数据的读写和异步提交，用这个就够了
-[tinyform.core.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.js)(开发版)
-[tinyform.core.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.min.js)(生产版)
+[tinyform.core.js](http://gitee.com/hyjiacan/TinyForm/raw/master/dist/tinyform.core.js)(开发版)
+[tinyform.core.min.js](http://gitee.com/hyjiacan/TinyForm/raw/master/dist/tinyform.core.min.js)(生产版)
 
 如果还想要用到数据的验证，那就用这个
-[tinyform.common.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.common.js)(开发版)
-[tinyform.common.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.core.common.js)(生产版)
+[tinyform.common.js](http://gitee.com/hyjiacan/TinyForm/raw/master/dist/tinyform.common.js)(开发版)
+[tinyform.common.min.js](http://gitee.com/hyjiacan/TinyForm/raw/master/dist/tinyform.core.common.js)(生产版)
 
 如果还想用到表单数据的本地存储，那就只能选这个了
-[tinyform.all.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.all.js)(开发版)
-[tinyform.all.min.js](http://git.oschina.net/hyjiacan/TinyForm/raw/master/dist/tinyform.all.min.js)(生产版)
+[tinyform.all.js](http://gitee.com/hyjiacan/TinyForm/raw/master/dist/tinyform.all.js)(开发版)
+[tinyform.all.min.js](http://gitee.com/hyjiacan/TinyForm/raw/master/dist/tinyform.all.min.js)(生产版)
 
 ## 源码
 
 git
 ```shell
-$ git clone https://git.oschina.net/hyjiacan/TinyForm.git
+$ git clone https://gitee.com/hyjiacan/TinyForm.git
 ```
 
 npm
@@ -141,6 +141,13 @@ var form = TinyForm('#f1', {
     // 也就是说，即使这里设置的是false，只在要标签上有属性 data-ignore
     ignore: 'ignore-field-2',
     validate: {
+        // 用于自定义html标签上写验证规则与提示消息的属性
+        attr:{
+            // 标签的验证规则属性名称
+            rule: 'data-rule',
+            // 标签的规则验证失败时的提示消息属性名称
+            msg: 'data-msg'  
+        },
         // 是否在输入字段失去焦点时自动验证，默认为false
         auto: true,
         // 是否在第一次验证失败时停止验证，默认为true
@@ -218,7 +225,7 @@ var form = TinyForm('#f1', {
 });
 ```
 
-自定义`rule`为函数的写法，参见 [issue#4](http://git.oschina.net/hyjiacan/TinyForm/issues/4)
+自定义`rule`为函数的写法，参见 [issue#4](http://gitee.com/hyjiacan/TinyForm/issues/4)
 
 ### 想看更多示例 ？ 那就点 **[这里](http://hyjiacan.oschina.io/tinyform/)** 吧
 
@@ -316,8 +323,8 @@ TinyForm.defaults.validate.rules.xxx = {
 另外，如果想验证输入与其它某个字段的值相同(比如常见的密码确认功能)，可以这样写规则：
 
 ```html
-<input type="password" name="pswd" rule="required|password" />
-<input type="password" name="pswdconfirm" rule="required|&pswd" />
+<input type="password" name="pswd" data-rule="required|password" />
+<input type="password" name="pswdconfirm" data-rule="required|&pswd" />
 ```
 
 ，看到了吧，这里写成引用的方式来告诉程序，希望字段`pswdconfirm`的值与`pswd`的值相同，这样，字段`pswdconfirm`验证时，就会自动判断了。
@@ -433,7 +440,7 @@ form.option.storage.container = window.sessionStorage;
 > **return** 表单数据，结构如下：
 
 ```javascript
-{
+var data = {
     username: 'hyjiacan',
     gender: '0'
 }
@@ -478,10 +485,10 @@ form.option.storage.container = window.sessionStorage;
 > **option** ajax选项，参数与jQuery的*ajax*选项相同，默认参数如下：
 
 ```javascript
-{
+var option = {
     url: 'String', // 使用表单的action属性
     type: 'String', // 使用表单的method属性，如果没有则使用"post"
-    data: 'Object', // 使用"getData()"取到的表单数据，在此指定时，参数会附加到参数里面
+    data: 'Object' // 使用"getData()"取到的表单数据，在此指定时，参数会附加到参数里面
 }
 ```
 
@@ -498,7 +505,7 @@ form.option.storage.container = window.sessionStorage;
 > **return** 获取单个字段规则时，返回结构如下：
 
 ```javascript
-{
+var rule = {
     rule:  /^.+$/, // 这里可能是正则或函数
     msg: '不能为空' // 提示消息，通过标签的 *data-msg* 属性设置
 }
@@ -507,11 +514,11 @@ form.option.storage.container = window.sessionStorage;
 > 获取多个字段规则时，结构如下：
 
 ```javascript
-{
+var rules = {
     username:{
         rule:  /^.+$/, // 必填
         msg: '不能为空' // 提示消息，通过标签的 *data-msg* 属性设置
-    }
+    },
     gender: {
         rule:  false, // 没有验证规则
         msg: ''
@@ -526,7 +533,7 @@ form.option.storage.container = window.sessionStorage;
 > **return** 验证通过时，返回`true`，未通过时返回失败详细信息，结构如下：
 
 ```javascript
-{
+var result = {
     username: false,
     gender: true
 }

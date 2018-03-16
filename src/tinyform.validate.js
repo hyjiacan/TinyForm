@@ -57,6 +57,9 @@
             rule: '^.{{0}}$',
             msg: '长度需要{0}个字'
         },
+        /**
+         * 限定长度应在某个区间内
+         */
         between: {
             rule: '^.{{0},{1}}$',
             msg: '长度应该在{0}到{1}个字之间'
@@ -92,10 +95,12 @@
      * 默认配置
      */
     TinyForm.defaults.validate = {
+        //  用于自定义html标签上写验证规则与提示消息的属性
+        attr: ATTRS,
         // 是否在输入字段失去焦点时自动验证，默认为false
         auto: false,
         // 是否在第一次验证失败时停止验证，默认为true
-        stop: false,
+        stop: true,
         // 每个字段验证后的回调函数
         callback: function () {
         },

@@ -11,3 +11,42 @@
 其值可以是表单范围内的选择器、DOM或jQuery对象，
 配置了`exclude`或含有属性`data-exclude`范围内的字段不会被`TinyForm`处理。
 
+## 如果自定义验证规则
+
+自定义验证规则可以有两种：
+
+- 全局规则
+
+```javascript
+$.extend(true, TinyForm.defaults.validate.rules, {
+   '自定义规则1':{
+       rule: '正则或函数',
+       msg: '验证失败时的提示消息'
+   } ,
+   '自定义规则2':{
+       rule: '正则或函数',
+       msg: '验证失败时的提示消息'
+   } 
+});
+```
+
+- 实例规则
+
+```javascript
+var form = TinyForm('#form', {
+    validate:{
+        rules:{
+             '自定义规则1':{
+                 rule: '正则或函数',
+                 msg: '验证失败时的提示消息'
+             } ,
+             '自定义规则2':{
+                 rule: '正则或函数',
+                 msg: '验证失败时的提示消息'
+             } 
+        }
+    }
+});
+```
+
+实例规则的优先级更高，也就是说，如果实例定义了与全局相同的验证规则，那么只会验证实例上的定义。
