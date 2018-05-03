@@ -294,6 +294,14 @@ TinyForm.defaults.validate.rules.xxx = {
 
 ## 标签属性
 
+### **data-checkbox**
+
+此属性用于指示`checkbox`选中和非选中状态时的值，两个值使用`|`符号分隔，如：
+`data-checkbox=1|0`或`data-checkbox=选中|未选中`。当设置在表单元素上时，其作用
+等同于实例化时的选项`option.checkbox`；当设置在字段上时，仅对设置的字段生效。
+
+> 注意：此项配置优于编码，即优先级为：字段>表单>选项
+
 ### **data-rule**
 
 此输入字段的验证规则，支持以下值(**这些写法均要区分大小写**)：

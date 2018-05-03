@@ -38,6 +38,10 @@
                 <input type="checkbox" name="checkbox">
             </li>
             <li>
+                <label>自定义值的复选框</label>
+                <input type="checkbox" name="checkbox-custom" data-checkbox="yes|no">
+            </li>
+            <li>
                 <label>下拉框(单选)</label>
                 <select name="select1">
                     <option value="1">第1项</option>
@@ -95,6 +99,17 @@
         assert.equal(form.getData('checkbox'), expected, "设置checkbox的值=选中");
     });
 
+    QUnit.test('获取自定义checkbox的值', function (assert) {
+        var expected = 'no';
+        assert.equal(form.getData('checkbox-custom'), expected, "获取checkbox的值=no");
+    });
+
+    QUnit.test('设置自定义checkbox的值', function (assert) {
+        var expected = 'yes';
+        form.setData(expected, 'checkbox-custom');
+        assert.equal(form.getData('checkbox-custom'), expected, "设置checkbox的值=yes");
+    });
+
     QUnit.test('设置下拉框(单选)的值', function (assert) {
         var expected = 2;
         form.setData(expected, 'select1');
@@ -113,34 +128,40 @@
         assert.equal(form.getData('textarea'), expected, "设置多行文本框的值=textareavalue");
     });
 
-    QUnit.test("获取改变的字段", function (assert) {
-        var expected = {
-            "checkbox": "选中",
-            "radio": "radio2",
-            "select1": "2",
-            "select2": [
-                "1",
-                "3"
-            ],
-            "text": "textboxvalue",
-            "textarea": "textareavalue"
-        };
-        assert.deepEqual(form.getChanges(), expected, "获取改变的字段=" + JSON.stringify(expected));
-    });
+    setTimeout(function(){
+        // 可能因为测试代码执行时机的问题，这部分项放到 setTimeout 之外可能会导致无法获取到改变的字段
+        QUnit.test("获取改变的字段", function (assert) {
+            var expected = {
+                "checkbox": "选中",
+                "checkbox-custom": "yes",
+                "radio": "radio2",
+                "select1": "2",
+                "select2": [
+                    "1",
+                    "3"
+                ],
+                "text": "textboxvalue",
+                "textarea": "textareavalue"
+            };
+            
+            assert.deepEqual(form.getChanges(), expected, "获取改变的字段=" + JSON.stringify(expected));
+        });
 
-    QUnit.test('重置表单', function (assert) {
-        var expected = {
-            "text": "",
-            "radio": '',
-            "checkbox": "未选中",
-            "select1": "1",
-            "select2": [],
-            "textarea": ""
-        };
-        form.reset();
-        assert.deepEqual(form.getData(), expected, "重置表单");
-        assert.deepEqual(form.getChanges(), false, "重置后获取改变的字段=false");
-    });
+        QUnit.test('重置表单', function (assert) {
+            var expected = {
+                "text": "",
+                "radio": '',
+                "checkbox": "未选中",
+                "checkbox-custom": "no",
+                "select1": "1",
+                "select2": [],
+                "textarea": ""
+            };
+            form.reset();
+            assert.deepEqual(form.getData(), expected, "重置表单");
+            assert.deepEqual(form.getChanges(), false, "重置后获取改变的字段=false");
+        });
+    }, 0);
 </script>
 </body>
 

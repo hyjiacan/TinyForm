@@ -1,5 +1,5 @@
 /**
- * TinyForm-all@0.7.9  2018-03-16
+ * TinyForm-all@0.7.10  2018-05-03
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -688,7 +688,13 @@
         if (field.is(':checkbox')) {
             // 比较字符串的值，以控制字段的选中状态 
             // 不区分大小写
-            field.prop('checked', data.toLowerCase() === me.option.checkbox[0].toString().toLowerCase());
+            var checkboxValue = readCheckboxValueOnTag(me, field);
+            // 检查值是否合法
+            data = data.toLowerCase();
+            if (checkboxValue.indexOf(data) === -1) {
+                console.warn('字段' + field.attr('name') + '的值' + data + '无效，需要[' + checkboxValue.join() + ']');
+            }
+            field.prop('checked', data === checkboxValue[0]);
             // 可以返回了
             return;
         }
@@ -770,7 +776,7 @@
 
         // checkbox 的值返回是根据 option.checkbox定义，默认返回 true和false
         if (field.is(':checkbox')) {
-            return field.is(':checked') ? me.option.checkbox[0] : me.option.checkbox[1];
+            return readCheckboxValueOnTag(me, field)[field.is(':checked') ? 0 : 1];
         }
 
         // 其它的直接返回值
@@ -862,6 +868,26 @@
 
         // 合并提交数据的参数，这些参数都是给ajax用的
         return $.extend(true, defaultOption, option);
+    }
+
+    /**
+     * 读取标签上定义的 data-checkbox 的值，如果读取不到，就使用表单上定义的值
+     * @param {TinyForm} me 实例
+     * @param {jQuery} field 字段的jQuery对象
+     * @return {Array} 定义的checkbox值数组，第一项是选中的值，第二项是未选中的值
+     */
+    function readCheckboxValueOnTag(me, field) {
+        var tagValue = (field.attr('data-checkbox') || '').toLowerCase();
+        if (tagValue) {
+            return tagValue.split('|');
+        }
+        var formValue = (me.context.attr('data-checkbox') || '').toLowerCase();
+        if (formValue) {
+            return formValue.split('|');
+        }
+        return me.option.checkbox.map(function (item) {
+            return item.toString().toLowerCase();
+        });
     }
 })(window, jQuery);
 /**
@@ -1702,4 +1728,4 @@
     }
 })(window, jQuery);
 
-TinyForm.version = "0.7.9"
+TinyForm.version = "0.7.10"
