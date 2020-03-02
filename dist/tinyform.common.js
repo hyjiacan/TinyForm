@@ -1,5 +1,5 @@
 /**
- * TinyForm-common@0.7.11  2020-03-02
+ * TinyForm-common@0.7.12  2020-03-02
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -1537,4 +1537,4 @@
     }
 })(window, jQuery);
 
-TinyForm.version = "0.7.11"
+TinyForm.version = "0.7.12"
