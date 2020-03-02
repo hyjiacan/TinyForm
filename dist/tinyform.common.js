@@ -352,10 +352,10 @@
         refresh: false
     };
 
-    // 搞懂，因为真正创建实例是通过 setup ，
+    // 搞懂，因为真正创建实例是通过 tinyform ，
     // 所以需要把 TinyForm 的原型交给 setup，
-    // 以通过 setup 来产生一个 TinyForm 的实例
-    TinyForm.prototype.setup.prototype = TinyForm.prototype;
+    // 以通过 tinyform 来产生一个 TinyForm 的实例
+    TinyForm.prototype.tinyform.prototype = TinyForm.prototype;
 
     /**
      * 搞一个全局的 TinyForm
