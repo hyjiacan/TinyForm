@@ -1,6 +1,6 @@
 {
     "name": "tinyform",
-    "version": "0.7.10",
+    "version": "0.7.11",
     "description": "一个简单的WEB表单工具",
     "keywords": [
         "form"
@@ -14,12 +14,20 @@
         "type": "git",
         "url": "https://git.oschina.net/hyjiacan/TinyForm.git"
     },
+    "main": "dist/tinyform.all.min.js",
     "license": "MIT",
-    "author": "hyjiacan <dev@hyjiacan.com> (http://www.hyjiacan.com)",
+    "author": "hyjiacan <dev@hyjiacan.com>",
     "files": [
         "dist/tinyform.core.js",
+        "dist/tinyform.core.js",
         "dist/tinyform.common.js",
-        "dist/tinyform.all.js"
+        "dist/tinyform.common.js",
+        "dist/tinyform.all.js",
+        "dist/tinyform.all.js",
+        "README.md",
+        "CHANGELOG.md",
+        "FAQ.md",
+        "LICENSE"
     ],
     "dependencies": {
         "jquery": "^1.11.0"
@@ -31,7 +39,9 @@
         "grunt-contrib-less": "^1.4.0",
         "grunt-contrib-qunit": "^1.3.0",
         "grunt-contrib-uglify": "^2.0.0",
-        "grunt-contrib-watch": "^1.0.0",
+        "grunt-contrib-watch": "^1.0.0"
+    },
+    "peerDependencies": {
         "qunitjs": "^1.23.1"
     },
     "scripts": {
