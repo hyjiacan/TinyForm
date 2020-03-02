@@ -389,7 +389,7 @@
      * 获取input字段的值
      * @param {TinyForm} me 实例
      * @param {Array} field 字段数组
-     * @return {String|Boolean|Number} 字段的值
+     * @return {String|Boolean|Number|File} 字段的值
      */
     function getInputValue(me, field) {
         // 取radio的值
@@ -403,6 +403,11 @@
             return readCheckboxValueOnTag(me, field)[field.is(':checked') ? 0 : 1];
         }
 
+        // 取文件描述
+        if (field.is(':file')) {
+            return field.get(0).files[0];
+        }
+
         // 其它的直接返回值
         return ifUndefOrNull(field.val());
     }
@@ -410,12 +415,12 @@
     /**
      * 若果值是 undefined，返回一个默认值
      * @param {string} [val] 用于判断的值
-     * @param {string} [def=''] 默认值
+     * @param {string} [dft=''] 默认值
      * @return {string}
      */
-    function ifUndefOrNull(val, def) {
+    function ifUndefOrNull(val, dft) {
         return typeof  val === 'undefined' || val === null ?
-            arguments.length > 1 ? def : ''
+            arguments.length > 1 ? dft : ''
             : val;
     }
 

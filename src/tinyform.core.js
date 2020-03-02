@@ -67,7 +67,7 @@
             // 把这个新id弄到标签的属性上面
             $me.attr(INSTANCE_ATTR, id);
             // 创建实例 TinyForm 的实例
-            instanceSet[id] = new TinyForm.prototype.setup($me, option, id);
+            instanceSet[id] = new TinyForm.prototype.tinyform($me, option, id);
         }
 
         // 返回表单实例
@@ -89,7 +89,7 @@
          * @param {String} id TinyForm实例id
          * @returns {Object}  实例
          */
-        setup: function (formContainer, option, id) {
+        tinyform: function (formContainer, option, id) {
             // 保存实例对象到变量里面
             var me = this;
             // 设置实例的id

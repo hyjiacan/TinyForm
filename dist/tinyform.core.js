@@ -1,5 +1,5 @@
 /**
- * TinyForm-core@0.7.10  2018-05-03
+ * TinyForm-core@0.7.11  2020-03-02
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -77,7 +77,7 @@
             // 把这个新id弄到标签的属性上面
             $me.attr(INSTANCE_ATTR, id);
             // 创建实例 TinyForm 的实例
-            instanceSet[id] = new TinyForm.prototype.setup($me, option, id);
+            instanceSet[id] = new TinyForm.prototype.tinyform($me, option, id);
         }
 
         // 返回表单实例
@@ -99,7 +99,7 @@
          * @param {String} id TinyForm实例id
          * @returns {Object}  实例
          */
-        setup: function (formContainer, option, id) {
+        tinyform: function (formContainer, option, id) {
             // 保存实例对象到变量里面
             var me = this;
             // 设置实例的id
@@ -765,7 +765,7 @@
      * 获取input字段的值
      * @param {TinyForm} me 实例
      * @param {Array} field 字段数组
-     * @return {String|Boolean|Number} 字段的值
+     * @return {String|Boolean|Number|File} 字段的值
      */
     function getInputValue(me, field) {
         // 取radio的值
@@ -779,6 +779,11 @@
             return readCheckboxValueOnTag(me, field)[field.is(':checked') ? 0 : 1];
         }
 
+        // 取文件描述
+        if (field.is(':file')) {
+            return field.get(0).files[0];
+        }
+
         // 其它的直接返回值
         return ifUndefOrNull(field.val());
     }
@@ -786,12 +791,12 @@
     /**
      * 若果值是 undefined，返回一个默认值
      * @param {string} [val] 用于判断的值
-     * @param {string} [def=''] 默认值
+     * @param {string} [dft=''] 默认值
      * @return {string}
      */
-    function ifUndefOrNull(val, def) {
+    function ifUndefOrNull(val, dft) {
         return typeof  val === 'undefined' || val === null ?
-            arguments.length > 1 ? def : ''
+            arguments.length > 1 ? dft : ''
             : val;
     }
 
@@ -890,4 +895,4 @@
         });
     }
 })(window, jQuery);
-TinyForm.version = "0.7.10"
+TinyForm.version = "0.7.11"
