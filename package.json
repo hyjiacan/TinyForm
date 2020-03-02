@@ -16,7 +16,7 @@
     },
     "main": "dist/tinyform.all.min.js",
     "license": "MIT",
-    "author": "hyjiacan <dev@hyjiacan.com>",
+    "author": "hyjiacan <hyjiacan@163.com>",
     "files": [
         "dist/tinyform.core.js",
         "dist/tinyform.core.js",
