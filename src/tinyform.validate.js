@@ -551,7 +551,7 @@
 
         // 如果值为空并且没有配置 required 规则，那么调用回调或者返回 true ，
         // 此时不需要验证，所以就不调用回调函数了
-        if (rules === false || ((value === '' || value.length === 0) && rules.every(function (rule) {
+        if (rules === false || ((typeof value === 'undefined' || value === '' || value.length === 0) && rules.every(function (rule) {
                 return rule.name !== 'required';
             }))) {
             return pass;
