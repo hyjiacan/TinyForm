@@ -1,5 +1,5 @@
 /**
- * TinyForm-core@0.7.12  2020-03-02
+ * TinyForm-core@0.7.12  2020-03-05
  * @作者: hyjiacan
  * @源码: https://git.oschina.net/hyjiacan/TinyForm.git
  * @示例: http://hyjiacan.oschina.io/tinyform
@@ -515,7 +515,19 @@
          */
         asDefault: function (data) {
             var me = this;
-            defaultData[me.id] = arguments.length ? data : me.getData();
+            var currentData = me.getData();
+            // 没有传入数据
+            if (!arguments.length || !data) {
+                defaultData[me.id] = currentData;
+                return me;
+            }
+            // 只取表单中有的字段，跳过没有的字段
+            // 以避免引入脏数据
+            var newData = {};
+            $.each(currentData, function (fieldName) {
+                newData[fieldName] = data[fieldName];
+            });
+            defaultData[me.id] = newData;
             return me;
         },
         /**
