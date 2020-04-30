@@ -30,7 +30,7 @@
         "LICENSE"
     ],
     "dependencies": {
-        "jquery": "^1.11.0"
+        "jquery": "^3.5.0"
     },
     "devDependencies": {
         "grunt": "^1.0.1",
